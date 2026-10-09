@@ -114,7 +114,7 @@ function Editor({ account, navigate, logout, path }) {
       const body=new FormData(); body.append('archivo',inlineUpload.file); body.append('textoAlternativo',inlineUpload.alt.trim());
       const img=await api('/admin/imagenes',{method:'POST',body});
       const images=await api('/admin/imagenes'); setData(d=>({...d,imagenes:images}));
-      if (active==='productos') setRelationIds(ids=>ids.includes(img.id)?ids:[...ids,img.id]);
+      if (active==='productos') setRelationIds(ids=>[img.id,...ids.filter(id=>id!==img.id)]);
       else setDraft(current=>({...current,imagenId:img.id}));
       setInlineUpload({file:null,alt:''}); form.reset(); setPreview(false); setReviewed(false);
       setMessage('Imagen cargada y asignada a este contenido. Guarde los cambios para conservar la asignación.');
