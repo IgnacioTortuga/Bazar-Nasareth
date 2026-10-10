@@ -90,6 +90,35 @@ function Editor({ account, navigate, logout, path }) {
     setPromoProducts((data.relaciones?.promocionProductos||[]).filter(x=>x.promocionId===item.id).map(x=>x.productoId));
     setPromoServices((data.relaciones?.promocionServicios||[]).filter(x=>x.promocionId===item.id).map(x=>x.servicioId));
   }
+  async function changePublicationState(item, nextState) {
+    const route = collection[active];
+    if (!route || !item?.id || !['Borrador','Publicado','Archivado'].includes(nextState)) return;
+    const recovering = nextState !== 'Archivado';
+    const promptText = recovering
+      ? '¿Recuperar este contenido como borrador? No se mostrará públicamente hasta que lo edite, abra la vista previa y lo publique.'
+      : '¿Archivar este contenido? Se conservará en el sistema, pero dejará de estar disponible públicamente.';
+    if (!confirm(promptText)) return;
+    setBusy(true);
+    try {
+      await api('/admin/' + route + '/' + item.id, {
+        method: 'PUT',
+        ...json({ ...item, estado: nextState })
+      });
+      if (selected?.id === item.id) {
+        setSelected(null);
+        setDraft(null);
+        setPreview(false);
+        setReviewed(false);
+      }
+      await reload();
+      setMessage(recovering ? 'Contenido recuperado como borrador. Abra el elemento para revisarlo y publicarlo.' : 'Contenido archivado. Se conservaron sus datos y relaciones.');
+    } catch (e) {
+      setMessage(e.message);
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function save() {
     const route=collection[active]; if (!route || !draft) return;
     if (draft.estado==='Publicado' && !reviewed) { setMessage('Abra la vista previa antes de publicar o actualizar.'); return; }
@@ -136,7 +165,7 @@ function Editor({ account, navigate, logout, path }) {
   : active==='usuarios' ? <><div className="list-panel">{(data.editores||[]).map(x=><button className="list-item" key={x.id} onClick={()=>setEditorForm({...x,password:'',permisos:x.permisos?x.permisos.split(','):[]})}>{x.nombre} · {x.email} <small>{x.completo?'Acceso completo':x.permisos||'Sin permisos'} · {x.activo?'Activo':'Inactivo'}</small></button>)}</div><form className="form-panel" onSubmit={saveEditor}><h2>{editorForm.id?'Editar cuenta':'Nueva cuenta'}</h2><label className="field">Nombre<input required value={editorForm.nombre} onChange={e=>setEditorForm({...editorForm,nombre:e.target.value})}/></label><label className="field">Correo<input type="email" required value={editorForm.email} onChange={e=>setEditorForm({...editorForm,email:e.target.value})}/></label><label className="field">Contraseña {editorForm.id?'(dejar vacía para conservar)':'(mínimo 12 caracteres)'}<input type="password" minLength="12" required={!editorForm.id} value={editorForm.password} onChange={e=>setEditorForm({...editorForm,password:e.target.value})}/></label><label className="checkbox-field">Acceso completo<input type="checkbox" checked={editorForm.completo} onChange={e=>setEditorForm({...editorForm,completo:e.target.checked})}/></label><fieldset disabled={editorForm.completo}><legend>Permisos personalizados</legend><div className="permission-grid">{sections.map(p=><label key={p}><input type="checkbox" checked={editorForm.permisos.includes(p)} onChange={e=>setEditorForm({...editorForm,permisos:e.target.checked?[...editorForm.permisos,p]:editorForm.permisos.filter(x=>x!==p)})}/>{labels[p]}</label>)}</div></fieldset>{editorForm.id&&<label className="checkbox-field">Cuenta activa<input type="checkbox" checked={editorForm.activo} onChange={e=>setEditorForm({...editorForm,activo:e.target.checked})}/></label>}<div className="row"><button className="button primary" disabled={busy}>Guardar cuenta</button><button type="button" onClick={()=>setEditorForm({nombre:'',email:'',password:'',completo:false,permisos:[],activo:true})}>Nueva cuenta</button></div></form></>
   : route && <><div className="editor-actions"><p>{active==='portada'?'Encabezado y presentación de la página':active==='productos'?'Fichas informativas por categoría':`Editar ${labels[active].toLowerCase()}`}</p>{active!=='portada'&&<button className="button primary" onClick={()=>open(null)}>+ Crear {active==='productos'?'producto':'contenido'}</button>}{active==='portada'&&!list.length&&<button className="button primary" onClick={()=>open(null)}>Crear portada</button>}</div>
   {active==='productos'&&<div className="category-block"><h2>Categorías</h2><div className="category-list">{(data.categorias||[]).map(c=><CategoryRow key={c.id} category={c} refresh={reload} setMessage={setMessage}/>)}</div><CategoryRow category={null} refresh={reload} setMessage={setMessage}/></div>}
-  <div className="list-panel">{list.map(item=><button className="list-item" key={item.id} onClick={()=>open(item)}><span><b>{title(item)}</b> <small>#{item.id} · {item.estado|| (item.activa?'Activa':'Inactiva')}</small></span><span>Editar →</span></button>)}{!list.length&&<p className="empty">Aún no hay contenido en esta sección.</p>}</div>
+  <div className="list-panel">{list.map(item=><div className="list-item list-item-actions" key={item.id}><button className="list-item-open" onClick={()=>open(item)} disabled={busy}><span><b>{title(item)}</b> <small>#{item.id} · {item.estado|| (item.activa?'Activa':'Inactiva')}</small></span><span>Editar →</span></button>{item.estado && <button className={item.estado==='Archivado'?'state-button restore-button':'state-button archive-button'} disabled={busy} onClick={()=>changePublicationState(item,item.estado==='Archivado'?'Borrador':'Archivado')}>{item.estado==='Archivado'?'Recuperar':'Archivar'}</button>}</div>)}{!list.length&&<p className="empty">Aún no hay contenido en esta sección.</p>}</div>
   {draft&&<div className="form-panel"><div className="row spread"><h2>{draft.id?'Editar':'Crear'} {labels[active].toLowerCase()}</h2><button onClick={()=>{setDraft(null);setSelected(null);setPreview(false);setReviewed(false)}}>Cerrar ×</button></div>{active==='productos'&&<p className="hint">Guarde primero un borrador para asignar fotografías; después puede publicarlo.</p>}{fieldsets[route].map(([name,label,kind])=><Field key={name} name={name} label={label} kind={kind} value={draft[name]} onChange={(n,v)=>{setDraft({...draft,[n]:v});setPreview(false);setReviewed(false)}} data={data} disabled={active==='portada'&&name==='clave'}/>)}
   {['portada','productos','servicios','promociones','galeria','textos'].includes(active)&&<div className="inline-image-tools"><h3>Imagen de este contenido</h3><p className="hint">Suba una fotografía aquí mismo; no necesita salir del formulario ni ir a la sección Imágenes.</p>{permitted('imagenes')?<form className="inline-image-form" onSubmit={uploadInlineImage}><label className="field">Archivo JPG, PNG o WebP (máximo 5 MB)<input type="file" accept="image/jpeg,image/png,image/webp" required onChange={e=>setInlineUpload({...inlineUpload,file:e.target.files?.[0]||null})}/></label><label className="field">Texto alternativo<input required maxLength="250" value={inlineUpload.alt} onChange={e=>setInlineUpload({...inlineUpload,alt:e.target.value})} placeholder="Describa la imagen"/></label><button className="button" type="submit" disabled={busy||!inlineUpload.file||!inlineUpload.alt.trim()}>Subir y asignar imagen</button></form>:<p className="hint">Su cuenta no tiene permiso para cargar imágenes. Solicite el permiso «Imágenes» o use una imagen ya cargada.</p>}{(active==='productos'?relationIds[0]:draft.imagenId)&&<div className="inline-image-preview"><span>Vista previa de la imagen asignada</span><Img id={active==='productos'?relationIds[0]:draft.imagenId} alt={imgAlt(active==='productos'?relationIds[0]:draft.imagenId)}/></div>}</div>}
 
