@@ -10,7 +10,7 @@ Dos proyectos independientes: `backend` (ASP.NET Core + EF Core + SQL Server) y 
 
 ## Instalar y ejecutar
 
-1. Cree una base SQL Server vacía `BazarNazareth`, o ejecute `sql/schema.sql` en SSMS. El backend crea el esquema mediante `EnsureCreated()` si la base está vacía; si usó el script, no lo recrea.
+1. Prepare una base SQL Server vacía `BazarNazareth`. El backend crea el esquema mediante `EnsureCreatedAsync()` si la base está vacía. `sql/schema.sql` solo consulta editores: no crea tablas. Este mecanismo no actualiza el esquema de una base existente.
 2. Configure `ConnectionStrings:Bazar` en `backend/appsettings.json` para su instancia. Para SQL Server Express, por ejemplo: `Server=.\\SQLEXPRESS;Database=BazarNazareth;Trusted_Connection=True;TrustServerCertificate=True`. En Linux o con usuario SQL configure `Server=...;Database=...;User Id=...;Password=...;TrustServerCertificate=True`. No incluya contraseñas reales en Git.
 3. Configure la primera cuenta en variables de entorno, **antes de iniciar la API por primera vez**:
 
@@ -43,7 +43,7 @@ Dos proyectos independientes: `backend` (ASP.NET Core + EF Core + SQL Server) y 
 ## Uso del panel
 
 - Primero cree categorías y cargue imágenes en `Imágenes` (JPG, PNG o WebP, máximo 5 MB, texto alternativo obligatorio).
-- Guarde un producto como borrador, vuelva a abrirlo, seleccione su imagen, guárdelo y finalmente publique después de revisar la vista previa. Precio opcional; si hay precio se exige moneda.
+- Cree un producto, seleccione sus imágenes existentes y revise la vista previa antes de publicar; puede guardarlo como borrador en cualquier momento. El formulario guarda los campos y relaciones juntos. Precio opcional; si hay precio se exige moneda.
 - Las promociones exigen imagen, condiciones, inicio y fin. Fechas se envían como instantes UTC y se muestran en hora local de Costa Rica. La consulta pública verifica `inicio <= UTC actual < fin`.
 - La imagen se sustituye seleccionando otra en el elemento editado. Si una imagen está asociada a cualquier contenido, el servidor impide borrarla. Las demás referencias no cambian.
 - Contacto edita solo el registro `Id = 1`. El teléfono inicial es `+506 6488 3862`. Cambiarlo actualiza los enlaces de consulta desde los productos.
@@ -52,7 +52,9 @@ Dos proyectos independientes: `backend` (ASP.NET Core + EF Core + SQL Server) y 
 
 ## Modelo y alcance
 
-`backend/Models.cs` contiene las 12 entidades, relaciones, restricciones y la configuración de EF Core. `sql/schema.sql` permite crear el mismo esquema manualmente en SSMS. No ejecute el script sobre una base que ya haya creado EF Core. El registro central y la primera cuenta se insertan al arrancar la API. Los campos `Completo` y `Permisos` amplían `Editor` para cumplir el requisito posterior de múltiples administradores.
+`backend/Models.cs` contiene las entidades, relaciones, restricciones y la configuración de EF Core. `sql/schema.sql` es una consulta de editores, no un instalador. El registro central y la primera cuenta se insertan al arrancar la API. Los campos `Completo` y `Permisos` amplían `Editor` para múltiples administradores.
+
+Los productos se ofrecen **por encargo**. Cada producto publicado tiene un enlace `/producto/ID` con vista para compartir. La medición de clics de WhatsApp está desactivada por defecto y requiere preparar su tabla en bases existentes. Consulte [operación del catálogo, activación de métricas y respaldos](docs/operacion-catalogo.md) antes de activarla o ejecutar los procedimientos de respaldo y restauración.
 
 Las imágenes se guardan en `backend/uploaded-images` fuera del directorio web, y se sirven únicamente si están publicadas o hay sesión activa. Haga copia de esta carpeta junto con la base de datos. La aplicación no contiene imágenes reales del negocio: el contenido inicial del sitio permanece vacío salvo el contacto y deberá cargarse desde el panel.
 

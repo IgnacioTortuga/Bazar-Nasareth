@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<BazarDb>(o => o.UseSqlServer(builder.Configuration.GetConnectionString("Bazar") ?? throw new Exception("Falta ConnectionStrings:Bazar")));
@@ -17,6 +18,12 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     o.Events.OnRedirectToAccessDenied = c => { c.Response.StatusCode = 403; return Task.CompletedTask; };
 });
 builder.Services.AddAuthorization();
+builder.Services.AddRateLimiter(options => {
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+    options.AddFixedWindowLimiter("clics", policy => {
+        policy.PermitLimit = 120; policy.Window = TimeSpan.FromMinutes(1); policy.QueueLimit = 0;
+    });
+});
 var app = builder.Build();
 var origin = builder.Configuration["FrontendOrigin"] ?? "http://localhost:5173";
 var storage = Path.GetFullPath(builder.Configuration["ImageDirectory"] ?? Path.Combine(app.Environment.ContentRootPath, "uploaded-images"));
@@ -36,8 +43,10 @@ using (var scope = app.Services.CreateScope())
         await db.SaveChangesAsync();
     }
 }
+app.UseStaticFiles();
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseRateLimiter();
 // El proxy de Vite sirve frontend y API bajo el mismo origen. Se rechazan mutaciones de otros orígenes.
 app.Use(async (ctx, next) =>
 {
@@ -68,20 +77,48 @@ app.MapGet("/api/publico", async (BazarDb db) =>
     var now = DateTimeOffset.UtcNow;
     var categorias = await db.Categorias.AsNoTracking().Where(x => x.Activa).OrderBy(x => x.Orden).ToListAsync();
     var categoryIds = categorias.Select(x => x.Id).ToArray();
-    var productos = await db.Productos.AsNoTracking().Where(x => x.Estado == "Publicado" && categoryIds.Contains(x.CategoriaId)).OrderBy(x => x.Orden).ToListAsync();
+    var productos = await db.Productos.AsNoTracking().Where(x => x.Estado == "Publicado" && categoryIds.Contains(x.CategoriaId) &&
+        !string.IsNullOrWhiteSpace(x.Nombre) && !string.IsNullOrWhiteSpace(x.Descripcion) &&
+        db.ProductoImagenes.Any(i => i.ProductoId == x.Id)).OrderBy(x => x.Orden).ToListAsync();
     var productIds = productos.Select(x => x.Id).ToArray();
     var productImages = await db.ProductoImagenes.AsNoTracking().Where(x => productIds.Contains(x.ProductoId)).OrderBy(x => x.Orden).ToListAsync();
-    var servicios = await db.Servicios.AsNoTracking().Where(x => x.Estado == "Publicado").OrderBy(x => x.Orden).ToListAsync();
-    var promociones = await db.Promociones.AsNoTracking().Where(x => x.Estado == "Publicado" && x.Inicio <= now && now < x.Fin).OrderBy(x => x.Orden).ToListAsync();
-    var galeria = await db.Galeria.AsNoTracking().Where(x => x.Estado == "Publicado").OrderBy(x => x.Orden).ToListAsync();
-    var secciones = await db.Secciones.AsNoTracking().Where(x => x.Estado == "Publicado").OrderBy(x => x.Orden).ToListAsync();
+    var servicios = await db.Servicios.AsNoTracking().Where(x => x.Estado == "Publicado" &&
+        !string.IsNullOrWhiteSpace(x.Nombre) && !string.IsNullOrWhiteSpace(x.Descripcion) &&
+        !string.IsNullOrWhiteSpace(x.Alcance)).OrderBy(x => x.Orden).ToListAsync();
+    var promociones = await db.Promociones.AsNoTracking().Where(x => x.Estado == "Publicado" &&
+        !string.IsNullOrWhiteSpace(x.Titulo) && !string.IsNullOrWhiteSpace(x.Descripcion) &&
+        !string.IsNullOrWhiteSpace(x.Condiciones) && x.ImagenId.HasValue &&
+        x.Inicio.HasValue && x.Fin.HasValue && now < x.Fin)
+        .OrderBy(x => x.Orden).ToListAsync();
+    var galeria = await db.Galeria.AsNoTracking().Where(x => x.Estado == "Publicado" &&
+        db.Imagenes.Any(i => i.Id == x.ImagenId)).OrderBy(x => x.Orden).ToListAsync();
+    var secciones = await db.Secciones.AsNoTracking().Where(x => x.Estado == "Publicado" &&
+        !string.IsNullOrWhiteSpace(x.Titulo) && !string.IsNullOrWhiteSpace(x.Cuerpo)).OrderBy(x => x.Orden).ToListAsync();
     var imagenes = await db.Imagenes.AsNoTracking().Select(x => new { x.Id, x.TextoAlternativo }).ToListAsync();
-    return Results.Ok(new { negocio = await db.Negocio.AsNoTracking().SingleAsync(x => x.Id == 1), categorias,
-        productos = productos.Select(x => new { x.Id, x.CategoriaId, x.Nombre, x.Descripcion, x.PrecioInformativo, x.Moneda, x.Destacado,
-            imagenes = productImages.Where(i => i.ProductoId == x.Id).Select(i => i.ImagenId).ToArray() }),
-        servicios, promociones, galeria, secciones, imagenes,
-        promocionProductos = await db.PromocionProductos.AsNoTracking().Where(x => productIds.Contains(x.ProductoId) && db.Promociones.Any(p => p.Id == x.PromocionId && p.Estado == "Publicado" && p.Inicio <= now && now < p.Fin)).ToListAsync(),
-        promocionServicios = await db.PromocionServicios.AsNoTracking().Where(x => db.Promociones.Any(p => p.Id == x.PromocionId && p.Estado == "Publicado" && p.Inicio <= now && now < p.Fin)).ToListAsync() });
+    return Results.Ok(new
+    {
+        negocio = await db.Negocio.AsNoTracking().SingleAsync(x => x.Id == 1),
+        medicionWhatsApp = builder.Configuration.GetValue<bool>("MedicionWhatsApp:Enabled"),
+        categorias,
+        productos = productos.Select(x => new
+        {
+            x.Id,
+            x.CategoriaId,
+            x.Nombre,
+            x.Descripcion,
+            x.PrecioInformativo,
+            x.Moneda,
+            x.Destacado,
+            imagenes = productImages.Where(i => i.ProductoId == x.Id).Select(i => i.ImagenId).ToArray()
+        }),
+        servicios,
+        promociones,
+        galeria,
+        secciones,
+        imagenes,
+        promocionProductos = await db.PromocionProductos.AsNoTracking().Where(x => productIds.Contains(x.ProductoId) && db.Promociones.Any(p => p.Id == x.PromocionId && p.Estado == "Publicado" && now < p.Fin)).ToListAsync(),
+        promocionServicios = await db.PromocionServicios.AsNoTracking().Where(x => db.Promociones.Any(p => p.Id == x.PromocionId && p.Estado == "Publicado" && now < p.Fin)).ToListAsync()
+    });
 });
 app.MapGet("/api/imagenes/{id:int}/archivo", async (int id, HttpContext ctx, BazarDb db) =>
 {
@@ -90,7 +127,7 @@ app.MapGet("/api/imagenes/{id:int}/archivo", async (int id, HttpContext ctx, Baz
     var now = DateTimeOffset.UtcNow;
     var visible = await db.ProductoImagenes.AnyAsync(x => x.ImagenId == id && x.Producto.Estado == "Publicado" && x.Producto.Categoria.Activa) ||
         await db.Servicios.AnyAsync(x => x.ImagenId == id && x.Estado == "Publicado") ||
-        await db.Promociones.AnyAsync(x => x.ImagenId == id && x.Estado == "Publicado" && x.Inicio <= now && now < x.Fin) ||
+        await db.Promociones.AnyAsync(x => x.ImagenId == id && x.Estado == "Publicado" && now < x.Fin) ||
         await db.Galeria.AnyAsync(x => x.ImagenId == id && x.Estado == "Publicado") ||
         await db.Secciones.AnyAsync(x => x.ImagenId == id && x.Estado == "Publicado");
     if (!visible && await Actor(ctx, db) is null) return Results.NotFound();
@@ -130,10 +167,12 @@ admin.MapPost("/imagenes", async (HttpContext ctx, BazarDb db) =>
     if (mime == "" || archivo.ContentType != mime) return Results.BadRequest("Solo JPG, PNG o WebP.");
     var header = new byte[12];
     await using (var stream = archivo.OpenReadStream()) await stream.ReadExactlyAsync(header);
-    var valid = mime switch {
+    var valid = mime switch
+    {
         "image/jpeg" => header[0] == 0xff && header[1] == 0xd8 && header[2] == 0xff,
-        "image/png" => header.AsSpan(0, 8).SequenceEqual(new byte[] {137,80,78,71,13,10,26,10}),
-        _ => Encoding.ASCII.GetString(header, 0, 4) == "RIFF" && Encoding.ASCII.GetString(header, 8, 4) == "WEBP" };
+        "image/png" => header.AsSpan(0, 8).SequenceEqual(new byte[] { 137, 80, 78, 71, 13, 10, 26, 10 }),
+        _ => Encoding.ASCII.GetString(header, 0, 4) == "RIFF" && Encoding.ASCII.GetString(header, 8, 4) == "WEBP"
+    };
     if (!valid) return Results.BadRequest("La firma del archivo no corresponde a su formato.");
     var name = Guid.NewGuid().ToString("N") + ext;
     await using (var file = File.Create(Path.Combine(storage, name))) await archivo.CopyToAsync(file);
@@ -213,7 +252,67 @@ admin.MapPut("/editores/{id:int}", async (int id, EditEditor input, HttpContext 
     if (!string.IsNullOrEmpty(input.Password)) e.PasswordHash = Hash(input.Password);
     await db.SaveChangesAsync(); return Results.Ok(Account(e));
 });
+// El formulario guarda contenido y relaciones en una única transacción.
+admin.MapPost("/productos/guardar", (ProductSave input, HttpContext ctx, BazarDb db) =>
+    SaveContent(input.Producto, 0, input.Imagenes, null, ctx, db));
+admin.MapPut("/productos/{id:int}/guardar", (int id, ProductSave input, HttpContext ctx, BazarDb db) =>
+    SaveContent(input.Producto, id, input.Imagenes, null, ctx, db));
+admin.MapPost("/promociones/guardar", (PromotionSave input, HttpContext ctx, BazarDb db) =>
+    SaveContent(input.Promocion, 0, input.Productos, input.Servicios, ctx, db));
+admin.MapPut("/promociones/{id:int}/guardar", (int id, PromotionSave input, HttpContext ctx, BazarDb db) =>
+    SaveContent(input.Promocion, id, input.Productos, input.Servicios, ctx, db));
+CatalogFeatures.Map(app, builder.Configuration);
 app.Run();
+
+static async Task<IResult> SaveContent<T>(T? input, int id, int[]? ids, int[]? serviceIds, HttpContext ctx, BazarDb db) where T : class, IRecord
+{
+    var product = typeof(T) == typeof(Producto);
+    if (!Allowed(ctx, await Actor(ctx, db), product ? "productos" : "promociones")) return Results.Forbid();
+    if (input is null || ids is null || (!product && serviceIds is null)) return Results.BadRequest("Faltan los datos o las relaciones del contenido.");
+    serviceIds ??= [];
+    if (ids.Distinct().Count() != ids.Length || serviceIds.Distinct().Count() != serviceIds.Length)
+        return Results.BadRequest("Hay relaciones repetidas. Revise la selección.");
+    await using var transaction = await db.Database.BeginTransactionAsync();
+    try
+    {
+        var item = id == 0 ? null : await db.Set<T>().FindAsync(id);
+        if (id != 0 && item is null) return Results.NotFound("El contenido ya no existe. Actualice la lista antes de continuar.");
+        input.Id = id;
+        if (product)
+        {
+            if (await db.Imagenes.CountAsync(x => ids.Contains(x.Id)) != ids.Length)
+                return Results.BadRequest("Una de las imágenes seleccionadas ya no existe. Revise la selección.");
+        }
+        else if (await db.Productos.CountAsync(x => ids.Contains(x.Id)) != ids.Length ||
+                 await db.Servicios.CountAsync(x => serviceIds.Contains(x.Id)) != serviceIds.Length)
+            return Results.BadRequest("Un producto o servicio relacionado ya no existe. Revise la selección.");
+        var error = await Validate(input, db, product ? ids.Length > 0 : null);
+        if (error is not null) return Results.BadRequest(error);
+        if (item is null) db.Set<T>().Add(input);
+        else db.Entry(item).CurrentValues.SetValues(input);
+        await db.SaveChangesAsync();
+        if (product)
+        {
+            await db.ProductoImagenes.Where(x => x.ProductoId == input.Id).ExecuteDeleteAsync();
+            db.ProductoImagenes.AddRange(ids.Select((imageId, order) => new ProductoImagen { ProductoId = input.Id, ImagenId = imageId, Orden = order }));
+        }
+        else
+        {
+            await db.PromocionProductos.Where(x => x.PromocionId == input.Id).ExecuteDeleteAsync();
+            await db.PromocionServicios.Where(x => x.PromocionId == input.Id).ExecuteDeleteAsync();
+            db.PromocionProductos.AddRange(ids.Select(productId => new PromocionProducto { PromocionId = input.Id, ProductoId = productId }));
+            db.PromocionServicios.AddRange(serviceIds.Select(serviceId => new PromocionServicio { PromocionId = input.Id, ServicioId = serviceId }));
+        }
+        await db.SaveChangesAsync();
+        await transaction.CommitAsync();
+        return Results.Ok(item ?? input);
+    }
+    catch (DbUpdateException)
+    {
+        await transaction.RollbackAsync();
+        return Results.Conflict("No se guardó ningún cambio. Una referencia cambió o un valor supera los límites permitidos; revise los datos y actualice la lista.");
+    }
+}
 
 static void MapCrud<T>(RouteGroupBuilder admin, string path, string permission) where T : class, IRecord, new()
 {
@@ -236,7 +335,7 @@ static void MapCrud<T>(RouteGroupBuilder admin, string path, string permission) 
         try { await db.SaveChangesAsync(); return Results.Ok(item); } catch (DbUpdateException) { return Results.BadRequest("Referencia, nombre u orden duplicado o inválido."); }
     });
 }
-static async Task<string?> Validate<T>(T input, BazarDb db) where T : class, IRecord
+static async Task<string?> Validate<T>(T input, BazarDb db, bool? hasProductImages = null) where T : class, IRecord
 {
     static bool Status(string s) => s is "Borrador" or "Publicado" or "Archivado";
     static string? Price(decimal? value, string? currency) => value < 0 || (value.HasValue && string.IsNullOrWhiteSpace(currency)) ? "Precio no negativo y moneda obligatoria si hay precio." : null;
@@ -251,7 +350,7 @@ static async Task<string?> Validate<T>(T input, BazarDb db) where T : class, IRe
             if (!Status(x.Estado) || !Order(x.Orden)) return "Estado u orden inválido.";
             if (Price(x.PrecioInformativo, x.Moneda) is string p) return p;
             if (!await db.Categorias.AnyAsync(c => c.Id == x.CategoriaId && (x.Estado != "Publicado" || c.Activa))) return "Categoría inexistente o inactiva.";
-            if (x.Estado == "Publicado" && (string.IsNullOrWhiteSpace(x.Nombre) || string.IsNullOrWhiteSpace(x.Descripcion) || !await db.ProductoImagenes.AnyAsync(i => i.ProductoId == x.Id))) return "Para publicar: nombre, descripción y al menos una foto.";
+            if (x.Estado == "Publicado" && (string.IsNullOrWhiteSpace(x.Nombre) || string.IsNullOrWhiteSpace(x.Descripcion) || !(hasProductImages ?? await db.ProductoImagenes.AnyAsync(i => i.ProductoId == x.Id)))) return "Para publicar: nombre, descripción y al menos una foto.";
             return null;
         case Servicio x:
             if (!Status(x.Estado) || !Order(x.Orden)) return "Estado u orden inválido.";
@@ -306,3 +405,6 @@ record Alt(string TextoAlternativo);
 record PromotionLinks(int[] Productos, int[] Servicios);
 record NewEditor(string Nombre, string Email, string Password, bool Completo, string[] Permisos);
 record EditEditor(string Nombre, string Email, string? Password, bool Activo, bool Completo, string[] Permisos);
+
+record ProductSave(Producto? Producto, int[]? Imagenes);
+record PromotionSave(Promocion? Promocion, int[]? Productos, int[]? Servicios);

@@ -1,2 +1,2 @@
 import { defineConfig } from 'vite';
-export default defineConfig({ server: { proxy: { '/api': { target: 'http://localhost:5080', changeOrigin: true } } } });
+export default defineConfig({ server: { proxy: { '/producto': { target: 'http://localhost:5080', changeOrigin: true }, '/api': { target: 'http://localhost:5080', changeOrigin: true } } } });

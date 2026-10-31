@@ -5,3 +5,7 @@ frontend/node_modules/
 frontend/dist/
 *.user
 *.suo
+tests/**/bin/
+tests/**/obj/
+backups/
+*.bak

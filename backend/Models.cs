@@ -15,6 +15,9 @@ public class SeccionContenido : IRecord { public int Id { get; set; } public str
 public class GaleriaImagen : IRecord { public int Id { get; set; } public int ImagenId { get; set; } public string? Titulo { get; set; } public int Orden { get; set; } public string Estado { get; set; } = "Borrador"; }
 public class InformacionNegocio : IRecord { public int Id { get; set; } = 1; public string Nombre { get; set; } = "Bazar Nazareth de Hojancha"; public string Direccion { get; set; } = "Hojancha, Guanacaste"; public string Horario { get; set; } = "Consultar horario"; public string Telefono { get; set; } = "+506 6488 3862"; public string? Email { get; set; } public string EnlaceContacto { get; set; } = "https://wa.me/50664883862"; public string? Redes { get; set; } = "https://www.instagram.com/bazarnazarethojancha\nhttps://linktr.ee/bazarnazareth"; }
 
+public class ClicWhatsApp { public int ProductoId { get; set; } public DateOnly Dia { get; set; } public string Origen { get; set; } = "catalogo"; public long Cantidad { get; set; } }
+public class ClicWhatsAppGaleria { public int GaleriaImagenId { get; set; } public DateOnly Dia { get; set; } public long Cantidad { get; set; } }
+
 public class BazarDb(DbContextOptions<BazarDb> options) : DbContext(options)
 {
     public DbSet<Categoria> Categorias => Set<Categoria>(); public DbSet<Producto> Productos => Set<Producto>();
@@ -23,8 +26,13 @@ public class BazarDb(DbContextOptions<BazarDb> options) : DbContext(options)
     public DbSet<PromocionServicio> PromocionServicios => Set<PromocionServicio>(); public DbSet<Editor> Editores => Set<Editor>();
     public DbSet<Imagen> Imagenes => Set<Imagen>(); public DbSet<SeccionContenido> Secciones => Set<SeccionContenido>();
     public DbSet<GaleriaImagen> Galeria => Set<GaleriaImagen>(); public DbSet<InformacionNegocio> Negocio => Set<InformacionNegocio>();
+    public DbSet<ClicWhatsApp> ClicsWhatsApp => Set<ClicWhatsApp>(); public DbSet<ClicWhatsAppGaleria> ClicsWhatsAppGaleria => Set<ClicWhatsAppGaleria>();
     protected override void OnModelCreating(ModelBuilder m)
     {
+        m.Entity<ClicWhatsApp>().ToTable("ClicWhatsApp").HasKey(x => new { x.ProductoId, x.Dia, x.Origen });
+        m.Entity<ClicWhatsApp>().HasOne<Producto>().WithMany().HasForeignKey(x => x.ProductoId).OnDelete(DeleteBehavior.Restrict);
+        m.Entity<ClicWhatsAppGaleria>().ToTable("ClicWhatsAppGaleria").HasKey(x => new { x.GaleriaImagenId, x.Dia });
+        m.Entity<ClicWhatsAppGaleria>().HasOne<GaleriaImagen>().WithMany().HasForeignKey(x => x.GaleriaImagenId).OnDelete(DeleteBehavior.Restrict);
         m.Entity<Categoria>().ToTable("Categoria").HasIndex(x => x.Nombre).IsUnique();
         m.Entity<Producto>().ToTable("Producto", t => t.HasCheckConstraint("CK_Producto_Precio", "precio_informativo IS NULL OR (precio_informativo >= 0 AND moneda IS NOT NULL)"));
         m.Entity<Producto>().Property(x => x.PrecioInformativo).HasColumnName("precio_informativo").HasPrecision(12, 2);
