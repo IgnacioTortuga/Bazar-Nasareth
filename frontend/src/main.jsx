@@ -388,7 +388,7 @@ function Public({ data }) {
       (!category || p.categoriaId === Number(category)) &&
       p.nombre.toLowerCase().includes(search.toLowerCase()),
   );
-  const galleryPageSize = 6;
+  const galleryPageSize = 3;
   const galleryPages = Math.max(1, Math.ceil(data.galeria.length / galleryPageSize));
   const visibleGallery = data.galeria.slice(
     (galleryPage - 1) * galleryPageSize,
