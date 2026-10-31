@@ -346,6 +346,14 @@ function businessEntries(value, fallbackLabels) {
         : { label: fallbackLabels[index] || `Local ${index + 1}`, value: line };
     });
 }
+function serviceInquiryUrl(service, business) {
+  let phone = (business.telefono || "").replace(/\D/g, "");
+  if (phone.length === 8) phone = "506" + phone;
+  if (!/^[1-9]\d{7,14}$/.test(phone)) return "#contacto";
+  const message = `Hola, quisiera consultar por el servicio «${service.nombre}». ¿Me pueden indicar el precio, la disponibilidad y las condiciones?`;
+  return `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+}
+
 function Public({ data }) {
   const [category, setCategory] = useState(''),
     [search, setSearch] = useState(''),
@@ -770,11 +778,20 @@ function Public({ data }) {
                     <p>
                       <b>Alcance:</b> {s.alcance}
                     </p>
-                    <strong>
-                      {s.precioDesde == null
-                        ? 'Consultar precio'
-                        : 'Desde ' + formattedPrice(s.precioDesde, s.moneda)}
-                    </strong>
+                    {s.precioDesde != null && (
+                      <strong>
+                        {"Desde " + formattedPrice(s.precioDesde, s.moneda)}
+                      </strong>
+                    )}
+                    <a
+                      className="button primary service-inquiry"
+                      href={serviceInquiryUrl(s, business)}
+                      target={serviceInquiryUrl(s, business) === "#contacto" ? undefined : "_blank"}
+                      rel="noopener noreferrer"
+                      aria-label={`Consultar ${s.nombre}${s.precioDesde == null ? ": precio y disponibilidad" : ": disponibilidad y condiciones"}`}
+                    >
+                      {s.precioDesde == null ? "Consultar precio" : "Consultar servicio"}
+                    </a>
                   </div>
                 </article>
               ))}
