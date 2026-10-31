@@ -1,0 +1,101 @@
+import React from 'react';
+import { toCostaRicaInput } from './format.js';
+
+export default function Field({
+  name,
+  label,
+  kind,
+  value,
+  onChange,
+  data,
+  disabled,
+}) {
+  const common = {
+    id: name,
+    disabled,
+    onChange: (e) =>
+      onChange(
+        name,
+        kind === 'checkbox'
+          ? e.target.checked
+          : kind === 'number'
+            ? Number(e.target.value)
+            : kind === 'decimal'
+              ? e.target.value === ''
+                ? null
+                : Number(e.target.value)
+              : kind === 'image' || kind === 'category'
+                ? e.target.value
+                  ? Number(e.target.value)
+                  : null
+                : kind === 'datetime'
+                  ? e.target.value
+                    ? new Date(e.target.value + ':00-06:00').toISOString()
+                    : null
+                  : e.target.value,
+      ),
+  };
+  const imageOptions = data.imagenes || [];
+  const options =
+    kind === 'status'
+      ? [
+          ['Borrador', 'Borrador'],
+          ['Publicado', 'Publicado'],
+          ['Archivado', 'Archivado'],
+        ]
+      : kind === 'category'
+        ? (data.categorias || []).map((c) => [c.id, c.nombre])
+        : kind === 'image'
+          ? imageOptions.map((i) => [i.id, `${i.id} · ${i.nombre}`])
+          : [
+              ['CRC', 'CRC'],
+              ['USD', 'USD'],
+            ];
+  return (
+    <label
+      className={kind === 'checkbox' ? 'checkbox-field' : 'field'}
+      htmlFor={name}
+    >
+      {label}
+      {kind === 'textarea' ? (
+        <textarea {...common} rows="4" value={value ?? ''} />
+      ) : ['status', 'category', 'image', 'currency'].includes(kind) ? (
+        <select {...common} value={value ?? ''}>
+          <option value="">
+            {kind === 'image' || kind === 'currency'
+              ? 'Sin seleccionar'
+              : 'Seleccione...'}
+          </option>
+          {options.map(([v, l]) => (
+            <option key={v} value={v}>
+              {l}
+            </option>
+          ))}
+        </select>
+      ) : (
+        <input
+          {...common}
+          type={
+            kind === 'decimal' || kind === 'number'
+              ? 'number'
+              : kind === 'datetime'
+                ? 'datetime-local'
+                : kind === 'checkbox'
+                  ? kind
+                  : kind
+          }
+          step={kind === 'decimal' ? '0.01' : undefined}
+          min={kind === 'decimal' || kind === 'number' ? 0 : undefined}
+          checked={kind === 'checkbox' ? !!value : undefined}
+          value={
+            kind === 'checkbox'
+              ? undefined
+              : kind === 'datetime'
+                ? toCostaRicaInput(value)
+                : (value ?? '')
+          }
+        />
+      )}
+    </label>
+  );
+}

@@ -1,0 +1,7 @@
+public class Categoria : IRecord
+{
+    public int Id { get; set; }
+    public string Nombre { get; set; } = "";
+    public int Orden { get; set; }
+    public bool Activa { get; set; } = true;
+}

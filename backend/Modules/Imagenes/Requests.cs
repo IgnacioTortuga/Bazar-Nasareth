@@ -1,0 +1,1 @@
+record Alt(string TextoAlternativo);

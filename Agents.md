@@ -21,18 +21,23 @@ Priorizar:
 - JavaScript.
 - Comunicación con backend mediante Fetch API.
 - Las solicitudes utilizan el prefijo `/api`.
+- `src/main.jsx` monta React; `src/app/App.jsx` coordina navegación y sesión.
+- `src/modules/` agrupa componentes, campos y acciones por funcionalidad: productos, servicios, promociones, galería, imágenes, usuarios, contacto, contenido, sesión y métricas.
+- `src/app/` compone la página pública y coordina el editor; `src/shared/` contiene API y componentes reutilizables.
 
 ### Backend
 - C#.
 - ASP.NET Core Minimal APIs.
 - .NET 10.
 - Arquitectura monolítica pequeña.
-- Los endpoints están concentrados principalmente en `Program.cs`.
-- Las entidades y el contexto están en `Models.cs`.
+- `Program.cs` configura el arranque y registra los grupos de rutas de `Modules/`.
+- `Modules/` agrupa rutas, entidades, contratos y validaciones por funcionalidad.
+- `Data/BazarDb.cs` conserva el contexto y los mapeos; `Shared/` contiene CRUD genérico, reglas comunes y auxiliares de acceso.
+- Consultar `docs/estructura-codigo.md` para localizar responsabilidades; las referencias antiguas a `main.jsx` o `Models.cs` en Skills corresponden a los módulos de este mapa.
 
 ### Persistencia
 - Microsoft SQL Server.
-- Entity Framework Core 10.0.0.
+- Entity Framework Core 10.0.14.
 - Contexto principal: `BazarDb`.
 - Configuración mediante `DbContext`.
 - Consultas LINQ y operaciones asíncronas.

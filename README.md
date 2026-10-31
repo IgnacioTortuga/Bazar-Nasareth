@@ -2,6 +2,8 @@
 
 Dos proyectos independientes: `backend` (ASP.NET Core + EF Core + SQL Server) y `frontend` (React + Vite). La web pública muestra solo contenido publicado. Los productos admiten una consulta por WhatsApp con cantidad, nombre y nota; se abre la aplicación de mensajería con texto precargado, **sin guardar pedidos, carrito, ventas ni pagos**.
 
+El código está organizado por funcionalidades en `frontend/src/modules/` y `backend/Modules/`: productos, servicios, promociones, galería, imágenes, usuarios, contacto, contenido, sesión y métricas. Consulte el [mapa de módulos y recorridos del código](docs/estructura-codigo.md).
+
 ## Requisitos
 
 - SDK .NET 10 y SQL Server (LocalDB o una instancia accesible).
@@ -52,7 +54,7 @@ Dos proyectos independientes: `backend` (ASP.NET Core + EF Core + SQL Server) y 
 
 ## Modelo y alcance
 
-`backend/Models.cs` contiene las entidades, relaciones, restricciones y la configuración de EF Core. `sql/schema.sql` es una consulta de editores, no un instalador. El registro central y la primera cuenta se insertan al arrancar la API. Los campos `Completo` y `Permisos` amplían `Editor` para múltiples administradores.
+Cada carpeta de `backend/Modules/` contiene las entidades de su funcionalidad y `backend/Data/BazarDb.cs` define las relaciones, restricciones y la configuración de EF Core. `sql/schema.sql` es una consulta de editores, no un instalador. `backend/Data/DatabaseInitialization.cs` inserta el registro central y la primera cuenta al arrancar la API. Los campos `Completo` y `Permisos` amplían `Editor` para múltiples administradores.
 
 Los productos se ofrecen **por encargo**. Cada producto publicado tiene un enlace `/producto/ID` con vista para compartir. La medición de clics de WhatsApp está desactivada por defecto y requiere preparar su tabla en bases existentes. Consulte [operación del catálogo, activación de métricas y respaldos](docs/operacion-catalogo.md) antes de activarla o ejecutar los procedimientos de respaldo y restauración.
 

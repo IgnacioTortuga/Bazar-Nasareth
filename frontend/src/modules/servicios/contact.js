@@ -1,0 +1,7 @@
+export function serviceInquiryUrl(service, business) {
+  let phone = (business.telefono || '').replace(/\D/g, '');
+  if (phone.length === 8) phone = '506' + phone;
+  if (!/^[1-9]\d{7,14}$/.test(phone)) return '#contacto';
+  const message = `Hola, quisiera consultar por el servicio «${service.nombre}». ¿Me pueden indicar el precio, la disponibilidad y las condiciones?`;
+  return `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+}

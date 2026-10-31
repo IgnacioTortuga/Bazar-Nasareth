@@ -15,7 +15,7 @@ En desarrollo Vite reenvía `/producto` al backend. En producción el alojamient
 Está desactivada por defecto. En una base existente, `EnsureCreatedAsync` **no agrega** la tabla nueva. Antes de activar:
 
 1. Confirmar servidor y nombre de la base objetivo y realizar el respaldo coordinado.
-2. Revisar y autorizar `sql/catalog-metrics.sql`. Crea solamente `dbo.ClicWhatsApp`, con clave producto/día y referencia a Producto. No elimina tablas ni cambia los datos de productos. Si la tabla ya existe, comparar su definición con `ClicWhatsApp` en `Models.cs`: el script no corrige esquemas distintos.
+2. Revisar y autorizar `sql/catalog-metrics.sql`. Crea solamente `dbo.ClicWhatsApp`, con clave producto/día y referencia a Producto. No elimina tablas ni cambia los datos de productos. Si la tabla ya existe, comparar su definición con `ClicWhatsApp` en `backend/Modules/Metricas/ClickModels.cs` y su configuración en `backend/Data/BazarDb.cs`: el script no corrige esquemas distintos.
 3. Ejecutar el script en la base confirmada, primero en la copia de prueba.
 4. Configurar `MedicionWhatsApp:Enabled=true` o la variable de entorno `MedicionWhatsApp__Enabled=true` y reiniciar el backend.
 5. Comprobar un clic desde un producto publicado y consultar **Productos → Interés por WhatsApp** con permiso de productos. Verificar que una cuenta sin ese permiso no pueda consultar el reporte.

@@ -1,124 +1,39 @@
 using System.Globalization;
 using System.Net;
-using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
 
-public static class CatalogFeatures
+public static class ProductSharing
 {
-    public static IQueryable<Producto> PublicProducts(BazarDb db) => db.Productos.AsNoTracking().Where(p =>
-        p.Estado == "Publicado" && p.Categoria.Activa &&
-        !string.IsNullOrWhiteSpace(p.Nombre) && !string.IsNullOrWhiteSpace(p.Descripcion) &&
-        db.ProductoImagenes.Any(i => i.ProductoId == p.Id));
-
+    public static IQueryable<Producto> PublicProducts(BazarDb db) => db.Productos.AsNoTracking().Where(p => p.Estado == "Publicado" && p.Categoria.Activa && !string.IsNullOrWhiteSpace(p.Nombre) && !string.IsNullOrWhiteSpace(p.Descripcion) && db.ProductoImagenes.Any(i => i.ProductoId == p.Id));
     public static void Map(WebApplication app, IConfiguration configuration)
     {
         bool enabled = configuration.GetValue<bool>("MedicionWhatsApp:Enabled");
-        app.MapPost("/api/productos/{id:int}/clic-whatsapp", async (int id, string? origen, BazarDb db, ILoggerFactory logs) =>
-        {
-            if (!enabled) return Results.NoContent();
-            if (!await PublicProducts(db).AnyAsync(p => p.Id == id)) return Results.NotFound();
-            var source = origen is "detalle" or "halloween" ? origen : "catalogo";
-            var day = CostaRicaDay(DateTimeOffset.UtcNow);
-            try
-            {
-                // HOLDLOCK serializa el alta de la clave producto/día; no hay incremento perdido.
-                await using var transaction = await db.Database.BeginTransactionAsync();
-                await db.Database.ExecuteSqlInterpolatedAsync($"""
-                    UPDATE dbo.ClicWhatsApp WITH (UPDLOCK, HOLDLOCK)
-                    SET Cantidad = Cantidad + 1 WHERE ProductoId = {id} AND Dia = {day} AND Origen = {source};
-                    IF @@ROWCOUNT = 0
-                        INSERT INTO dbo.ClicWhatsApp (ProductoId, Dia, Origen, Cantidad) VALUES ({id}, {day}, {source}, 1);
-                    """);
-                await transaction.CommitAsync();
-                return Results.NoContent();
-            }
-            catch (Exception ex) when (ex is System.Data.Common.DbException or DbUpdateException)
-            {
-                logs.CreateLogger("MedicionWhatsApp").LogWarning("No se pudo registrar un clic de WhatsApp.");
-                return Results.StatusCode(503);
-            }
-        }).RequireRateLimiting("clics");
-
-        app.MapPost("/api/galeria/{id:int}/clic-whatsapp", async (int id, BazarDb db, ILoggerFactory logs) =>
-        {
-            if (!enabled) return Results.NoContent();
-            if (!await db.Galeria.AsNoTracking().AnyAsync(g => g.Id == id && g.Estado == "Publicado")) return Results.NotFound();
-            var day = CostaRicaDay(DateTimeOffset.UtcNow);
-            try
-            {
-                await using var transaction = await db.Database.BeginTransactionAsync();
-                await db.Database.ExecuteSqlInterpolatedAsync($"""
-                    UPDATE dbo.ClicWhatsAppGaleria WITH (UPDLOCK, HOLDLOCK)
-                    SET Cantidad = Cantidad + 1 WHERE GaleriaImagenId = {id} AND Dia = {day};
-                    IF @@ROWCOUNT = 0
-                        INSERT INTO dbo.ClicWhatsAppGaleria (GaleriaImagenId, Dia, Cantidad) VALUES ({id}, {day}, 1);
-                    """);
-                await transaction.CommitAsync();
-                return Results.NoContent();
-            }
-            catch (Exception ex) when (ex is System.Data.Common.DbException or DbUpdateException)
-            {
-                logs.CreateLogger("MedicionWhatsApp").LogWarning("No se pudo registrar un clic de WhatsApp desde la galería.");
-                return Results.StatusCode(503);
-            }
-        }).RequireRateLimiting("clics");
-
-        app.MapGet("/api/admin/metricas/whatsapp", async (HttpContext ctx, BazarDb db) =>
-        {
-            if (!int.TryParse(ctx.User.FindFirstValue(ClaimTypes.NameIdentifier), out var id)) return Results.Forbid();
-            var actor = await db.Editores.AsNoTracking().SingleOrDefaultAsync(e => e.Id == id && e.Activo);
-            if (actor is null || (!actor.Completo && !actor.Permisos.Split(',').Contains("productos"))) return Results.Forbid();
-            ctx.Response.Headers.CacheControl = "no-store";
-            if (!enabled) return Results.Ok(new { habilitada = false, productos = Array.Empty<object>() });
-            var start = CostaRicaDay(DateTimeOffset.UtcNow).AddDays(-29);
-            var products = await db.ClicsWhatsApp.AsNoTracking().Where(c => c.Dia >= start)
-                .Join(db.Productos, c => c.ProductoId, p => p.Id, (c, p) => new { c.ProductoId, c.Cantidad, c.Origen, p.Nombre })
-                .GroupBy(c => new { c.ProductoId, c.Nombre, c.Origen })
-                .Select(g => new { g.Key.ProductoId, g.Key.Nombre, g.Key.Origen, clics = g.Sum(x => x.Cantidad) })
-                .OrderByDescending(c => c.clics).ToListAsync();
-            var gallery = await db.ClicsWhatsAppGaleria.AsNoTracking().Where(c => c.Dia >= start)
-                .Join(db.Galeria, c => c.GaleriaImagenId, g => g.Id, (c, g) => new { c.GaleriaImagenId, c.Cantidad, g.Titulo })
-                .GroupBy(c => new { c.GaleriaImagenId, c.Titulo })
-                .Select(g => new { g.Key.GaleriaImagenId, g.Key.Titulo, clics = g.Sum(x => x.Cantidad) })
-                .OrderByDescending(c => c.clics).ToListAsync();
-            var origins = products.GroupBy(p => p.Origen)
-                .Select(g => new { origen = g.Key, clics = g.Sum(x => x.clics) }).ToList();
-            if (gallery.Count > 0) origins.Add(new { origen = "galeria", clics = gallery.Sum(x => x.clics) });
-            return Results.Ok(new { habilitada = true, desde = start, origenes = origins.OrderByDescending(x => x.clics), productos = products, galeria = gallery });
-        }).RequireAuthorization();
-
         app.MapGet("/producto/{id:int}", async (int id, BazarDb db, HttpContext ctx) =>
         {
             var product = await PublicProducts(db).SingleOrDefaultAsync(p => p.Id == id);
             ctx.Response.Headers.CacheControl = "no-store";
-            if (product is null) return Results.Content("<!doctype html><html lang=\"es\"><meta charset=\"utf-8\"><title>Producto no disponible</title><h1>Este producto no está disponible</h1><a href=\"/#productos\">Volver al catálogo</a></html>", "text/html; charset=utf-8", statusCode: 404);
+            if (product is null)
+                return Results.Content("<!doctype html><html lang=\"es\"><meta charset=\"utf-8\"><title>Producto no disponible</title><h1>Este producto no está disponible</h1><a href=\"/#productos\">Volver al catálogo</a></html>", "text/html; charset=utf-8", statusCode: 404);
             var business = await db.Negocio.AsNoTracking().SingleAsync(n => n.Id == 1);
-            var images = await db.ProductoImagenes.AsNoTracking().Where(i => i.ProductoId == id)
-                .OrderBy(i => i.Orden).Join(db.Imagenes, i => i.ImagenId, image => image.Id,
-                    (i, image) => new ProductPhoto(image.Id, image.TextoAlternativo)).ToListAsync();
+            var images = await db.ProductoImagenes.AsNoTracking().Where(i => i.ProductoId == id).OrderBy(i => i.Orden).Join(db.Imagenes, i => i.ImagenId, image => image.Id, (i, image) => new ProductPhoto(image.Id, image.TextoAlternativo)).ToListAsync();
             // Se configura el dominio público explícitamente: no confiar en Host para metadatos compartidos.
             var publicUrl = configuration["PublicSiteUrl"];
             return Results.Content(RenderProduct(product, business, images, publicUrl, enabled), "text/html; charset=utf-8");
         });
     }
 
-    public static DateOnly CostaRicaDay(DateTimeOffset now) => DateOnly.FromDateTime(now.ToOffset(TimeSpan.FromHours(-6)).DateTime);
-
     public static string RenderProduct(Producto p, InformacionNegocio business, IReadOnlyList<ProductPhoto> images, string? siteUrl, bool measure)
     {
         static string E(string? value) => WebUtility.HtmlEncode(value ?? "");
-        var validUrl = Uri.TryCreate(siteUrl, UriKind.Absolute, out var site) &&
-            site.Scheme == "https" && string.IsNullOrEmpty(site.UserInfo) && string.IsNullOrEmpty(site.Query) && string.IsNullOrEmpty(site.Fragment);
+        var validUrl = Uri.TryCreate(siteUrl, UriKind.Absolute, out var site) && site.Scheme == "https" && string.IsNullOrEmpty(site.UserInfo) && string.IsNullOrEmpty(site.Query) && string.IsNullOrEmpty(site.Fragment);
         var root = validUrl ? site!.GetLeftPart(UriPartial.Authority) : null;
         var pageUrl = root + $"/producto/{p.Id}";
         var metadata = root is null ? "" : $"<link rel=\"canonical\" href=\"{E(pageUrl)}\"><meta property=\"og:url\" content=\"{E(pageUrl)}\">";
         if (root is not null && images.Count > 0)
             metadata += $"<meta property=\"og:image\" content=\"{E(root)}/api/imagenes/{images[0].Id}/archivo\"><meta property=\"og:image:alt\" content=\"{E(images[0].Alt)}\">";
         var primaryPhoto = images[0];
-        var thumbnails = images.Count > 1
-            ? $"<div class=\"thumbnails\" aria-label=\"Fotografías del producto\">{string.Join("", images.Select((i, index) => $"<button type=\"button\" class=\"thumbnail{(index == 0 ? " active" : "")}\" aria-label=\"Mostrar fotografía {index + 1}\" aria-pressed=\"{(index == 0 ? "true" : "false")}\" data-src=\"/api/imagenes/{i.Id}/archivo\" data-alt=\"{E(i.Alt)}\"><img src=\"/api/imagenes/{i.Id}/archivo\" alt=\"\" loading=\"lazy\"></button>"))}</div>"
-            : "";
-        var phone = new string(business.Telefono.Where(char.IsAsciiDigit).ToArray());
+        var thumbnails = images.Count > 1 ? $"<div class=\"thumbnails\" aria-label=\"Fotografías del producto\">{string.Join("", images.Select((i, index) => $"<button type=\"button\" class=\"thumbnail{(index == 0 ? " active" : "")}\" aria-label=\"Mostrar fotografía {index + 1}\" aria-pressed=\"{(index == 0 ? "true" : "false")}\" data-src=\"/api/imagenes/{i.Id}/archivo\" data-alt=\"{E(i.Alt)}\"><img src=\"/api/imagenes/{i.Id}/archivo\" alt=\"\" loading=\"lazy\"></button>"))}</div>" : "";
+        var phone = new string (business.Telefono.Where(char.IsAsciiDigit).ToArray());
         var message = Uri.EscapeDataString($"Hola, me interesa cotizar este producto:\n• Producto: {p.Nombre}\n• Modalidad: Por encargo\n\n¿Podrían confirmarme disponibilidad, plazo de entrega y precio final?");
         var price = p.PrecioInformativo.HasValue ? $"{p.Moneda} {p.PrecioInformativo.Value.ToString("N2", CultureInfo.GetCultureInfo("es-CR"))}" : "Consultar precio";
         var tracking = measure ? $"fetch('/api/productos/{p.Id}/clic-whatsapp?origen=detalle',{{method:'POST',credentials:'same-origin',keepalive:true}}).catch(()=>{{}});" : "";
