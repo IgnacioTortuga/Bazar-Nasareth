@@ -1168,11 +1168,25 @@ function WhatsAppMetrics() {
       : <p>Todavía no hay clics registrados en este período.</p>)}
   </section>;
 }
-function PaginatedList({ children, className, label, total, disabled = false }) {
+function normalizeEditorSearch(value) {
+  return String(value ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase('es').trim();
+}
+
+function matchesEditorSearch(text, query) {
+  const normalized = normalizeEditorSearch(text);
+  return normalizeEditorSearch(query).split(/\s+/).filter(Boolean).every(word => normalized.includes(word));
+}
+
+function PaginatedList({ children, className, label, total, searchTerms = [], searchable = true, disabled = false }) {
   const [page, setPage] = useState(1);
+  const [query, setQuery] = useState('');
+  const searchId = React.useId();
   const pageSize = 6;
   const entries = React.Children.toArray(children);
-  const count = total ?? entries.length;
+  const originalCount = total ?? entries.length;
+  const filtering = searchable && !!query.trim();
+  const filtered = originalCount ? entries.filter((_, index) => !filtering || matchesEditorSearch(searchTerms[index], query)) : [];
+  const count = filtered.length;
   const pages = Math.max(1, Math.ceil(count / pageSize));
   const current = Math.min(page, pages);
   useEffect(() => { setPage(value => Math.min(value, pages)); }, [pages]);
@@ -1180,9 +1194,15 @@ function PaginatedList({ children, className, label, total, disabled = false }) 
   const numbers = Array.from({ length: Math.min(5, pages) }, (_, index) => first + index);
   const start = (current - 1) * pageSize;
   return <div className="paginated-list">
-    <div className={className}>{count ? entries.slice(start, start + pageSize) : children}</div>
+    {searchable && <div className="editor-search">
+      <label htmlFor={searchId}>Buscar en {label}</label>
+      <div className="editor-search-input"><input id={searchId} type="search" value={query} placeholder="Escriba para filtrar…" onChange={event => { setQuery(event.target.value); setPage(1); }} />
+        {query && <button type="button" onClick={() => { setQuery(''); setPage(1); }}>Limpiar</button>}
+      </div>
+    </div>}
+    <div className={className}>{count ? filtered.slice(start, start + pageSize) : filtering ? <p className="empty" role="status">No hay coincidencias para «{query}».</p> : children}</div>
     {count > 0 && <nav className="editor-pagination" aria-label={'Paginación de ' + label}>
-      <span role="status">{start + 1}–{Math.min(start + pageSize, count)} de {count} · Página {current} de {pages}</span>
+      <span role="status">{start + 1}–{Math.min(start + pageSize, count)} de {count}{filtering ? ' coincidencias de ' + originalCount : ''} · Página {current} de {pages}</span>
       {pages > 1 && <div className="pagination-controls">
         <button type="button" disabled={disabled || current === 1} onClick={() => setPage(current - 1)}>Anterior</button>
         {numbers.map(number => <button type="button" key={number} disabled={disabled} aria-label={'Página ' + number} aria-current={current === number ? 'page' : undefined} onClick={() => setPage(number)}>{number}</button>)}
@@ -1876,7 +1896,7 @@ function Editor({ account, navigate, logout, path, registerNavigationGuard }) {
                   Vista previa
                 </button>
               </div>
-              <PaginatedList key="imagenes" label="imágenes" className="grid image-library" total={data.imagenes?.length || 0} disabled={busy}>
+              <PaginatedList key="imagenes" label="imágenes" searchTerms={(data.imagenes || []).map(img => [img.nombre, img.textoAlternativo, ...imageUsages(img.id).map(usage => usage.title + " " + usage.section)].join(" "))} className="grid image-library" total={data.imagenes?.length || 0} disabled={busy}>
                 {data.imagenes?.map((img) => {
                   const usages = imageUsages(img.id);
                   return (
@@ -1948,7 +1968,7 @@ function Editor({ account, navigate, logout, path, registerNavigationGuard }) {
             </>
           ) : active === 'usuarios' ? (
             <>
-              <PaginatedList key="usuarios" label="administradores" className="list-panel" total={data.editores?.length || 0} disabled={busy}>
+              <PaginatedList key="usuarios" label="administradores" searchTerms={(data.editores || []).map(item => [item.nombre, item.email, item.permisos, item.completo ? "Acceso completo" : "", item.activo ? "Activo" : "Inactivo"].join(" "))} className="list-panel" total={data.editores?.length || 0} disabled={busy}>
                 {(data.editores || []).map((x) => (
                   <button
                     className="list-item"
@@ -2115,7 +2135,7 @@ function Editor({ account, navigate, logout, path, registerNavigationGuard }) {
                 {active === 'productos' && (
                   <div className="category-block">
                     <h2>Categorías</h2>
-                    <PaginatedList key="categorias" label="categorías" className="category-list" total={data.categorias?.length || 0} disabled={busy}>
+                    <PaginatedList key="categorias" label="categorías" searchTerms={(data.categorias || []).map(item => item.nombre)} className="category-list" total={data.categorias?.length || 0} disabled={busy}>
                       {(data.categorias || []).map((c) => (
                         <CategoryRow
                           key={c.id}
@@ -2132,7 +2152,7 @@ function Editor({ account, navigate, logout, path, registerNavigationGuard }) {
                     />
                   </div>
                 )}
-                <PaginatedList key={active} label={labels[active]} className="list-panel" total={list.length} disabled={busy}>
+                <PaginatedList key={active} label={labels[active]} searchable={active !== "portada"} searchTerms={list.map(item => [title(item), item.descripcion, item.cuerpo, item.alcance, item.condiciones, item.estado, data.categorias?.find(category => category.id === item.categoriaId)?.nombre].filter(Boolean).join(" "))} className="list-panel" total={list.length} disabled={busy}>
                   {list.map((item) => (
                     <div className="list-item list-item-actions" key={item.id}>
                       <button
