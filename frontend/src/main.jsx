@@ -1168,6 +1168,30 @@ function WhatsAppMetrics() {
       : <p>Todavía no hay clics registrados en este período.</p>)}
   </section>;
 }
+function PaginatedList({ children, className, label, total, disabled = false }) {
+  const [page, setPage] = useState(1);
+  const pageSize = 6;
+  const entries = React.Children.toArray(children);
+  const count = total ?? entries.length;
+  const pages = Math.max(1, Math.ceil(count / pageSize));
+  const current = Math.min(page, pages);
+  useEffect(() => { setPage(value => Math.min(value, pages)); }, [pages]);
+  const first = Math.max(1, Math.min(current - 2, pages - 4));
+  const numbers = Array.from({ length: Math.min(5, pages) }, (_, index) => first + index);
+  const start = (current - 1) * pageSize;
+  return <div className="paginated-list">
+    <div className={className}>{count ? entries.slice(start, start + pageSize) : children}</div>
+    {count > 0 && <nav className="editor-pagination" aria-label={'Paginación de ' + label}>
+      <span role="status">{start + 1}–{Math.min(start + pageSize, count)} de {count} · Página {current} de {pages}</span>
+      {pages > 1 && <div className="pagination-controls">
+        <button type="button" disabled={disabled || current === 1} onClick={() => setPage(current - 1)}>Anterior</button>
+        {numbers.map(number => <button type="button" key={number} disabled={disabled} aria-label={'Página ' + number} aria-current={current === number ? 'page' : undefined} onClick={() => setPage(number)}>{number}</button>)}
+        <button type="button" disabled={disabled || current === pages} onClick={() => setPage(current + 1)}>Siguiente</button>
+      </div>}
+    </nav>}
+  </div>;
+}
+
 function Editor({ account, navigate, logout, path, registerNavigationGuard }) {
   const [active, setActive] = useState(
     location.pathname.split('/')[2] || 'portada',
@@ -1852,7 +1876,7 @@ function Editor({ account, navigate, logout, path, registerNavigationGuard }) {
                   Vista previa
                 </button>
               </div>
-              <div className="grid image-library">
+              <PaginatedList key="imagenes" label="imágenes" className="grid image-library" total={data.imagenes?.length || 0} disabled={busy}>
                 {data.imagenes?.map((img) => {
                   const usages = imageUsages(img.id);
                   return (
@@ -1915,7 +1939,7 @@ function Editor({ account, navigate, logout, path, registerNavigationGuard }) {
                     </article>
                   );
                 })}
-              </div>
+              </PaginatedList>
               <p className="hint">
                 Reemplazar sube la nueva foto y actualiza solo el contenido
                 elegido. Si la foto se usa en más de un lugar, cada uso tiene su
@@ -1924,7 +1948,7 @@ function Editor({ account, navigate, logout, path, registerNavigationGuard }) {
             </>
           ) : active === 'usuarios' ? (
             <>
-              <div className="list-panel">
+              <PaginatedList key="usuarios" label="administradores" className="list-panel" total={data.editores?.length || 0} disabled={busy}>
                 {(data.editores || []).map((x) => (
                   <button
                     className="list-item"
@@ -1946,7 +1970,7 @@ function Editor({ account, navigate, logout, path, registerNavigationGuard }) {
                     </small>
                   </button>
                 ))}
-              </div>
+              </PaginatedList>
               <form className="form-panel" onSubmit={saveEditor}>
                 <h2>{editorForm.id ? 'Editar cuenta' : 'Nueva cuenta'}</h2>
                 <label className="field">
@@ -2091,7 +2115,7 @@ function Editor({ account, navigate, logout, path, registerNavigationGuard }) {
                 {active === 'productos' && (
                   <div className="category-block">
                     <h2>Categorías</h2>
-                    <div className="category-list">
+                    <PaginatedList key="categorias" label="categorías" className="category-list" total={data.categorias?.length || 0} disabled={busy}>
                       {(data.categorias || []).map((c) => (
                         <CategoryRow
                           key={c.id}
@@ -2100,7 +2124,7 @@ function Editor({ account, navigate, logout, path, registerNavigationGuard }) {
                           setMessage={setMessage}
                         />
                       ))}
-                    </div>
+                    </PaginatedList>
                     <CategoryRow
                       category={null}
                       refresh={reload}
@@ -2108,7 +2132,7 @@ function Editor({ account, navigate, logout, path, registerNavigationGuard }) {
                     />
                   </div>
                 )}
-                <div className="list-panel">
+                <PaginatedList key={active} label={labels[active]} className="list-panel" total={list.length} disabled={busy}>
                   {list.map((item) => (
                     <div className="list-item list-item-actions" key={item.id}>
                       <button
@@ -2158,7 +2182,7 @@ function Editor({ account, navigate, logout, path, registerNavigationGuard }) {
                       Aún no hay contenido en esta sección.
                     </p>
                   )}
-                </div>
+                </PaginatedList>
                 {draft && (
                   <div className="form-panel">
                     <div className="row spread">
