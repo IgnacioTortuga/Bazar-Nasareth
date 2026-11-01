@@ -36,6 +36,7 @@ var app = builder.Build();
 var origin = builder.Configuration["FrontendOrigin"] ?? "http://localhost:5173";
 var storage = Path.GetFullPath(builder.Configuration["ImageDirectory"] ?? Path.Combine(app.Environment.ContentRootPath, "uploaded-images"));
 Directory.CreateDirectory(storage);
+CopyMissingSeedImages(Path.Combine(app.Environment.ContentRootPath, "seed-images"), storage);
 await DatabaseInitialization.InitializeAsync(app);
 app.UseStaticFiles();
 app.UseAuthentication();
@@ -71,4 +72,19 @@ RelationsEndpoints.Map(admin);
 EditorEndpoints.Map(admin);
 ProductSharing.Map(app, builder.Configuration);
 MetricsEndpoints.Map(app, builder.Configuration);
+app.MapFallbackToFile("index.html");
 app.Run();
+
+static void CopyMissingSeedImages(string source, string destination)
+{
+    if (!Directory.Exists(source)) return;
+
+    foreach (var sourceFile in Directory.EnumerateFiles(source, "*", SearchOption.AllDirectories))
+    {
+        var relativePath = Path.GetRelativePath(source, sourceFile);
+        var destinationFile = Path.Combine(destination, relativePath);
+        var destinationDirectory = Path.GetDirectoryName(destinationFile);
+        if (destinationDirectory is not null) Directory.CreateDirectory(destinationDirectory);
+        if (!File.Exists(destinationFile)) File.Copy(sourceFile, destinationFile);
+    }
+}

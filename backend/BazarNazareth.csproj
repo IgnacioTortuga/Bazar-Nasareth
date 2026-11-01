@@ -9,4 +9,22 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.14" />
     <PackageReference Include="System.Security.Cryptography.Pkcs" Version="9.0.21" />
   </ItemGroup>
+  <Target Name="PublishFrontend" BeforeTargets="ComputeFilesToPublish">
+    <Exec WorkingDirectory="../frontend" Command="npm ci" Condition="!Exists('../frontend/node_modules')" />
+    <Exec WorkingDirectory="../frontend" Command="npm run build" />
+    <ItemGroup>
+      <FrontendFiles Include="../frontend/dist/**" />
+      <SeedImageFiles Include="uploaded-images/**" />
+      <ResolvedFileToPublish Include="@(FrontendFiles->'%(FullPath)')" Exclude="@(ResolvedFileToPublish)">
+        <RelativePath>wwwroot/%(RecursiveDir)%(Filename)%(Extension)</RelativePath>
+        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      </ResolvedFileToPublish>
+      <ResolvedFileToPublish Include="@(SeedImageFiles->'%(FullPath)')" Exclude="@(ResolvedFileToPublish)">
+        <RelativePath>seed-images/%(RecursiveDir)%(Filename)%(Extension)</RelativePath>
+        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      </ResolvedFileToPublish>
+    </ItemGroup>
+  </Target>
 </Project>
