@@ -7,12 +7,26 @@ async function api(path, options = {}) {
     });
   } catch {
     throw new Error(
-      options.method && options.method !== 'GET'
-        ? 'Se perdió la conexión. No se pudo confirmar el resultado. Conserve sus cambios y compruebe la lista antes de repetir el guardado.'
-        : 'No se pudo conectar con el servidor. Compruebe su conexión e inténtelo de nuevo.',
+      path === '/login'
+        ? 'No se pudo conectar. Compruebe su conexión e intente iniciar sesión de nuevo.'
+        : options.method && options.method !== 'GET'
+          ? 'Se perdió la conexión. No se pudo confirmar el resultado. Conserve sus cambios y compruebe la lista antes de repetir el guardado.'
+          : 'No se pudo conectar con el servidor. Compruebe su conexión e inténtelo de nuevo.',
     );
   }
   if (!response.ok) {
+    if (path === '/login') {
+      if (response.status === 401)
+        throw new Error('Correo o contraseña incorrectos.');
+      if (response.status === 429)
+        throw new Error(
+          'Demasiados intentos. Espere un momento antes de volver a ingresar.',
+        );
+      if (response.status >= 500)
+        throw new Error(
+          'El servicio de acceso no está disponible. Inténtelo de nuevo en unos minutos.',
+        );
+    }
     if (response.status === 401)
       throw new Error(
         'Su sesión terminó. Abra el acceso en otra pestaña para iniciar sesión y conservar este formulario.',

@@ -1,11 +1,11 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useState } from 'react';
+import Modal from '../../shared/Modal.jsx';
 import Img from '../../shared/Img.jsx';
 import { BazarDoodle } from '../../shared/Icons.jsx';
 import { imageUrl } from '../../shared/images.js';
 export default function Gallery({ data, images, business }) {
   const [galleryPage, setGalleryPage] = useState(1);
   const [gallerySelection, setGallerySelection] = useState(null);
-  const galleryCloseRef = useRef(null);
   const galleryPageSize = 3;
   const galleryPages = Math.max(
     1,
@@ -16,20 +16,6 @@ export default function Gallery({ data, images, business }) {
     galleryPage * galleryPageSize,
   );
 
-  useEffect(() => {
-    if (!gallerySelection) return undefined;
-    const previousOverflow = document.body.style.overflow;
-    const close = (event) => {
-      if (event.key === 'Escape') setGallerySelection(null);
-    };
-    document.body.style.overflow = 'hidden';
-    document.addEventListener('keydown', close);
-    galleryCloseRef.current?.focus();
-    return () => {
-      document.body.style.overflow = previousOverflow;
-      document.removeEventListener('keydown', close);
-    };
-  }, [gallerySelection]);
   return (
     <>
       <section id="galeria" className="soft section">
@@ -122,22 +108,14 @@ export default function Gallery({ data, images, business }) {
             'Hola, quisiera personalizar una taza u otro artículo con una idea propia. ¿Cómo puedo enviarles mi diseño y conocer el precio?';
           const phone = (business.telefono || '').replace(/\D/g, '');
           return (
-            <div
-              className="idea-modal-backdrop"
-              role="presentation"
-              onMouseDown={(event) => {
-                if (event.target === event.currentTarget)
-                  setGallerySelection(null);
-              }}
+            <Modal
+              className="public-site idea-modal-backdrop"
+              onClose={() => setGallerySelection(null)}
+              labelledBy="idea-modal-title"
             >
-              <section
-                className="idea-modal"
-                role="dialog"
-                aria-modal="true"
-                aria-labelledby="idea-modal-title"
-              >
+              <section className="idea-modal">
                 <button
-                  ref={galleryCloseRef}
+                  autoFocus
                   className="idea-modal-close"
                   type="button"
                   onClick={() => setGallerySelection(null)}
@@ -188,7 +166,7 @@ export default function Gallery({ data, images, business }) {
                   </div>
                 </div>
               </section>
-            </div>
+            </Modal>
           );
         })()}
     </>

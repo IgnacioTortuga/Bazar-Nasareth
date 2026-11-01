@@ -67,7 +67,7 @@ export default function ContactMessage({
         className="button primary"
         href={`https://wa.me/${num}?text=${encodeURIComponent(message)}`}
         onClick={() => {
-          const origin = campaign ? 'halloween' : 'catalogo';
+          const origin = /halloween/i.test(campaign) ? 'halloween' : 'catalogo';
           if (medir)
             fetch(
               `/api/productos/${product.id}/clic-whatsapp?origen=${origin}`,

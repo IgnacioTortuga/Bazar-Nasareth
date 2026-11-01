@@ -8,13 +8,53 @@ import Highlights from '../modules/contenido/Highlights.jsx';
 import TextBlocks from '../modules/contenido/TextBlocks.jsx';
 import ContactSection from '../modules/contacto/ContactSection.jsx';
 import Gallery from '../modules/galeria/Gallery.jsx';
+import {
+  readCatalogFilters,
+  catalogReturnUrl,
+  filterCatalog,
+} from '../modules/productos/catalogFilters.js';
+import { promotionTimingLabel } from '../shared/format.js';
 
 export default function Public({ data }) {
-  const [category, setCategory] = useState(''),
-    [search, setSearch] = useState(''),
+  const [filters, setFilters] = useState(readCatalogFilters),
     [menu, setMenu] = useState(false),
-    [campaign, setCampaign] = useState(''),
     [activeSection, setActiveSection] = useState('inicio');
+  const { category, search, promotionId } = filters;
+  const setCategory = (value) =>
+    setFilters((current) => ({ ...current, category: value }));
+  const setSearch = (value) =>
+    setFilters((current) => ({ ...current, search: value }));
+  const promotion = data.promociones.find(
+    (item) =>
+      String(item.id) === promotionId &&
+      promotionTimingLabel(item) === 'Vigente',
+  );
+  const campaign = promotion?.titulo || '';
+  const returnUrl = catalogReturnUrl(filters);
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    const values = { categoria: category, q: search, promocion: promotionId };
+    for (const [key, value] of Object.entries(values)) {
+      if (value) url.searchParams.set(key, value);
+      else url.searchParams.delete(key);
+    }
+    history.replaceState(history.state, '', url);
+  }, [category, search, promotionId]);
+  useEffect(() => {
+    const restore = () => setFilters(readCatalogFilters());
+    const closeMenu = (event) => {
+      if (event.key === 'Escape' && menu) {
+        setMenu(false);
+        document.querySelector('.public-header .mobile-menu')?.focus();
+      }
+    };
+    window.addEventListener('popstate', restore);
+    window.addEventListener('keydown', closeMenu);
+    return () => {
+      window.removeEventListener('popstate', restore);
+      window.removeEventListener('keydown', closeMenu);
+    };
+  }, [menu]);
   const business = data.negocio,
     images = Object.fromEntries(
       data.imagenes.map((i) => [i.id, i.textoAlternativo]),
@@ -22,11 +62,7 @@ export default function Public({ data }) {
   const hero =
     data.secciones.find((s) => s.clave === 'portada') ||
     data.secciones.find((s) => s.clave === 'presentación');
-  const products = data.productos.filter(
-    (p) =>
-      (!category || p.categoriaId === Number(category)) &&
-      p.nombre.toLowerCase().includes(search.toLowerCase()),
-  );
+  const products = filterCatalog(data, filters);
   const links = [
     ['productos', 'Productos'],
     ['servicios', 'Servicios'],
@@ -81,19 +117,19 @@ export default function Public({ data }) {
   function searchCatalog(e) {
     e.preventDefault();
     setMenu(false);
-    document
-      .getElementById('productos')
-      ?.scrollIntoView({ behavior: 'smooth' });
+    document.getElementById('productos')?.scrollIntoView({
+      behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches
+        ? 'auto'
+        : 'smooth',
+    });
   }
   function openCampaign(promotion) {
-    setCampaign(
-      /halloween/i.test(promotion.titulo) ? 'Halloween' : promotion.titulo,
-    );
-    setCategory('');
-    setSearch('');
-    document
-      .getElementById('productos')
-      ?.scrollIntoView({ behavior: 'smooth' });
+    setFilters({ category: '', search: '', promotionId: String(promotion.id) });
+    document.getElementById('productos')?.scrollIntoView({
+      behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches
+        ? 'auto'
+        : 'smooth',
+    });
   }
   return (
     <div className="public-site">
@@ -176,6 +212,13 @@ export default function Public({ data }) {
           business={business}
           images={images}
           campaign={campaign}
+          clearCampaign={() =>
+            setFilters((current) => ({ ...current, promotionId: '' }))
+          }
+          clearFilters={() =>
+            setFilters({ category: '', search: '', promotionId: '' })
+          }
+          returnUrl={returnUrl}
         />
         <ServicesSection data={data} images={images} business={business} />
         <PromotionsSection

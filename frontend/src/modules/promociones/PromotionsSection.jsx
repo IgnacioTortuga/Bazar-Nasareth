@@ -46,7 +46,7 @@ export default function PromotionsSection({ data, images, openCampaign }) {
                     type="button"
                     onClick={() => openCampaign(p)}
                   >
-                    Ver productos para esta temática
+                    Consultar con esta temática
                   </button>
                 )}
               </div>

@@ -29,6 +29,7 @@ export default function ImageLibrary({
             JPG, PNG o WebP · hasta 5 MB
             <input
               type="file"
+              disabled={busy}
               accept="image/jpeg,image/png,image/webp"
               required
               onChange={(e) =>
@@ -41,6 +42,7 @@ export default function ImageLibrary({
             <input
               required
               value={upload.alt}
+              disabled={busy}
               onChange={(e) => setUpload({ ...upload, alt: e.target.value })}
             />
           </label>

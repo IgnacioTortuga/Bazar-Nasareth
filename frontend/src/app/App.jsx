@@ -9,9 +9,12 @@ export default function App() {
     [account, setAccount] = useState(null),
     [data, setData] = useState(null),
     [error, setError] = useState(''),
+    [publicError, setPublicError] = useState(''),
+    [signingIn, setSigningIn] = useState(false),
     [loading, setLoading] = useState(true),
     [login, setLogin] = useState({ email: '', password: '' });
   const navigationGuard = useRef(null);
+  const loginInFlight = useRef(false);
   const registerNavigationGuard = useCallback((guard) => {
     navigationGuard.current = guard;
   }, []);
@@ -22,6 +25,7 @@ export default function App() {
   useEffect(() => {
     const fn = () => {
       const nextPath = location.pathname;
+      if (nextPath === path) return;
       if (navigationGuard.current && !navigationGuard.current()) {
         history.pushState({}, '', path);
         return;
@@ -31,13 +35,15 @@ export default function App() {
     window.addEventListener('popstate', fn);
     return () => window.removeEventListener('popstate', fn);
   }, [path]);
-  useEffect(() => {
+  const loadPage = useCallback(async () => {
+    setLoading(true);
+    setPublicError('');
     Promise.allSettled([api('/publico'), api('/session')]).then(
       ([pub, user]) => {
         if (pub.status === 'fulfilled') setData(pub.value);
         else
-          setError(
-            'No se pudo cargar la página. Compruebe que la API esté en ejecución.',
+          setPublicError(
+            'No pudimos cargar el bazar. Compruebe su conexión y vuelva a intentarlo.',
           );
         if (user.status === 'fulfilled') setAccount(user.value);
         setLoading(false);
@@ -45,18 +51,27 @@ export default function App() {
     );
   }, []);
   useEffect(() => {
+    loadPage();
+  }, [loadPage]);
+  useEffect(() => {
     if (!loading && !account && path.startsWith('/contenido'))
       navigate('/login');
   }, [loading, account, path]);
   async function submit(e) {
     e.preventDefault();
+    if (loginInFlight.current) return;
+    loginInFlight.current = true;
+    setSigningIn(true);
     setError('');
     try {
       const u = await api('/login', { method: 'POST', ...json(login) });
       setAccount(u);
       navigate('/contenido/portada');
-    } catch {
-      setError('Correo o contraseña incorrectos.');
+    } catch (failure) {
+      setError(failure.message);
+    } finally {
+      loginInFlight.current = false;
+      setSigningIn(false);
     }
   }
   async function logout() {
@@ -93,12 +108,16 @@ export default function App() {
         error={error}
         login={login}
         setLogin={setLogin}
+        busy={signingIn}
       />
     );
-  if (error)
+  if (publicError)
     return (
       <div className="center-state" role="alert">
-        {error}
+        <p>{publicError}</p>
+        <button className="button primary" type="button" onClick={loadPage}>
+          Volver a intentar
+        </button>
       </div>
     );
   return data ? (

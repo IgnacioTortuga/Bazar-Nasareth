@@ -9,10 +9,17 @@ export default function Field({
   onChange,
   data,
   disabled,
+  error,
+  required = false,
+  form,
 }) {
   const common = {
     id: name,
     disabled,
+    required,
+    form,
+    'aria-invalid': error ? true : undefined,
+    'aria-describedby': error ? `${name}-error` : undefined,
     onChange: (e) =>
       onChange(
         name,
@@ -56,7 +63,10 @@ export default function Field({
       className={kind === 'checkbox' ? 'checkbox-field' : 'field'}
       htmlFor={name}
     >
-      {label}
+      <span>
+        {label}
+        {required && <span className="required-label"> (obligatorio)</span>}
+      </span>
       {kind === 'textarea' ? (
         <textarea {...common} rows="4" value={value ?? ''} />
       ) : ['status', 'category', 'image', 'currency'].includes(kind) ? (
@@ -95,6 +105,11 @@ export default function Field({
                 : (value ?? '')
           }
         />
+      )}
+      {error && (
+        <span id={`${name}-error`} className="field-error">
+          {error}
+        </span>
       )}
     </label>
   );

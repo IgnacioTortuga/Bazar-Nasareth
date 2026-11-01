@@ -13,6 +13,9 @@ export default function ProductCatalog({
   business,
   images,
   campaign,
+  clearCampaign,
+  clearFilters,
+  returnUrl,
 }) {
   return (
     <section id="productos" className="wrap section">
@@ -28,10 +31,9 @@ export default function ProductCatalog({
       {campaign && (
         <div className="campaign-notice" role="status">
           <span>
-            🎃 Está viendo el catálogo para pedidos con temática de{' '}
-            <b>{campaign}</b>.
+            Temática para su consulta: <b>{campaign}</b>. Se añadirá al mensaje de WhatsApp.
           </span>
-          <button type="button" onClick={() => setCampaign('')}>
+          <button type="button" onClick={clearCampaign}>
             Quitar temática
           </button>
         </div>
@@ -102,13 +104,20 @@ export default function ProductCatalog({
                 <span>Por encargo</span>
               </div>
               <h3>
-                <a href={`/producto/${p.id}`}>{p.nombre}</a>
+                <a
+                  href={`/producto/${p.id}?volver=${encodeURIComponent(returnUrl)}`}
+                >
+                  {p.nombre}
+                </a>
               </h3>
               <p className="product-description">{p.descripcion}</p>
               <strong className="product-price">
                 {formattedPrice(p.precioInformativo, p.moneda)}
               </strong>
-              <a className="product-detail-link" href={`/producto/${p.id}`}>
+              <a
+                className="product-detail-link"
+                href={`/producto/${p.id}?volver=${encodeURIComponent(returnUrl)}`}
+              >
                 Ver detalles y compartir ↗
               </a>
               <details className="request-disclosure">
@@ -127,7 +136,12 @@ export default function ProductCatalog({
         ))}
       </div>
       {!products.length && (
-        <p className="empty">No hay productos con esos filtros.</p>
+        <div className="empty">
+          <p>No hay productos con esos filtros.</p>
+          <button className="button" type="button" onClick={clearFilters}>
+            Ver todo el catálogo
+          </button>
+        </div>
       )}
     </section>
   );

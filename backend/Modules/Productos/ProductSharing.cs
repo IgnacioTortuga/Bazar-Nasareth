@@ -18,11 +18,13 @@ public static class ProductSharing
             var images = await db.ProductoImagenes.AsNoTracking().Where(i => i.ProductoId == id).OrderBy(i => i.Orden).Join(db.Imagenes, i => i.ImagenId, image => image.Id, (i, image) => new ProductPhoto(image.Id, image.TextoAlternativo)).ToListAsync();
             // Se configura el dominio público explícitamente: no confiar en Host para metadatos compartidos.
             var publicUrl = configuration["PublicSiteUrl"];
-            return Results.Content(RenderProduct(product, business, images, publicUrl, enabled), "text/html; charset=utf-8");
+            return Results.Content(RenderProduct(product, business, images, publicUrl, enabled, ctx.Request.Query["volver"].ToString()), "text/html; charset=utf-8");
         });
     }
 
-    public static string RenderProduct(Producto p, InformacionNegocio business, IReadOnlyList<ProductPhoto> images, string? siteUrl, bool measure)
+    public static string CatalogReturnUrl(string? value) => value is { Length: <= 2048 } && (value == "/#productos" || (value.StartsWith("/?", StringComparison.Ordinal) && value.EndsWith("#productos", StringComparison.Ordinal))) && !value.Any(c => char.IsControl(c) || c == '\\') ? value : "/#productos";
+
+    public static string RenderProduct(Producto p, InformacionNegocio business, IReadOnlyList<ProductPhoto> images, string? siteUrl, bool measure, string? returnUrl = null)
     {
         static string E(string? value) => WebUtility.HtmlEncode(value ?? "");
         var validUrl = Uri.TryCreate(siteUrl, UriKind.Absolute, out var site) && site.Scheme == "https" && string.IsNullOrEmpty(site.UserInfo) && string.IsNullOrEmpty(site.Query) && string.IsNullOrEmpty(site.Fragment);
@@ -65,7 +67,7 @@ public static class ProductSharing
             </style></head>
             <body>
             <header class="detail-header"><div class="header-inner"><a class="brand" href="/"><img class="brand-mark" src="/images/simbolo-bazar.png" alt="" width="48" height="48"><span>{{{E(business.Nombre)}}}</span></a><span class="header-note">Detalles personalizados en Hojancha</span></div></header>
-            <main><a class="back-link" href="/#productos" aria-label="Volver al catálogo de productos">← Volver al catálogo</a>
+            <main><a class="back-link" href="{{{E(CatalogReturnUrl(returnUrl))}}}" aria-label="Volver al catálogo de productos">← Volver al catálogo</a>
             <section class="product-layout">
             <div class="media-card"><div class="hero-stage"><a class="hero-link" id="photo-link" href="/api/imagenes/{{{primaryPhoto.Id}}}/archivo" target="_blank" aria-label="Ver fotografía a tamaño completo"><img id="product-photo" src="/api/imagenes/{{{primaryPhoto.Id}}}/archivo" alt="{{{E(primaryPhoto.Alt)}}}" loading="eager" fetchpriority="high"></a></div>{{{thumbnails}}}</div>
             <article class="info-card"><span class="eyebrow">Producto personalizado</span><h1>{{{E(p.Nombre)}}}</h1><span class="availability">Por encargo</span><p class="description">{{{E(p.Descripcion)}}}</p>

@@ -6,12 +6,18 @@ export default function ProductImages({
   setPreview,
   setReviewed,
   data,
+  error,
+  disabled,
 }) {
   return (
     <label className="field image-picker" htmlFor="productoImagenes">
       Fotografías existentes{' '}
       <select
         id="productoImagenes"
+        form="content-editor-form"
+        disabled={disabled}
+        aria-invalid={error ? true : undefined}
+        aria-describedby={error ? 'productoImagenes-error' : undefined}
         multiple
         size="5"
         value={relationIds.map(String)}
@@ -29,6 +35,11 @@ export default function ProductImages({
           </option>
         ))}
       </select>
+      {error && (
+        <span id="productoImagenes-error" className="field-error">
+          {error}
+        </span>
+      )}
       <small>
         Puede elegir varias. Cambiar la selección actualiza solo este producto
         al guardar.
