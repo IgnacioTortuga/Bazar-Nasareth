@@ -1,3 +1,11 @@
+import {
+  LanguageProvider,
+  LanguageToggle,
+  useLanguage,
+} from '../shared/Language.jsx';
+import { useMemo } from 'react';
+import { localizeCatalog } from '../shared/translations.js';
+import ThemeFeedback from '../shared/ThemeFeedback.jsx';
 import React, { useEffect, useState } from 'react';
 import { BazarDoodle } from '../shared/Icons.jsx';
 import ProductCatalog from '../modules/productos/ProductCatalog.jsx';
@@ -8,13 +16,73 @@ import Highlights from '../modules/contenido/Highlights.jsx';
 import TextBlocks from '../modules/contenido/TextBlocks.jsx';
 import ContactSection from '../modules/contacto/ContactSection.jsx';
 import Gallery from '../modules/galeria/Gallery.jsx';
+import {
+  readCatalogFilters,
+  catalogReturnUrl,
+  filterCatalog,
+} from '../modules/productos/catalogFilters.js';
+import { promotionTimingLabel } from '../shared/format.js';
+import {
+  useReadingPreferences,
+  ContrastToggle,
+  ReadingMenu,
+} from '../shared/ReadingControls.jsx';
 
 export default function Public({ data }) {
-  const [category, setCategory] = useState(''),
-    [search, setSearch] = useState(''),
+  return (
+    <LanguageProvider>
+      <PublicContent originalData={data} />
+    </LanguageProvider>
+  );
+}
+function PublicContent({ originalData }) {
+  const { t, language } = useLanguage();
+  const data = useMemo(
+    () => localizeCatalog(originalData, language),
+    [originalData, language],
+  );
+
+  const reading = useReadingPreferences();
+  const [themeFeedback, setThemeFeedback] = useState(null);
+  const [filters, setFilters] = useState(readCatalogFilters),
     [menu, setMenu] = useState(false),
-    [campaign, setCampaign] = useState(''),
     [activeSection, setActiveSection] = useState('inicio');
+  const { category, search, promotionId } = filters;
+  const setCategory = (value) =>
+    setFilters((current) => ({ ...current, category: value }));
+  const setSearch = (value) =>
+    setFilters((current) => ({ ...current, search: value }));
+  const promotion = data.promociones.find(
+    (item) =>
+      String(item.id) === promotionId &&
+      promotionTimingLabel(item) === 'Vigente',
+  );
+  const campaign = promotion?.titulo || '';
+  const returnUrl = catalogReturnUrl({ ...filters, language });
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    const values = { categoria: category, q: search, promocion: promotionId };
+    for (const [key, value] of Object.entries(values)) {
+      if (value) url.searchParams.set(key, value);
+      else url.searchParams.delete(key);
+    }
+    history.replaceState(history.state, '', url);
+  }, [category, search, promotionId]);
+  useEffect(() => {
+    const restore = () => setFilters(readCatalogFilters());
+    const closeMenu = (event) => {
+      if (event.key === 'Escape' && menu) {
+        setMenu(false);
+        document.querySelector('.public-header .mobile-menu')?.focus();
+      }
+    };
+    window.addEventListener('popstate', restore);
+    window.addEventListener('keydown', closeMenu);
+    return () => {
+      window.removeEventListener('popstate', restore);
+      window.removeEventListener('keydown', closeMenu);
+    };
+  }, [menu]);
   const business = data.negocio,
     images = Object.fromEntries(
       data.imagenes.map((i) => [i.id, i.textoAlternativo]),
@@ -22,17 +90,13 @@ export default function Public({ data }) {
   const hero =
     data.secciones.find((s) => s.clave === 'portada') ||
     data.secciones.find((s) => s.clave === 'presentación');
-  const products = data.productos.filter(
-    (p) =>
-      (!category || p.categoriaId === Number(category)) &&
-      p.nombre.toLowerCase().includes(search.toLowerCase()),
-  );
+  const products = filterCatalog(data, filters);
   const links = [
-    ['productos', 'Productos'],
-    ['servicios', 'Servicios'],
-    ['promociones', 'Promociones'],
-    ['galeria', 'Galería'],
-    ['contacto', 'Contacto'],
+    ['productos', t('Productos')],
+    ['servicios', t('Servicios')],
+    ['promociones', t('Promociones')],
+    ['galeria', t('Galería')],
+    ['contacto', t('Contacto')],
   ];
   useEffect(() => {
     const sectionIds = ['inicio', ...links.map(([id]) => id)];
@@ -81,29 +145,44 @@ export default function Public({ data }) {
   function searchCatalog(e) {
     e.preventDefault();
     setMenu(false);
-    document
-      .getElementById('productos')
-      ?.scrollIntoView({ behavior: 'smooth' });
+    document.getElementById('productos')?.scrollIntoView({
+      behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches
+        ? 'auto'
+        : 'smooth',
+    });
   }
   function openCampaign(promotion) {
-    setCampaign(
-      /halloween/i.test(promotion.titulo) ? 'Halloween' : promotion.titulo,
+    setThemeFeedback(
+      /halloween/i.test(promotion.titulo)
+        ? { title: promotion.titulo, id: performance.now() }
+        : null,
     );
-    setCategory('');
-    setSearch('');
-    document
-      .getElementById('productos')
-      ?.scrollIntoView({ behavior: 'smooth' });
+    setFilters({ category: '', search: '', promotionId: String(promotion.id) });
+    document.getElementById('productos')?.scrollIntoView({
+      behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches
+        ? 'auto'
+        : 'smooth',
+    });
   }
   return (
     <div className="public-site">
+      {themeFeedback && (
+        <ThemeFeedback
+          key={themeFeedback.id}
+          title={themeFeedback.title}
+          onClose={() => setThemeFeedback(null)}
+        />
+      )}
       <a className="skip-link" href="#productos">
-        Saltar al catálogo
+        {' '}
+        {t('Saltar al catálogo')}{' '}
       </a>
       <div className="welcome-ribbon">
-        <BazarDoodle /> Un detalle pequeño. Una sonrisa enorme. <BazarDoodle />
+        <BazarDoodle /> {t('Un detalle pequeño. Una sonrisa enorme.')}{' '}
+        <BazarDoodle />
       </div>
       <header className="public-header">
+        <ContrastToggle theme={reading.theme} onToggle={reading.toggleTheme} />
         <div className="header-inner wrap">
           <a className="brand" href="#inicio">
             <img
@@ -120,7 +199,7 @@ export default function Public({ data }) {
             onClick={() => setMenu(!menu)}
             aria-expanded={menu}
             aria-controls="public-navigation"
-            aria-label={menu ? 'Cerrar navegación' : 'Abrir navegación'}
+            aria-label={menu ? t('Cerrar navegación') : t('Abrir navegación')}
           >
             ☰
           </button>
@@ -133,7 +212,8 @@ export default function Public({ data }) {
                 setMenu(false);
               }}
             >
-              Inicio
+              {' '}
+              {t('Inicio')}{' '}
             </a>
             {links.map(([id, label]) => (
               <a
@@ -152,15 +232,22 @@ export default function Public({ data }) {
           <form className="header-search" onSubmit={searchCatalog}>
             <input
               type="search"
-              aria-label="Buscar productos en el catálogo"
+              aria-label={t('Buscar productos en el catálogo')}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Buscar productos…"
+              placeholder={t('Buscar productos…')}
             />
-            <button type="submit" aria-label="Buscar">
+            <button type="submit" aria-label={t('Buscar')}>
               ⌕
             </button>
           </form>
+        </div>
+        <div className="header-utilities">
+          <LanguageToggle />
+          <ReadingMenu
+            fontSize={reading.fontSize}
+            onSizeChange={reading.setFontSize}
+          />
         </div>
       </header>
       <main>
@@ -176,6 +263,14 @@ export default function Public({ data }) {
           business={business}
           images={images}
           campaign={campaign}
+          clearCampaign={() => {
+            setThemeFeedback(null);
+            setFilters((current) => ({ ...current, promotionId: '' }));
+          }}
+          clearFilters={() =>
+            setFilters({ category: '', search: '', promotionId: '' })
+          }
+          returnUrl={returnUrl}
         />
         <ServicesSection data={data} images={images} business={business} />
         <PromotionsSection
@@ -190,8 +285,10 @@ export default function Public({ data }) {
       <footer>
         <div className="wrap">
           <b>{business.nombre}</b>
-          <span>Dos tiendas en Hojancha · {business.telefono}</span>
-          <a href="/login">Acceso al editor</a>
+          <span>
+            {t('Dos tiendas en Hojancha ·')} {business.telefono}
+          </span>
+          <a href="/login">{t('Acceso al editor')}</a>
         </div>
       </footer>
     </div>

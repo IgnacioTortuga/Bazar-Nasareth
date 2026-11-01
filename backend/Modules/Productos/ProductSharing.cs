@@ -10,39 +10,52 @@ public static class ProductSharing
         bool enabled = configuration.GetValue<bool>("MedicionWhatsApp:Enabled");
         app.MapGet("/producto/{id:int}", async (int id, BazarDb db, HttpContext ctx) =>
         {
+            var language = ctx.Request.Query["lang"] == "en" ? "en" : "es";
             var product = await PublicProducts(db).SingleOrDefaultAsync(p => p.Id == id);
             ctx.Response.Headers.CacheControl = "no-store";
             if (product is null)
-                return Results.Content("<!doctype html><html lang=\"es\"><meta charset=\"utf-8\"><title>Producto no disponible</title><h1>Este producto no está disponible</h1><a href=\"/#productos\">Volver al catálogo</a></html>", "text/html; charset=utf-8", statusCode: 404);
+                return Results.Content(RenderUnavailable(language), "text/html; charset=utf-8", statusCode: 404);
             var business = await db.Negocio.AsNoTracking().SingleAsync(n => n.Id == 1);
             var images = await db.ProductoImagenes.AsNoTracking().Where(i => i.ProductoId == id).OrderBy(i => i.Orden).Join(db.Imagenes, i => i.ImagenId, image => image.Id, (i, image) => new ProductPhoto(image.Id, image.TextoAlternativo)).ToListAsync();
             // Se configura el dominio público explícitamente: no confiar en Host para metadatos compartidos.
             var publicUrl = configuration["PublicSiteUrl"];
-            return Results.Content(RenderProduct(product, business, images, publicUrl, enabled), "text/html; charset=utf-8");
+            return Results.Content(RenderProduct(product, business, images, publicUrl, enabled, ctx.Request.Query["volver"].ToString(), language), "text/html; charset=utf-8");
         });
     }
 
-    public static string RenderProduct(Producto p, InformacionNegocio business, IReadOnlyList<ProductPhoto> images, string? siteUrl, bool measure)
+    public static string RenderUnavailable(string language)
     {
+        var english = language == "en";
+        string T(string text) => WebUtility.HtmlEncode(PublicLocalization.Translate(text, english));
+        return $"<!doctype html><html lang=\"{(english ? "en" : "es")}\"><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><title>{T("Producto no disponible")}</title><h1>{T("Este producto no está disponible")}</h1><a href=\"/?lang={(english ? "en" : "es")}#productos\">{T("Volver al catálogo")}</a></html>";
+    }
+
+    public static string CatalogReturnUrl(string? value) => value is { Length: <= 2048 } && (value == "/#productos" || (value.StartsWith("/?", StringComparison.Ordinal) && value.EndsWith("#productos", StringComparison.Ordinal))) && !value.Any(c => char.IsControl(c) || c == '\\') ? value : "/#productos";
+
+    public static string RenderProduct(Producto p, InformacionNegocio business, IReadOnlyList<ProductPhoto> images, string? siteUrl, bool measure, string? returnUrl = null, string language = "es")
+    {
+        var english = language == "en";
+        var lang = english ? "en" : "es";
+        string T(string text) => PublicLocalization.Translate(text, english);
         static string E(string? value) => WebUtility.HtmlEncode(value ?? "");
         var validUrl = Uri.TryCreate(siteUrl, UriKind.Absolute, out var site) && site.Scheme == "https" && string.IsNullOrEmpty(site.UserInfo) && string.IsNullOrEmpty(site.Query) && string.IsNullOrEmpty(site.Fragment);
         var root = validUrl ? site!.GetLeftPart(UriPartial.Authority) : null;
-        var pageUrl = root + $"/producto/{p.Id}";
+        var pageUrl = root + $"/producto/{p.Id}" + (english ? "?lang=en" : "");
         var metadata = root is null ? "" : $"<link rel=\"canonical\" href=\"{E(pageUrl)}\"><meta property=\"og:url\" content=\"{E(pageUrl)}\">";
         if (root is not null && images.Count > 0)
-            metadata += $"<meta property=\"og:image\" content=\"{E(root)}/api/imagenes/{images[0].Id}/archivo\"><meta property=\"og:image:alt\" content=\"{E(images[0].Alt)}\">";
+            metadata += $"<meta property=\"og:image\" content=\"{E(root)}/api/imagenes/{images[0].Id}/archivo\"><meta property=\"og:image:alt\" content=\"{E(T(images[0].Alt))}\">";
         var primaryPhoto = images[0];
-        var thumbnails = images.Count > 1 ? $"<div class=\"thumbnails\" aria-label=\"Fotografías del producto\">{string.Join("", images.Select((i, index) => $"<button type=\"button\" class=\"thumbnail{(index == 0 ? " active" : "")}\" aria-label=\"Mostrar fotografía {index + 1}\" aria-pressed=\"{(index == 0 ? "true" : "false")}\" data-src=\"/api/imagenes/{i.Id}/archivo\" data-alt=\"{E(i.Alt)}\"><img src=\"/api/imagenes/{i.Id}/archivo\" alt=\"\" loading=\"lazy\"></button>"))}</div>" : "";
+        var thumbnails = images.Count > 1 ? $"<div class=\"thumbnails\" aria-label=\"{E(T("Fotografías del producto"))}\">{string.Join("", images.Select((i, index) => $"<button type=\"button\" class=\"thumbnail{(index == 0 ? " active" : "")}\" aria-label=\"{E(T("Mostrar fotografía"))} {index + 1}\" aria-pressed=\"{(index == 0 ? "true" : "false")}\" data-src=\"/api/imagenes/{i.Id}/archivo\" data-alt=\"{E(T(i.Alt))}\"><img src=\"/api/imagenes/{i.Id}/archivo\" alt=\"\" loading=\"lazy\"></button>"))}</div>" : "";
         var phone = new string (business.Telefono.Where(char.IsAsciiDigit).ToArray());
-        var message = Uri.EscapeDataString($"Hola, me interesa cotizar este producto:\n• Producto: {p.Nombre}\n• Modalidad: Por encargo\n\n¿Podrían confirmarme disponibilidad, plazo de entrega y precio final?");
-        var price = p.PrecioInformativo.HasValue ? $"{p.Moneda} {p.PrecioInformativo.Value.ToString("N2", CultureInfo.GetCultureInfo("es-CR"))}" : "Consultar precio";
+        var message = Uri.EscapeDataString(english ? $"Hello, I would like a quote for this product:\n• Product: {T(p.Nombre)}\n• Availability: Made to order\n\nCould you confirm availability, lead time and the final price?" : $"Hola, me interesa cotizar este producto:\n• Producto: {p.Nombre}\n• Modalidad: Por encargo\n\n¿Podrían confirmarme disponibilidad, plazo de entrega y precio final?");
+        var price = p.PrecioInformativo.HasValue ? $"{p.Moneda} {p.PrecioInformativo.Value.ToString("N2", CultureInfo.GetCultureInfo(english ? "en-US" : "es-CR"))}" : T("Consultar precio");
         var tracking = measure ? $"fetch('/api/productos/{p.Id}/clic-whatsapp?origen=detalle',{{method:'POST',credentials:'same-origin',keepalive:true}}).catch(()=>{{}});" : "";
         return $$$"""
-            <!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-            <title>{{{E(p.Nombre)}}} · {{{E(business.Nombre)}}}</title><meta name="description" content="{{{E(p.Descripcion)}}}">
+            <!doctype html><html lang="{{{lang}}}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+            <title>{{{E(T(p.Nombre))}}} · {{{E(business.Nombre)}}}</title><meta name="description" content="{{{E(T(p.Descripcion))}}}">
             <meta name="theme-color" content="#fffaf7">
-            <meta property="og:type" content="product"><meta property="og:title" content="{{{E(p.Nombre)}}}">
-            <meta property="og:description" content="{{{E(p.Descripcion)}}}">{{{metadata}}}
+            <meta property="og:type" content="product"><meta property="og:title" content="{{{E(T(p.Nombre))}}}">
+            <meta property="og:description" content="{{{E(T(p.Descripcion))}}}">{{{metadata}}}
             <style>
             :root{font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#493653;background:#fffaf7;line-height:1.6;font-synthesis:none}
             *{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 8% 8%,#f9eaf3 0,transparent 25%),#fffaf7;color:#493653}img{display:block;max-width:100%}a{color:inherit}button{font:inherit}
@@ -64,20 +77,20 @@ public static class ProductSharing
             @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
             </style></head>
             <body>
-            <header class="detail-header"><div class="header-inner"><a class="brand" href="/"><img class="brand-mark" src="/images/simbolo-bazar.png" alt="" width="48" height="48"><span>{{{E(business.Nombre)}}}</span></a><span class="header-note">Detalles personalizados en Hojancha</span></div></header>
-            <main><a class="back-link" href="/#productos" aria-label="Volver al catálogo de productos">← Volver al catálogo</a>
+            <header class="detail-header"><div class="header-inner"><a class="brand" href="/?lang={{{lang}}}"><img class="brand-mark" src="/images/simbolo-bazar.png" alt="" width="48" height="48"><span>{{{E(business.Nombre)}}}</span></a><span class="header-note">{{{E(T("Detalles personalizados en Hojancha"))}}}</span></div></header>
+            <main><a class="back-link" href="{{{E(CatalogReturnUrl(returnUrl ?? (english ? "/?lang=en#productos" : "/#productos")))}}}" aria-label="{{{E(T("Volver al catálogo de productos"))}}}">← {{{E(T("Volver al catálogo"))}}}</a>
             <section class="product-layout">
-            <div class="media-card"><div class="hero-stage"><a class="hero-link" id="photo-link" href="/api/imagenes/{{{primaryPhoto.Id}}}/archivo" target="_blank" aria-label="Ver fotografía a tamaño completo"><img id="product-photo" src="/api/imagenes/{{{primaryPhoto.Id}}}/archivo" alt="{{{E(primaryPhoto.Alt)}}}" loading="eager" fetchpriority="high"></a></div>{{{thumbnails}}}</div>
-            <article class="info-card"><span class="eyebrow">Producto personalizado</span><h1>{{{E(p.Nombre)}}}</h1><span class="availability">Por encargo</span><p class="description">{{{E(p.Descripcion)}}}</p>
-            <div class="price-block"><span class="price-label">Precio informativo</span><strong class="price">{{{E(price)}}}</strong><span class="price-help">Sujeto a confirmación según diseño y disponibilidad.</span></div>
-            <p class="order-note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 3v18M3 12h18"/></svg><span>Confirme por WhatsApp la disponibilidad, el diseño y el plazo de entrega antes de realizar el encargo.</span></p>
-            <div class="actions"><a class="button button-primary" id="whatsapp" target="_blank" rel="noopener noreferrer" href="https://wa.me/{{{phone}}}?text={{{message}}}">Consultar por WhatsApp</a><button class="button button-secondary" type="button" id="share">Compartir producto</button></div>
+            <div class="media-card"><div class="hero-stage"><a class="hero-link" id="photo-link" href="/api/imagenes/{{{primaryPhoto.Id}}}/archivo" target="_blank" aria-label="{{{E(T("Ver fotografía a tamaño completo"))}}}"><img id="product-photo" src="/api/imagenes/{{{primaryPhoto.Id}}}/archivo" alt="{{{E(T(primaryPhoto.Alt))}}}" loading="eager" fetchpriority="high"></a></div>{{{thumbnails}}}</div>
+            <article class="info-card"><span class="eyebrow">{{{E(T("Producto personalizado"))}}}</span><h1>{{{E(T(p.Nombre))}}}</h1><span class="availability">{{{E(T("Por encargo"))}}}</span><p class="description">{{{E(T(p.Descripcion))}}}</p>
+            <div class="price-block"><span class="price-label">{{{E(T("Precio informativo"))}}}</span><strong class="price">{{{E(price)}}}</strong><span class="price-help">{{{E(T("Sujeto a confirmación según diseño y disponibilidad."))}}}</span></div>
+            <p class="order-note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 3v18M3 12h18"/></svg><span>{{{E(T("Confirme por WhatsApp la disponibilidad, el diseño y el plazo de entrega antes de realizar el encargo."))}}}</span></p>
+            <div class="actions"><a class="button button-primary" id="whatsapp" target="_blank" rel="noopener noreferrer" href="https://wa.me/{{{phone}}}?text={{{message}}}">{{{E(T("Consultar por WhatsApp"))}}}</a><button class="button button-secondary" type="button" id="share">{{{E(T("Compartir producto"))}}}</button></div>
             <p id="share-result" role="status" aria-live="polite"></p></article></section>
-            <section class="confidence" aria-label="Información de compra"><article><b>Atención personalizada</b><span>Le ayudamos a confirmar su diseño.</span></article><article><b>Preparado por encargo</b><span>El plazo se acuerda antes de producir.</span></article><article><b>Precio transparente</b><span>Recibirá confirmación antes de continuar.</span></article></section></main>
-            <footer><div class="footer-inner"><b>{{{E(business.Nombre)}}}</b><span>{{{E(business.Telefono)}}}</span><a href="/#contacto">Ubicación y horarios</a></div></footer>
+            <section class="confidence" aria-label="{{{E(T("Información de compra"))}}}"><article><b>{{{E(T("Atención personalizada"))}}}</b><span>{{{E(T("Le ayudamos a confirmar su diseño."))}}}</span></article><article><b>{{{E(T("Preparado por encargo"))}}}</b><span>{{{E(T("El plazo se acuerda antes de producir."))}}}</span></article><article><b>{{{E(T("Precio transparente"))}}}</b><span>{{{E(T("Recibirá confirmación antes de continuar."))}}}</span></article></section></main>
+            <footer><div class="footer-inner"><b>{{{E(business.Nombre)}}}</b><span>{{{E(business.Telefono)}}}</span><a href="/?lang={{{lang}}}#contacto">{{{E(T("Ubicación y horarios"))}}}</a></div></footer>
             <script>document.getElementById('whatsapp').addEventListener('click',()=>{ {{{tracking}}} });
             document.querySelectorAll('.thumbnail').forEach(button=>button.addEventListener('click',()=>{const image=document.getElementById('product-photo');const link=document.getElementById('photo-link');image.src=button.dataset.src;image.alt=button.dataset.alt;link.href=button.dataset.src;document.querySelectorAll('.thumbnail').forEach(item=>{item.classList.toggle('active',item===button);item.setAttribute('aria-pressed',item===button?'true':'false');});}));
-            document.getElementById('share').addEventListener('click',async()=>{const url=location.origin+location.pathname;try{if(navigator.share){await navigator.share({title:document.title,url});}else{await navigator.clipboard.writeText(url);document.getElementById('share-result').textContent='Enlace copiado.';}}catch(error){if(error.name!=='AbortError')document.getElementById('share-result').textContent='Copie el enlace desde la barra de direcciones.';}});</script></body></html>
+            document.getElementById('share').addEventListener('click',async()=>{const url=location.origin+location.pathname+{{{System.Text.Json.JsonSerializer.Serialize(english ? "?lang=en" : "")}}};try{if(navigator.share){await navigator.share({title:document.title,url});}else{await navigator.clipboard.writeText(url);document.getElementById('share-result').textContent={{{System.Text.Json.JsonSerializer.Serialize(T("Enlace copiado."))}}};}}catch(error){if(error.name!=='AbortError')document.getElementById('share-result').textContent={{{System.Text.Json.JsonSerializer.Serialize(T("Copie el enlace desde la barra de direcciones."))}}};}});</script></body></html>
             """;
     }
 }

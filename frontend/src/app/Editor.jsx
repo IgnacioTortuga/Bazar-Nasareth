@@ -21,6 +21,12 @@ import WhatsAppMetrics from '../modules/metricas/WhatsAppMetrics.jsx';
 import BusinessForm from '../modules/contacto/BusinessForm.jsx';
 import ImageLibrary from '../modules/imagenes/ImageLibrary.jsx';
 import AccountsPanel from '../modules/usuarios/AccountsPanel.jsx';
+import FormErrors from '../shared/FormErrors.jsx';
+import {
+  browserErrors,
+  contentErrors,
+  requiredFields,
+} from '../shared/contentValidation.js';
 
 export default function Editor({
   account,
@@ -41,6 +47,13 @@ export default function Editor({
     [busy, setBusy] = useState(false),
     [menu, setMenu] = useState(false);
   const menuButton = useRef(null);
+  const [errors, setErrors] = useState({});
+  const [errorAttempt, setErrorAttempt] = useState(0);
+  function showErrors(next) {
+    setErrors(next);
+    setErrorAttempt((value) => value + 1);
+  }
+  const [formResetKey, setFormResetKey] = useState(0);
   const [relationIds, setRelationIds] = useState([]),
     [promoProducts, setPromoProducts] = useState([]),
     [promoServices, setPromoServices] = useState([]);
@@ -55,7 +68,15 @@ export default function Editor({
     imageUsages,
   } = useImageLibrary({ data, permitted, reload, setMessage, setBusy });
   const [inlineUpload, setInlineUpload] = useState({ file: null, alt: '' });
-  const { editorForm, setEditorForm, saveEditor, loadEditors } = useAccounts({
+  const {
+    editorForm,
+    setEditorForm,
+    saveEditor,
+    loadEditors,
+    accountDirty,
+    resetAccount,
+    openAccount,
+  } = useAccounts({
     setBusy,
     setMessage,
     setData,
@@ -64,7 +85,7 @@ export default function Editor({
     setActive(path.split('/')[2] || 'portada');
   }, [path]);
 
-  const hasUnsavedChanges = () => {
+  const hasDraftChanges = () => {
     const baseline = active === 'contacto' ? data.negocio : selected;
     if (draft && JSON.stringify(draft) !== JSON.stringify(baseline))
       return true;
@@ -77,7 +98,7 @@ export default function Editor({
         .filter((x) => x.productoId === selected?.id)
         .sort((a, b) => a.orden - b.orden)
         .map((x) => x.imagenId);
-      if (!sameIds(relationIds, original)) return true;
+      if (JSON.stringify(relationIds) !== JSON.stringify(original)) return true;
     }
     if (active === 'promociones') {
       const originalProducts = (data.relaciones?.promocionProductos || [])
@@ -94,15 +115,41 @@ export default function Editor({
     }
     return false;
   };
+  const hasUnsavedChanges = () =>
+    hasDraftChanges() ||
+    accountDirty ||
+    !!upload.file ||
+    !!upload.alt.trim() ||
+    !!inlineUpload.file ||
+    !!inlineUpload.alt.trim();
+  function canDiscardChanges() {
+    if (busy) {
+      setMessage(
+        'Espere a que termine la operación antes de cambiar de formulario.',
+      );
+      return false;
+    }
+    return (
+      !hasUnsavedChanges() ||
+      confirm('Hay cambios sin guardar. ¿Descartarlos y continuar?')
+    );
+  }
+  function resetPendingChanges() {
+    setSelected(null);
+    setDraft(null);
+    setPreview(false);
+    setReviewed(false);
+    setInlineUpload({ file: null, alt: '' });
+    setUpload({ file: null, alt: '' });
+    resetAccount();
+    setErrors({});
+    setFormResetKey((value) => value + 1);
+  }
   const dirty = hasUnsavedChanges();
   useEffect(() => {
     const guard = () => {
-      if (hasUnsavedChanges() && !confirm('Hay cambios sin guardar. ¿Salir?'))
-        return false;
-      setSelected(null);
-      setDraft(null);
-      setPreview(false);
-      setReviewed(false);
+      if (!canDiscardChanges()) return false;
+      resetPendingChanges();
       setMenu(false);
       return true;
     };
@@ -117,6 +164,10 @@ export default function Editor({
     promoProducts,
     promoServices,
     registerNavigationGuard,
+    accountDirty,
+    upload,
+    inlineUpload,
+    busy,
   ]);
   useEffect(() => {
     if (!dirty) return;
@@ -164,41 +215,32 @@ export default function Editor({
     reload();
   }, []);
   function go(section) {
-    if (hasUnsavedChanges() && !confirm('Hay cambios sin guardar. ¿Salir?'))
-      return;
+    if (!canDiscardChanges()) return;
     setActive(section);
     navigate('/contenido/' + section);
-    setSelected(null);
-    setDraft(null);
-    setPreview(false);
-    setReviewed(false);
+    resetPendingChanges();
     setMenu(false);
     setMessage('');
   }
   function closeDraft() {
-    if (
-      hasUnsavedChanges() &&
-      !confirm('Hay cambios sin guardar. ¿Cerrar sin guardarlos?')
-    )
-      return;
-    setSelected(null);
-    setDraft(null);
-    setPreview(false);
-    setReviewed(false);
+    if (!canDiscardChanges()) return;
+    resetPendingChanges();
   }
   function closePreview() {
     setPreview(false);
     setReviewed(true);
   }
   async function requestLogout() {
-    if (
-      hasUnsavedChanges() &&
-      !confirm('Hay cambios sin guardar. ¿Cerrar sesión de todas formas?')
-    )
-      return;
-    await logout();
+    if (!canDiscardChanges()) return;
+    try {
+      await logout();
+    } catch (failure) {
+      setMessage(failure.message);
+    }
   }
   function open(entity) {
+    if (!canDiscardChanges()) return;
+    resetPendingChanges();
     const item = entity
       ? structuredClone(entity)
       : structuredClone(defaults[collection[active] || 'productos']);
@@ -225,6 +267,7 @@ export default function Editor({
     );
   }
   async function changePublicationState(item, nextState) {
+    if (busy || (selected?.id === item.id && !canDiscardChanges())) return;
     const route = collection[active];
     if (
       !route ||
@@ -262,11 +305,30 @@ export default function Editor({
     }
   }
 
-  async function save() {
+  async function save(event) {
+    event.preventDefault();
     const route = collection[active];
     if (!route || !draft || busy) return;
+    if (inlineUpload.file || inlineUpload.alt.trim()) {
+      showErrors({
+        _form:
+          'Hay una fotografía pendiente de cargar. Use «Subir y asignar imagen» o «Descartar selección» antes de guardar el contenido.',
+      });
+      return;
+    }
+    const nextErrors = {
+      ...browserErrors(event.currentTarget),
+      ...contentErrors(active, draft, relationIds, data, fieldsets[route]),
+    };
+    if (Object.keys(nextErrors).length) {
+      showErrors(nextErrors);
+      return;
+    }
+    setErrors({});
     if (draft.estado === 'Publicado' && !reviewed) {
-      setMessage('Abra la vista previa antes de publicar o actualizar.');
+      showErrors({
+        _form: 'Abra la vista previa antes de publicar o actualizar.',
+      });
       return;
     }
     if (
@@ -300,23 +362,25 @@ export default function Editor({
           (combined ? '/guardar' : ''),
         { method: draft.id ? 'PUT' : 'POST', ...json(payload) },
       );
-      setDraft(null);
-      setSelected(null);
-      setPreview(false);
-      setReviewed(false);
+      resetPendingChanges();
       await reload();
       setMessage('Cambios guardados.');
     } catch (e) {
-      setMessage(e.message);
+      showErrors({ _form: e.message });
     } finally {
       setBusy(false);
     }
   }
   async function saveBusiness(e) {
     e.preventDefault();
+    if (busy) return;
     setBusy(true);
     try {
-      await api('/admin/negocio', { method: 'PUT', ...json(draft) });
+      await api('/admin/negocio', {
+        method: 'PUT',
+        ...json(draft || data.negocio),
+      });
+      setDraft(null);
       await reload();
       setMessage('Contacto actualizado.');
     } catch (e) {
@@ -352,7 +416,7 @@ export default function Editor({
         active === 'galeria' && selected?.id
           ? (data.galeria || []).find((item) => item.id === selected.id)
           : null;
-      if (persistedGalleryItem && !hasUnsavedChanges()) {
+      if (persistedGalleryItem && !hasDraftChanges()) {
         const updated = await api(`/admin/galeria/${persistedGalleryItem.id}`, {
           method: 'PUT',
           ...json({ ...persistedGalleryItem, imagenId: img.id }),
@@ -470,6 +534,7 @@ export default function Editor({
             />
           ) : active === 'imagenes' ? (
             <ImageLibrary
+              key={formResetKey}
               data={data}
               uploadImage={uploadImage}
               upload={upload}
@@ -488,6 +553,7 @@ export default function Editor({
               setEditorForm={setEditorForm}
               saveEditor={saveEditor}
               busy={busy}
+              openAccount={openAccount}
             />
           ) : (
             route && (
@@ -603,17 +669,31 @@ export default function Editor({
                 </PaginatedList>
                 {draft && (
                   <div className="form-panel">
+                    <form
+                      id="content-editor-form"
+                      noValidate
+                      onSubmit={save}
+                      aria-busy={busy}
+                    />
+                    <FormErrors errors={errors} focusKey={errorAttempt} />
                     <div className="row spread">
                       <h2>
                         {draft.id ? 'Editar' : 'Crear'}{' '}
                         {labels[active].toLowerCase()}
                       </h2>
-                      <button onClick={closeDraft}>Cerrar ×</button>
+                      <button
+                        type="button"
+                        disabled={busy}
+                        onClick={closeDraft}
+                      >
+                        Cerrar ×
+                      </button>
                     </div>
                     {active === 'productos' && (
                       <p className="hint">
-                        Guarde primero un borrador para asignar fotografías;
-                        después puede publicarlo.
+                        Seleccione fotografías de la biblioteca o cargue una
+                        nueva abajo. El producto y sus fotografías se guardan
+                        juntos. Puede guardar un borrador antes de publicarlo.
                       </p>
                     )}
                     {active === 'promociones' && (
@@ -649,11 +729,22 @@ export default function Editor({
                         value={draft[name]}
                         onChange={(n, v) => {
                           setDraft({ ...draft, [n]: v });
+                          setErrors((current) => {
+                            const next = { ...current };
+                            delete next[n];
+                            delete next._form;
+                            return next;
+                          });
                           setPreview(false);
                           setReviewed(false);
                         }}
                         data={data}
-                        disabled={active === 'portada' && name === 'clave'}
+                        disabled={
+                          busy || (active === 'portada' && name === 'clave')
+                        }
+                        form="content-editor-form"
+                        error={errors[name]}
+                        required={requiredFields(active, draft).includes(name)}
                       />
                     ))}
                     {active === 'productos' && (
@@ -663,6 +754,8 @@ export default function Editor({
                         setPreview={setPreview}
                         setReviewed={setReviewed}
                         data={data}
+                        error={errors.productoImagenes}
+                        disabled={busy}
                       />
                     )}
                     {[
@@ -674,6 +767,7 @@ export default function Editor({
                       'textos',
                     ].includes(active) && (
                       <InlineImageTools
+                        key={formResetKey}
                         permitted={permitted}
                         uploadInlineImage={uploadInlineImage}
                         inlineUpload={inlineUpload}
@@ -700,6 +794,8 @@ export default function Editor({
                     <div className="row">
                       <button
                         className="button"
+                        type="button"
+                        disabled={busy}
                         onClick={() => {
                           setPreview(true);
                           setReviewed(false);
@@ -710,8 +806,9 @@ export default function Editor({
                       </button>
                       <button
                         className="button primary"
+                        type="submit"
+                        form="content-editor-form"
                         disabled={busy}
-                        onClick={save}
                       >
                         Guardar{' '}
                         {draft.estado === 'Publicado' ? 'y publicar' : ''}

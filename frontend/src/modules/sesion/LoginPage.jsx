@@ -1,9 +1,9 @@
 import React from 'react';
 
-export default function LoginPage({ submit, error, login, setLogin }) {
+export default function LoginPage({ submit, error, login, setLogin, busy }) {
   return (
     <div className="login-screen">
-      <form className="login-card" onSubmit={submit}>
+      <form className="login-card" onSubmit={submit} aria-busy={busy}>
         <a href="/">← Volver al sitio</a>
         <span className="eyebrow">BAZAR NAZARETH</span>
         <h1>Acceso al editor</h1>
@@ -28,7 +28,10 @@ export default function LoginPage({ submit, error, login, setLogin }) {
             onChange={(e) => setLogin({ ...login, password: e.target.value })}
           />
         </label>
-        <button className="button primary">Iniciar sesión</button>
+        <button className="button primary" disabled={busy}>
+          {busy ? 'Ingresando…' : 'Iniciar sesión'}
+        </button>
+        {busy && <p role="status">Comprobando el acceso…</p>}
       </form>
     </div>
   );

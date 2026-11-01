@@ -25,6 +25,7 @@ export default function InlineImageTools({
             Archivo JPG, PNG o WebP (máximo 5 MB)
             <input
               type="file"
+              disabled={busy}
               accept="image/jpeg,image/png,image/webp"
               required
               onChange={(e) =>
@@ -40,6 +41,7 @@ export default function InlineImageTools({
             <input
               required
               maxLength="250"
+              disabled={busy}
               value={inlineUpload.alt}
               onChange={(e) =>
                 setInlineUpload({
@@ -57,6 +59,19 @@ export default function InlineImageTools({
           >
             Subir y asignar imagen
           </button>
+          {(inlineUpload.file || inlineUpload.alt) && (
+            <button
+              className="button"
+              type="button"
+              disabled={busy}
+              onClick={(event) => {
+                setInlineUpload({ file: null, alt: '' });
+                event.currentTarget.form.reset();
+              }}
+            >
+              Descartar selección
+            </button>
+          )}
         </form>
       ) : (
         <p className="hint">

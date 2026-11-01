@@ -31,6 +31,23 @@ Check(!disabled.Contains("og:image"), "No se debe inventar una fotografía.");
 Check(!disabled.Contains("canonical"), "No se debe inventar el dominio público.");
 var unsafeUrl = ProductSharing.RenderProduct(product, business, images, "javascript:alert(1)", false);
 Check(!unsafeUrl.Contains("javascript:"), "No se permiten dominios con esquema inseguro.");
+var returnUrl = "/?categoria=1&q=taza%20personalizada&promocion=7#productos";
+Check(ProductSharing.CatalogReturnUrl(returnUrl) == returnUrl, "Se conserva el contexto local del catálogo.");
+foreach (var invalidReturn in new[] { "https://otro.example/#productos", "//otro.example/#productos", "javascript:alert(1)", "/\\otro.example#productos", "/?q=taza\n#productos" })
+    Check(ProductSharing.CatalogReturnUrl(invalidReturn) == "/#productos", "El regreso no admite destinos externos ni caracteres de control.");
+var withContext = ProductSharing.RenderProduct(product, business, images, "https://bazar.example", false, returnUrl);
+Check(withContext.Contains("href=\"/?categoria=1&amp;q=taza%20personalizada&amp;promocion=7#productos\""), "El enlace de regreso conserva y escapa los filtros.");
+Check(withContext.Contains("href=\"https://bazar.example/producto/17\""), "Los filtros no deben modificar el enlace canónico.");
+var englishProduct = new Producto { Id = 99, Nombre = "Llaveros personalizados", Descripcion = "Texto <img> sin traducción" };
+var englishProductHtml = ProductSharing.RenderProduct(englishProduct, business, images, "https://bazar.example", false, null, "en");
+Check(englishProductHtml.Contains("lang=\"en\""), "La ficha debe declarar el idioma inglés.");
+Check(englishProductHtml.Contains("Personalized keychains"), "El título de producto debe traducirse.");
+Check(englishProductHtml.Contains("Ask via WhatsApp"), "El botón de consulta debe traducirse.");
+Check(englishProductHtml.Contains("/?lang=en#productos"), "El regreso debe conservar inglés.");
+Check(englishProductHtml.Contains("Texto &lt;img&gt; sin traducci"), "Los textos nuevos deben conservarse escapados.");
+Check(Uri.UnescapeDataString(englishProductHtml).Contains("Hello, I would like a quote"), "La consulta de WhatsApp debe estar en inglés.");
+Check(ProductSharing.RenderUnavailable("en").Contains("This product is unavailable"), "El error 404 debe traducirse.");
+
 Check(MetricsEndpoints.CostaRicaDay(DateTimeOffset.Parse("2026-10-31T05:59:59Z")) == new DateOnly(2026, 10, 30), "El día de Costa Rica aún no ha terminado.");
 Check(MetricsEndpoints.CostaRicaDay(DateTimeOffset.Parse("2026-10-31T06:00:00Z")) == new DateOnly(2026, 10, 31), "El conteo cambia a medianoche de Costa Rica.");
 

@@ -8,6 +8,7 @@ export default function AccountsPanel({
   setEditorForm,
   saveEditor,
   busy,
+  openAccount,
 }) {
   return (
     <>
@@ -31,13 +32,8 @@ export default function AccountsPanel({
           <button
             className="list-item"
             key={x.id}
-            onClick={() =>
-              setEditorForm({
-                ...x,
-                password: '',
-                permisos: x.permisos ? x.permisos.split(',') : [],
-              })
-            }
+            disabled={busy}
+            onClick={() => openAccount(x)}
           >
             {x.nombre} · {x.email}{' '}
             <small>
@@ -141,16 +137,8 @@ export default function AccountsPanel({
           </button>
           <button
             type="button"
-            onClick={() =>
-              setEditorForm({
-                nombre: '',
-                email: '',
-                password: '',
-                completo: false,
-                permisos: [],
-                activo: true,
-              })
-            }
+            disabled={busy}
+            onClick={() => openAccount(null)}
           >
             Nueva cuenta
           </button>

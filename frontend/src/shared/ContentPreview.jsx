@@ -1,6 +1,7 @@
 import React from 'react';
 import Img from './Img.jsx';
 import { formattedPrice } from './format.js';
+import Modal from './Modal.jsx';
 export default function ContentPreview({
   closePreview,
   active,
@@ -9,23 +10,17 @@ export default function ContentPreview({
   imgAlt,
 }) {
   return (
-    <div
-      className="modal-backdrop"
-      role="presentation"
-      onMouseDown={(e) => {
-        if (e.target === e.currentTarget) closePreview();
-      }}
+    <Modal
+      className="editor-layout modal-backdrop"
+      onClose={closePreview}
+      label="Vista previa"
     >
-      <div
-        className="preview-modal"
-        role="dialog"
-        aria-modal="true"
-        aria-label="Vista previa"
-        onMouseDown={(e) => e.stopPropagation()}
-      >
+      <div className="preview-modal">
         <div className="row spread">
           <h2>Vista previa · {draft.estado}</h2>
-          <button onClick={closePreview}>Cerrar ×</button>
+          <button type="button" autoFocus onClick={closePreview}>
+            Cerrar ×
+          </button>
         </div>
         <div className="preview-card">
           <Img
@@ -52,6 +47,6 @@ export default function ContentPreview({
           Volver a editar
         </button>
       </div>
-    </div>
+    </Modal>
   );
 }

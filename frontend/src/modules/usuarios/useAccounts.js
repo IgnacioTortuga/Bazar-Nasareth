@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { api, json } from '../../shared/api.js';
 
 export default function useAccounts({ setBusy, setMessage, setData }) {
-  const [editorForm, setEditorForm] = useState({
+  const emptyAccount = () => ({
     nombre: '',
     email: '',
     password: '',
@@ -10,6 +10,32 @@ export default function useAccounts({ setBusy, setMessage, setData }) {
     permisos: [],
     activo: true,
   });
+  const [editorForm, setEditorForm] = useState(emptyAccount);
+  const [baseline, setBaseline] = useState(emptyAccount);
+  const accountDirty = JSON.stringify(editorForm) !== JSON.stringify(baseline);
+  function resetAccount() {
+    const empty = emptyAccount();
+    setEditorForm(empty);
+    setBaseline(empty);
+  }
+  function openAccount(account) {
+    if (
+      accountDirty &&
+      !confirm(
+        'Hay cambios en esta cuenta sin guardar. ¿Descartarlos para abrir otra cuenta?',
+      )
+    )
+      return;
+    const next = account
+      ? {
+          ...account,
+          password: '',
+          permisos: account.permisos ? account.permisos.split(',') : [],
+        }
+      : emptyAccount();
+    setEditorForm(next);
+    setBaseline(structuredClone(next));
+  }
   async function saveEditor(e) {
     e.preventDefault();
     setBusy(true);
@@ -19,14 +45,7 @@ export default function useAccounts({ setBusy, setMessage, setData }) {
         method: id ? 'PUT' : 'POST',
         ...json(editorForm),
       });
-      setEditorForm({
-        nombre: '',
-        email: '',
-        password: '',
-        completo: false,
-        permisos: [],
-        activo: true,
-      });
+      resetAccount();
       setData((d) => ({ ...d, editores: undefined }));
       await loadEditors();
       setMessage('Cuenta guardada.');
@@ -45,5 +64,13 @@ export default function useAccounts({ setBusy, setMessage, setData }) {
     }
   }
 
-  return { editorForm, setEditorForm, saveEditor, loadEditors };
+  return {
+    editorForm,
+    setEditorForm,
+    saveEditor,
+    loadEditors,
+    accountDirty,
+    resetAccount,
+    openAccount,
+  };
 }

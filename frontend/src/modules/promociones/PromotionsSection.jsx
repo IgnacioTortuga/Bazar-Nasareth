@@ -1,13 +1,17 @@
+import { useLanguage } from '../../shared/Language.jsx';
 import React from 'react';
 import Img from '../../shared/Img.jsx';
 import { BazarDoodle } from '../../shared/Icons.jsx';
 import { promotionTimingLabel } from '../../shared/format.js';
 export default function PromotionsSection({ data, images, openCampaign }) {
+  const { t, language } = useLanguage();
+
   return (
     <section id="promociones" className="wrap section">
-      <span className="eyebrow">TEMPORADA EN EL BAZAR</span>
+      <span className="eyebrow">{t('TEMPORADA EN EL BAZAR')}</span>
       <h2>
-        Un detalle más para alegrarse <BazarDoodle />
+        {' '}
+        {t('Un detalle más para alegrarse')} <BazarDoodle />
       </h2>
       <div className="grid promotion-grid">
         {data.promociones.map((p) => {
@@ -21,17 +25,17 @@ export default function PromotionsSection({ data, images, openCampaign }) {
               <Img id={p.imagenId} alt={images[p.imagenId]} />
               <div className="card-body">
                 <span className="promo-status">
-                  {upcoming ? '✦ Próximamente' : '✦ Vigente ahora'}
+                  {upcoming ? t('✦ Próximamente') : t('✦ Vigente ahora')}
                 </span>
                 <h3>{p.titulo}</h3>
                 <p>{p.descripcion}</p>
                 <p>
-                  <b>Condiciones:</b> {p.condiciones}
+                  <b>{t('Condiciones:')}</b> {p.condiciones}
                 </p>
                 <small>
-                  {upcoming ? 'Disponible desde ' : 'Hasta '}
+                  {upcoming ? t('Disponible desde ') : t('Hasta ')}
                   {new Date(upcoming ? p.inicio : p.fin).toLocaleDateString(
-                    'es-CR',
+                    language === 'en' ? 'en-US' : 'es-CR',
                     {
                       timeZone: 'America/Costa_Rica',
                       day: 'numeric',
@@ -46,7 +50,8 @@ export default function PromotionsSection({ data, images, openCampaign }) {
                     type="button"
                     onClick={() => openCampaign(p)}
                   >
-                    Ver productos para esta temática
+                    {' '}
+                    {t('Consultar con esta temática')}{' '}
                   </button>
                 )}
               </div>
@@ -55,7 +60,7 @@ export default function PromotionsSection({ data, images, openCampaign }) {
         })}
       </div>
       {!data.promociones.length && (
-        <p className="empty">No hay promociones vigentes.</p>
+        <p className="empty">{t('No hay promociones vigentes.')}</p>
       )}
     </section>
   );

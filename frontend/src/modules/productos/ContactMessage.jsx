@@ -1,3 +1,4 @@
+import { useLanguage } from '../../shared/Language.jsx';
 import React, { useState } from 'react';
 import { formattedPrice } from '../../shared/format.js';
 
@@ -7,6 +8,8 @@ export default function ContactMessage({
   medir = false,
   campaign = '',
 }) {
+  const { t, language } = useLanguage();
+
   const [cantidad, setCantidad] = useState(1),
     [nombre, setNombre] = useState(''),
     [nota, setNota] = useState('');
@@ -16,27 +19,38 @@ export default function ContactMessage({
       ? null
       : Number(product.precioInformativo) * cantidad;
   const message = [
-    'Hola, me interesa cotizar este producto:',
-    `• Producto: ${product.nombre}`,
-    campaign ? `• Temática: ${campaign}` : null,
-    `• Cantidad: ${cantidad} ${cantidad === 1 ? 'unidad' : 'unidades'}`,
+    t('Hola, me interesa cotizar este producto:'),
+    t('• Producto: {name}', { name: product.nombre }),
+    campaign ? t('• Temática: {theme}', { theme: campaign }) : null,
+    t('• Cantidad: {quantity} {unit}', {
+      quantity: cantidad,
+      unit: t(cantidad === 1 ? 'unidad' : 'unidades'),
+    }),
     product.precioInformativo != null
-      ? `• Precio de referencia: ${formattedPrice(product.precioInformativo, product.moneda)} por unidad`
+      ? t('• Precio de referencia: {price} por unidad', {
+          price: formattedPrice(
+            product.precioInformativo,
+            product.moneda,
+            language,
+          ),
+        })
       : null,
     price != null
-      ? `• Total estimado: ${formattedPrice(price, product.moneda)}`
+      ? t('• Total estimado: {price}', {
+          price: formattedPrice(price, product.moneda, language),
+        })
       : null,
-    nombre.trim() ? `• Nombre: ${nombre.trim()}` : null,
-    nota.trim() ? `• Detalles: ${nota.trim()}` : null,
-    '',
-    '¿Podrían confirmarme disponibilidad, plazo de entrega y precio final?',
+    nombre.trim() ? t('• Nombre: {name}', { name: nombre.trim() }) : null,
+    nota.trim() ? t('• Detalles: {note}', { note: nota.trim() }) : null,
+    t('¿Podrían confirmarme disponibilidad, plazo de entrega y precio final?'),
   ]
     .filter(Boolean)
     .join('\n');
   return (
     <div className="contact-request">
       <label>
-        Cantidad aproximada{' '}
+        {' '}
+        {t('Cantidad aproximada')}{' '}
         <input
           type="number"
           min="1"
@@ -48,7 +62,8 @@ export default function ContactMessage({
         />
       </label>
       <label>
-        Nombre (opcional){' '}
+        {' '}
+        {t('Nombre (opcional)')}{' '}
         <input
           value={nombre}
           maxLength="80"
@@ -56,7 +71,8 @@ export default function ContactMessage({
         />
       </label>
       <label>
-        Nota (opcional){' '}
+        {' '}
+        {t('Nota (opcional)')}{' '}
         <input
           value={nota}
           maxLength="500"
@@ -67,7 +83,7 @@ export default function ContactMessage({
         className="button primary"
         href={`https://wa.me/${num}?text=${encodeURIComponent(message)}`}
         onClick={() => {
-          const origin = campaign ? 'halloween' : 'catalogo';
+          const origin = /halloween/i.test(campaign) ? 'halloween' : 'catalogo';
           if (medir)
             fetch(
               `/api/productos/${product.id}/clic-whatsapp?origen=${origin}`,
@@ -81,7 +97,8 @@ export default function ContactMessage({
         target="_blank"
         rel="noopener noreferrer"
       >
-        Consultar por WhatsApp
+        {' '}
+        {t('Consultar por WhatsApp')}{' '}
       </a>
     </div>
   );
