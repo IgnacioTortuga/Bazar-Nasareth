@@ -8,10 +8,12 @@ const toCostaRicaInput = (value) =>
         .slice(0, 16)
         .replace(' ', 'T')
     : '';
-function formattedPrice(value, currency) {
+function formattedPrice(value, currency, language = 'es') {
   return value == null
-    ? 'Consultar precio'
-    : `${currency || 'CRC'} ${Number(value).toLocaleString('es-CR', { minimumFractionDigits: 2 })}`;
+    ? language === 'en'
+      ? 'Ask for price'
+      : 'Consultar precio'
+    : `${currency || 'CRC'} ${Number(value).toLocaleString(language === 'en' ? 'en-US' : 'es-CR', { minimumFractionDigits: 2 })}`;
 }
 function promotionTimingLabel(promotion, now = Date.now()) {
   const start = promotion.inicio ? new Date(promotion.inicio).getTime() : NaN;

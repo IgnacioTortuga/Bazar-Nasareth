@@ -1,45 +1,53 @@
+import { useLanguage } from '../../shared/Language.jsx';
 import React from 'react';
 import { BazarDoodle, SocialIcon } from '../../shared/Icons.jsx';
 import { businessEntries } from './contact.js';
 export default function ContactSection({ business }) {
+  const { t, language } = useLanguage();
+
   const addresses = businessEntries(business.direccion, [
-    'Tienda principal',
-    'Tienda de fiestas',
+    t('Tienda principal'),
+    t('Tienda de fiestas'),
   ]);
   const schedules = businessEntries(business.horario, [
-    'Tienda principal',
-    'Tienda de fiestas',
+    t('Tienda principal'),
+    t('Tienda de fiestas'),
   ]);
   const stores = addresses.map((address, index) => ({
     name: address.label,
     address: address.value,
-    schedule: schedules[index]?.value || 'Consulte el horario',
+    schedule: schedules[index]?.value || t('Consulte el horario'),
   }));
 
   return (
     <section id="contacto" className="wrap section contact">
-      <span className="eyebrow">NUESTRAS TIENDAS</span>
+      <span className="eyebrow">{t('NUESTRAS TIENDAS')}</span>
       <h2>
-        Su próxima idea
-        <br />
-        empieza con un <span>¡hola!</span>
+        {' '}
+        {t('Su próxima idea')} <br /> {t('empieza con un')}{' '}
+        <span>{t('¡hola!')}</span>
       </h2>
       <p className="contact-intro">
-        Consulte disponibilidad, cuéntenos lo que busca o visítenos en el bazar.
+        {' '}
+        {t(
+          'Consulte disponibilidad, cuéntenos lo que busca o visítenos en el bazar.',
+        )}{' '}
       </p>
       <BazarDoodle kind="gift" className="contact-gift" />
       <div className="store-grid">
         {stores.map((store) => (
           <article className="store-card" key={store.name}>
-            <span>Local {stores.indexOf(store) + 1}</span>
+            <span>
+              {t('Local')} {stores.indexOf(store) + 1}
+            </span>
             <h3>{store.name}</h3>
             <p>
-              <b>Dirección</b>
+              <b>{t('Dirección')}</b>
               <br />
               {store.address}
             </p>
             <p>
-              <b>Horario</b>
+              <b>{t('Horario')}</b>
               <br />
               {store.schedule}
             </p>
@@ -48,13 +56,13 @@ export default function ContactSection({ business }) {
       </div>
       <div className="contact-grid contact-details">
         <p>
-          <b>Teléfono</b>
+          <b>{t('Teléfono')}</b>
           <br />
           {business.telefono}
         </p>
         {business.email && (
           <p>
-            <b>Correo</b>
+            <b>{t('Correo')}</b>
             <br />
             {business.email}
           </p>
@@ -62,7 +70,7 @@ export default function ContactSection({ business }) {
       </div>
       <div className="location-map">
         <iframe
-          title="Mapa de Bazar Nazareth en Hojancha"
+          title={t('Mapa de Bazar Nazareth en Hojancha')}
           src="https://www.google.com/maps?q=10.0576279,-85.4188402&z=19&output=embed"
           loading="lazy"
           referrerPolicy="no-referrer-when-downgrade"
@@ -72,7 +80,8 @@ export default function ContactSection({ business }) {
           target="_blank"
           rel="noopener noreferrer"
         >
-          Abrir ubicación en Google Maps ↗
+          {' '}
+          {t('Abrir ubicación en Google Maps ↗')}{' '}
         </a>
       </div>
       <div className="contact-actions">
@@ -82,9 +91,10 @@ export default function ContactSection({ business }) {
           target="_blank"
           rel="noopener noreferrer"
         >
-          Abrir contacto por WhatsApp
+          {' '}
+          {t('Abrir contacto por WhatsApp')}{' '}
         </a>
-        <div className="social" aria-label="Redes sociales">
+        <div className="social" aria-label={t('Redes sociales')}>
           {(business.redes || '')
             .split('\n')
             .filter((x) => {
@@ -103,7 +113,9 @@ export default function ContactSection({ business }) {
                   href={x.trim()}
                   target="_blank"
                   rel="noopener noreferrer"
-                  aria-label={instagram ? 'Abrir Instagram' : 'Abrir Linktree'}
+                  aria-label={
+                    instagram ? t('Abrir Instagram') : t('Abrir Linktree')
+                  }
                 >
                   <SocialIcon kind={instagram ? 'instagram' : 'linktree'} />
                   <span>{instagram ? 'Instagram' : 'Linktree'}</span>

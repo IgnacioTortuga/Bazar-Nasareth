@@ -1,3 +1,11 @@
+import {
+  LanguageProvider,
+  LanguageToggle,
+  useLanguage,
+} from '../shared/Language.jsx';
+import { useMemo } from 'react';
+import { localizeCatalog } from '../shared/translations.js';
+import ThemeFeedback from '../shared/ThemeFeedback.jsx';
 import React, { useEffect, useState } from 'react';
 import { BazarDoodle } from '../shared/Icons.jsx';
 import ProductCatalog from '../modules/productos/ProductCatalog.jsx';
@@ -14,8 +22,28 @@ import {
   filterCatalog,
 } from '../modules/productos/catalogFilters.js';
 import { promotionTimingLabel } from '../shared/format.js';
+import {
+  useReadingPreferences,
+  ContrastToggle,
+  ReadingMenu,
+} from '../shared/ReadingControls.jsx';
 
 export default function Public({ data }) {
+  return (
+    <LanguageProvider>
+      <PublicContent originalData={data} />
+    </LanguageProvider>
+  );
+}
+function PublicContent({ originalData }) {
+  const { t, language } = useLanguage();
+  const data = useMemo(
+    () => localizeCatalog(originalData, language),
+    [originalData, language],
+  );
+
+  const reading = useReadingPreferences();
+  const [themeFeedback, setThemeFeedback] = useState(null);
   const [filters, setFilters] = useState(readCatalogFilters),
     [menu, setMenu] = useState(false),
     [activeSection, setActiveSection] = useState('inicio');
@@ -30,7 +58,7 @@ export default function Public({ data }) {
       promotionTimingLabel(item) === 'Vigente',
   );
   const campaign = promotion?.titulo || '';
-  const returnUrl = catalogReturnUrl(filters);
+  const returnUrl = catalogReturnUrl({ ...filters, language });
   useEffect(() => {
     const url = new URL(window.location.href);
     const values = { categoria: category, q: search, promocion: promotionId };
@@ -64,11 +92,11 @@ export default function Public({ data }) {
     data.secciones.find((s) => s.clave === 'presentación');
   const products = filterCatalog(data, filters);
   const links = [
-    ['productos', 'Productos'],
-    ['servicios', 'Servicios'],
-    ['promociones', 'Promociones'],
-    ['galeria', 'Galería'],
-    ['contacto', 'Contacto'],
+    ['productos', t('Productos')],
+    ['servicios', t('Servicios')],
+    ['promociones', t('Promociones')],
+    ['galeria', t('Galería')],
+    ['contacto', t('Contacto')],
   ];
   useEffect(() => {
     const sectionIds = ['inicio', ...links.map(([id]) => id)];
@@ -124,6 +152,11 @@ export default function Public({ data }) {
     });
   }
   function openCampaign(promotion) {
+    setThemeFeedback(
+      /halloween/i.test(promotion.titulo)
+        ? { title: promotion.titulo, id: performance.now() }
+        : null,
+    );
     setFilters({ category: '', search: '', promotionId: String(promotion.id) });
     document.getElementById('productos')?.scrollIntoView({
       behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -133,13 +166,23 @@ export default function Public({ data }) {
   }
   return (
     <div className="public-site">
+      {themeFeedback && (
+        <ThemeFeedback
+          key={themeFeedback.id}
+          title={themeFeedback.title}
+          onClose={() => setThemeFeedback(null)}
+        />
+      )}
       <a className="skip-link" href="#productos">
-        Saltar al catálogo
+        {' '}
+        {t('Saltar al catálogo')}{' '}
       </a>
       <div className="welcome-ribbon">
-        <BazarDoodle /> Un detalle pequeño. Una sonrisa enorme. <BazarDoodle />
+        <BazarDoodle /> {t('Un detalle pequeño. Una sonrisa enorme.')}{' '}
+        <BazarDoodle />
       </div>
       <header className="public-header">
+        <ContrastToggle theme={reading.theme} onToggle={reading.toggleTheme} />
         <div className="header-inner wrap">
           <a className="brand" href="#inicio">
             <img
@@ -156,7 +199,7 @@ export default function Public({ data }) {
             onClick={() => setMenu(!menu)}
             aria-expanded={menu}
             aria-controls="public-navigation"
-            aria-label={menu ? 'Cerrar navegación' : 'Abrir navegación'}
+            aria-label={menu ? t('Cerrar navegación') : t('Abrir navegación')}
           >
             ☰
           </button>
@@ -169,7 +212,8 @@ export default function Public({ data }) {
                 setMenu(false);
               }}
             >
-              Inicio
+              {' '}
+              {t('Inicio')}{' '}
             </a>
             {links.map(([id, label]) => (
               <a
@@ -188,15 +232,22 @@ export default function Public({ data }) {
           <form className="header-search" onSubmit={searchCatalog}>
             <input
               type="search"
-              aria-label="Buscar productos en el catálogo"
+              aria-label={t('Buscar productos en el catálogo')}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Buscar productos…"
+              placeholder={t('Buscar productos…')}
             />
-            <button type="submit" aria-label="Buscar">
+            <button type="submit" aria-label={t('Buscar')}>
               ⌕
             </button>
           </form>
+        </div>
+        <div className="header-utilities">
+          <LanguageToggle />
+          <ReadingMenu
+            fontSize={reading.fontSize}
+            onSizeChange={reading.setFontSize}
+          />
         </div>
       </header>
       <main>
@@ -212,9 +263,10 @@ export default function Public({ data }) {
           business={business}
           images={images}
           campaign={campaign}
-          clearCampaign={() =>
-            setFilters((current) => ({ ...current, promotionId: '' }))
-          }
+          clearCampaign={() => {
+            setThemeFeedback(null);
+            setFilters((current) => ({ ...current, promotionId: '' }));
+          }}
           clearFilters={() =>
             setFilters({ category: '', search: '', promotionId: '' })
           }
@@ -233,8 +285,10 @@ export default function Public({ data }) {
       <footer>
         <div className="wrap">
           <b>{business.nombre}</b>
-          <span>Dos tiendas en Hojancha · {business.telefono}</span>
-          <a href="/login">Acceso al editor</a>
+          <span>
+            {t('Dos tiendas en Hojancha ·')} {business.telefono}
+          </span>
+          <a href="/login">{t('Acceso al editor')}</a>
         </div>
       </footer>
     </div>

@@ -9,4 +9,7 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.14" />
     <PackageReference Include="System.Security.Cryptography.Pkcs" Version="9.0.21" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="../localization/en.json" LogicalName="Bazar.English.json" />
+  </ItemGroup>
 </Project>

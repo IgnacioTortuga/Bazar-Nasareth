@@ -1,3 +1,4 @@
+import { useLanguage } from '../../shared/Language.jsx';
 import React from 'react';
 
 export default function TextBlocks({ data, hero }) {

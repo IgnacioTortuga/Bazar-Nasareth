@@ -1,0 +1,111 @@
+:root.bazar-theme-wave::view-transition-image-pair(root) {
+  isolation: auto;
+}
+:root.bazar-theme-wave::view-transition-old(root),
+:root.bazar-theme-wave::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+:root.bazar-theme-wave::view-transition-old(root) {
+  z-index: 1;
+}
+:root.bazar-theme-wave::view-transition-new(root) {
+  z-index: 2;
+}
+:root.bazar-theme-wave::view-transition {
+  pointer-events: none;
+}
+.public-site .theme-feedback {
+  position: fixed;
+  bottom: max(24px, env(safe-area-inset-bottom));
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: calc(100% - 32px);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 18px;
+  border: 1px solid #edb763;
+  border-radius: 20px;
+  background: #fff3df;
+  color: #492c42;
+  box-shadow: 0 16px 48px #2d172e30;
+  z-index: 40;
+  animation: theme-arrival 480ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.public-site .theme-feedback-icon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  color: #df7418;
+  background: #ffe1aa;
+  animation: pumpkin-greeting 800ms ease-out both;
+}
+.public-site .theme-feedback strong {
+  display: block;
+  color: inherit;
+  font-size: 1rem;
+  padding: 0;
+}
+.public-site .theme-feedback span:not(.theme-feedback-icon) {
+  display: block;
+  font-size: 0.85rem;
+}
+.public-site .theme-feedback button {
+  align-self: start;
+  flex: none;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: inherit;
+  font-size: 1.4rem;
+}
+:root[data-bazar-theme='dark'] .public-site .theme-feedback {
+  background: #34233e;
+  border-color: #d79d5d;
+  color: #ffe7c4;
+  box-shadow: 0 16px 48px #0006;
+}
+@keyframes theme-arrival {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 24px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+  }
+}
+@keyframes pumpkin-greeting {
+  0% {
+    transform: rotate(-16deg) scale(0.8);
+  }
+  50% {
+    transform: rotate(10deg) scale(1.08);
+  }
+  100% {
+    transform: rotate(0) scale(1);
+  }
+}
+@media (max-width: 620px) {
+  .public-site .theme-feedback {
+    gap: 10px;
+    padding: 14px 12px;
+  }
+  .public-site .theme-feedback-icon {
+    width: 44px;
+    height: 44px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .public-site .theme-feedback,
+  .public-site .theme-feedback-icon {
+    animation: none;
+  }
+}

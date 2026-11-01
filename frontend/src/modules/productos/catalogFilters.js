@@ -9,8 +9,9 @@ export function readCatalogFilters(search = window.location.search) {
   };
 }
 
-export function catalogReturnUrl({ category, search, promotionId }) {
+export function catalogReturnUrl({ category, search, promotionId, language }) {
   const params = new URLSearchParams();
+  if (language) params.set('lang', language);
   if (category) params.set('categoria', category);
   if (search) params.set('q', search);
   if (promotionId) params.set('promocion', promotionId);
@@ -21,6 +22,6 @@ export function filterCatalog(data, { category, search }) {
   return data.productos.filter(
     (product) =>
       (!category || product.categoriaId === Number(category)) &&
-      matchesEditorSearch(product.nombre, search),
+      matchesEditorSearch(product.searchNames || product.nombre, search),
   );
 }

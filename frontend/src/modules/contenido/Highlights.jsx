@@ -1,9 +1,12 @@
+import { useLanguage } from '../../shared/Language.jsx';
 import React from 'react';
 import Img from '../../shared/Img.jsx';
 import { BazarDoodle } from '../../shared/Icons.jsx';
 export default function Highlights({ highlights, images }) {
+  const { t, language } = useLanguage();
+
   return (
-    <section className="featured wrap" aria-label="Explore Bazar Nazareth">
+    <section className="featured wrap" aria-label={t('Explore Bazar Nazareth')}>
       <div className="featured-grid">
         {highlights.map((item, index) => (
           <a
@@ -17,7 +20,7 @@ export default function Highlights({ highlights, images }) {
               ) : item.fallback ? (
                 <img
                   src={item.fallback}
-                  alt="Inspiración de detalles personalizados del bazar"
+                  alt={t('Inspiración de detalles personalizados del bazar')}
                   loading="lazy"
                   width="1004"
                   height="1004"
@@ -28,10 +31,10 @@ export default function Highlights({ highlights, images }) {
                   <BazarDoodle kind={item.symbol} className="art-symbol" />
                   <span className="art-word">
                     {index === 0
-                      ? 'Un detalle especial'
+                      ? t('Un detalle especial')
                       : index === 1
-                        ? 'Hecho para usted'
-                        : 'Algo por descubrir'}
+                        ? t('Hecho para usted')
+                        : t('Algo por descubrir')}
                   </span>
                 </div>
               )}
@@ -40,8 +43,8 @@ export default function Highlights({ highlights, images }) {
               </span>
             </div>
             <div className="feature-body">
-              <h2>{item.title}</h2>
-              <span>{item.tag}</span>
+              <h2>{t(item.title)}</h2>
+              <span>{t(item.tag)}</span>
             </div>
           </a>
         ))}
