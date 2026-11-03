@@ -1,0 +1,1579 @@
+{
+  "negocio": {
+    "id": 1,
+    "nombre": "Bazar Nazareth de Hojancha",
+    "direccion": "Tienda principal | 25 m sur y 10 m oeste de Correos de Costa Rica, Hojancha, Guanacaste.\r\nTienda de fiestas | 25 m sur de Correos de Costa Rica, Hojancha, Guanacaste.",
+    "horario": "Tienda principal | Lunes a sábado, de 8:00 a. m. a 6:00 p. m.\r\nTienda de fiestas | Lunes a sábado, de 9:00 a. m. a 4:00 p. m.",
+    "telefono": "+506 6488 3862",
+    "email": null,
+    "enlaceContacto": "https://wa.me/50664883862",
+    "redes": "https://www.instagram.com/bazarnazarethojancha\r\nhttps://linktr.ee/bazarnazareth"
+  },
+  "medicionWhatsApp": false,
+  "categorias": [
+    {
+      "id": 3,
+      "nombre": "Papelería",
+      "orden": 0,
+      "activa": true
+    },
+    {
+      "id": 1,
+      "nombre": "Sublimación y personalizados",
+      "orden": 1,
+      "activa": true
+    },
+    {
+      "id": 2,
+      "nombre": "Regalos",
+      "orden": 2,
+      "activa": true
+    },
+    {
+      "id": 4,
+      "nombre": "Escolares",
+      "orden": 3,
+      "activa": true
+    },
+    {
+      "id": 5,
+      "nombre": "Fiestas",
+      "orden": 4,
+      "activa": true
+    }
+  ],
+  "productos": [
+    {
+      "id": 13,
+      "categoriaId": 1,
+      "nombre": "Llaveros personalizados",
+      "descripcion": "Llaveros de material acrílico, sublimables por ambos lados. Hay variedad de figuras; consulte disponibilidad.",
+      "precioInformativo": 2500.0,
+      "moneda": "CRC",
+      "destacado": false,
+      "imagenes": [
+        138,
+        62,
+        17
+      ]
+    },
+    {
+      "id": 14,
+      "categoriaId": 1,
+      "nombre": "Can cooler personalizado",
+      "descripcion": "Can cooler de neopreno sublimable por ambos lados y preparado con el diseño que elija.",
+      "precioInformativo": 3500.0,
+      "moneda": "CRC",
+      "destacado": false,
+      "imagenes": [
+        134,
+        18
+      ]
+    },
+    {
+      "id": 15,
+      "categoriaId": 1,
+      "nombre": "Tazas personalizadas",
+      "descripcion": "Taza de 11 oz desde ₡3.500, taza de 16 oz a ₡4.000 y taza de 11 oz con color interno a ₡3.800. Colores sujetos a disponibilidad.",
+      "precioInformativo": 3500.0,
+      "moneda": "CRC",
+      "destacado": false,
+      "imagenes": [
+        143,
+        19
+      ]
+    },
+    {
+      "id": 16,
+      "categoriaId": 1,
+      "nombre": "Taza mágica personalizada",
+      "descripcion": "Taza de 11 oz que cambia de color con la temperatura y revela el diseño personalizado.",
+      "precioInformativo": 4500.0,
+      "moneda": "CRC",
+      "destacado": false,
+      "imagenes": [
+        20
+      ]
+    },
+    {
+      "id": 5,
+      "categoriaId": 2,
+      "nombre": "Rompecabezas personalizado",
+      "descripcion": "Rompecabezas rectangulares y en forma de corazón. Consulte los tamaños disponibles.",
+      "precioInformativo": 3500.0,
+      "moneda": "CRC",
+      "destacado": false,
+      "imagenes": [
+        142,
+        21
+      ]
+    },
+    {
+      "id": 17,
+      "categoriaId": 1,
+      "nombre": "Placas de aluminio personalizadas",
+      "descripcion": "Placa de 10 × 10 cm a ₡2.500 o de 20 × 30 cm a ₡3.000, personalizada con su fotografía o diseño.",
+      "precioInformativo": 2500.0,
+      "moneda": "CRC",
+      "destacado": false,
+      "imagenes": [
+        139,
+        22
+      ]
+    },
+    {
+      "id": 18,
+      "categoriaId": 1,
+      "nombre": "Camisetas personalizadas",
+      "descripcion": "Camisetas blancas de poliéster para sublimación y camisetas de otros colores para vinilo termoadhesivo. Disponibles para personas adultas y niñas o niños. El precio depende de la talla y el diseño.",
+      "precioInformativo": null,
+      "moneda": null,
+      "destacado": false,
+      "imagenes": [
+        133,
+        23
+      ]
+    },
+    {
+      "id": 19,
+      "categoriaId": 1,
+      "nombre": "Camiseta polo Waffit personalizada",
+      "descripcion": "Polo blanco para sublimación o de otros colores para vinilo termoadhesivo de uno o dos colores. Por encargo; desde seis unidades se aplica precio de descuento.",
+      "precioInformativo": null,
+      "moneda": null,
+      "destacado": false,
+      "imagenes": [
+        24
+      ]
+    },
+    {
+      "id": 6,
+      "categoriaId": 3,
+      "nombre": "Block de notas personalizado",
+      "descripcion": "Block compacto con notas adhesivas y separadores de colores, preparado como detalle personalizado.",
+      "precioInformativo": 5500.0,
+      "moneda": "CRC",
+      "destacado": false,
+      "imagenes": [
+        132,
+        25
+      ]
+    },
+    {
+      "id": 7,
+      "categoriaId": 1,
+      "nombre": "Posavasos personalizados",
+      "descripcion": "Posavasos de neopreno personalizados con su fotografía, logo o diseño.",
+      "precioInformativo": 2500.0,
+      "moneda": "CRC",
+      "destacado": false,
+      "imagenes": [
+        141,
+        26
+      ]
+    },
+    {
+      "id": 8,
+      "categoriaId": 1,
+      "nombre": "Gorras personalizadas",
+      "descripcion": "Gorras en variedad de colores; consulte disponibilidad antes de realizar el encargo.",
+      "precioInformativo": 4000.0,
+      "moneda": "CRC",
+      "destacado": false,
+      "imagenes": [
+        136,
+        27
+      ]
+    },
+    {
+      "id": 9,
+      "categoriaId": 1,
+      "nombre": "Viseras personalizadas",
+      "descripcion": "Viseras sublimables disponibles en color blanco.",
+      "precioInformativo": 4000.0,
+      "moneda": "CRC",
+      "destacado": false,
+      "imagenes": [
+        144,
+        28
+      ]
+    },
+    {
+      "id": 2,
+      "categoriaId": 2,
+      "nombre": "Destapador con funda de cuero personalizado",
+      "descripcion": "Destapador con funda de cuero personalizado, ideal como recuerdo o regalo.",
+      "precioInformativo": 3500.0,
+      "moneda": "CRC",
+      "destacado": false,
+      "imagenes": [
+        135,
+        29
+      ]
+    },
+    {
+      "id": 3,
+      "categoriaId": 2,
+      "nombre": "Porta tarjetas personalizado",
+      "descripcion": "Porta tarjetas adhesivo para celular, personalizado con nombre, frase o diseño.",
+      "precioInformativo": 3500.0,
+      "moneda": "CRC",
+      "destacado": false,
+      "imagenes": [
+        140,
+        30
+      ]
+    },
+    {
+      "id": 4,
+      "categoriaId": 2,
+      "nombre": "Imanes personalizados",
+      "descripcion": "Imanes disponibles en varias formas para personalizar con fotografías, logos o diseños.",
+      "precioInformativo": 2500.0,
+      "moneda": "CRC",
+      "destacado": false,
+      "imagenes": [
+        137,
+        31
+      ]
+    },
+    {
+      "id": 10,
+      "categoriaId": 1,
+      "nombre": "Totebags personalizadas",
+      "descripcion": "Bolsas de manta sublimables por ambos lados, personalizadas con frases o ilustraciones.",
+      "precioInformativo": 5000.0,
+      "moneda": "CRC",
+      "destacado": false,
+      "imagenes": [
+        32
+      ]
+    },
+    {
+      "id": 11,
+      "categoriaId": 1,
+      "nombre": "Mamelucos personalizados",
+      "descripcion": "Mamelucos de poliéster para bebés de 0 a 3, 3 a 6 y 6 a 12 meses.",
+      "precioInformativo": 4500.0,
+      "moneda": "CRC",
+      "destacado": false,
+      "imagenes": [
+        33
+      ]
+    },
+    {
+      "id": 12,
+      "categoriaId": 1,
+      "nombre": "Vasos con tapa de bambú personalizados",
+      "descripcion": "Vasos con tapa de bambú decorados con vinilo adhesivo, con diseño completo o parcial.",
+      "precioInformativo": 6000.0,
+      "moneda": "CRC",
+      "destacado": false,
+      "imagenes": [
+        34
+      ]
+    }
+  ],
+  "servicios": [
+    {
+      "id": 1,
+      "nombre": "Sublimación personalizada en llaveros acrílicos",
+      "descripcion": "Personalizamos llaveros acrílicos mediante sublimación por ambos lados. Hay variedad de figuras; consulte disponibilidad.",
+      "alcance": "Diseño y disponibilidad sujetos a consulta. Material acrílico sublimable por ambas caras; precio a confirmar.",
+      "imagenId": 55,
+      "precioDesde": null,
+      "moneda": null,
+      "orden": 0,
+      "estado": "Publicado"
+    },
+    {
+      "id": 2,
+      "nombre": "Personalización de medallas acrílicas",
+      "descripcion": "Personalizamos medallas acrílicas con sublimación por ambos lados o con vinil adhesivo, según el diseño.",
+      "alcance": "Disponibles en blanco y transparente según existencia. Diseño, precio y técnica se confirman al realizar el pedido.",
+      "imagenId": 56,
+      "precioDesde": null,
+      "moneda": null,
+      "orden": 1,
+      "estado": "Publicado"
+    },
+    {
+      "id": 3,
+      "nombre": "Sublimación personalizada en can cooler",
+      "descripcion": "Can cooler de neopreno sublimable por ambos lados, personalizado con el diseño que usted elija.",
+      "alcance": "Opciones de diseño y disponibilidad sujetas a consulta. Precio y detalles se confirman antes de preparar el pedido.",
+      "imagenId": 18,
+      "precioDesde": null,
+      "moneda": null,
+      "orden": 2,
+      "estado": "Publicado"
+    },
+    {
+      "id": 5,
+      "nombre": "Trabajo con vinil",
+      "descripcion": "Decoramos y rotulamos superficies lisas con vinil adhesivo resistente y de alta calidad.",
+      "alcance": "Cajas de cartón o madera, vasos, botellas, tazas y otros artículos. Diseño y precio según el encargo.",
+      "imagenId": 57,
+      "precioDesde": null,
+      "moneda": null,
+      "orden": 10,
+      "estado": "Publicado"
+    },
+    {
+      "id": 6,
+      "nombre": "Stickers personalizados",
+      "descripcion": "Stickers de alta definición sobre base de plástico blanco para que los colores y diseños resalten.",
+      "alcance": "Para decorar bolsas, botellas, cuadernos y otros objetos, o para promocionar su negocio.",
+      "imagenId": 58,
+      "precioDesde": null,
+      "moneda": null,
+      "orden": 11,
+      "estado": "Publicado"
+    },
+    {
+      "id": 7,
+      "nombre": "Detalles y regalos personalizados",
+      "descripcion": "Creamos recuerdos, arreglos y regalos que dan un toque único a fiestas y ocasiones especiales.",
+      "alcance": "Trabajamos cada arreglo según la petición del cliente. Diseño, plazo y precio se confirman antes de prepararlo.",
+      "imagenId": 59,
+      "precioDesde": null,
+      "moneda": null,
+      "orden": 12,
+      "estado": "Publicado"
+    },
+    {
+      "id": 8,
+      "nombre": "Collares y placas personalizadas para mascotas",
+      "descripcion": "Personalizamos placas para el collar de su mascota con nombre, teléfono o diseño.",
+      "alcance": "Formas y colores sujetos a disponibilidad. Se preparan por encargo y se confirma el diseño por WhatsApp.",
+      "imagenId": 40,
+      "precioDesde": null,
+      "moneda": null,
+      "orden": 13,
+      "estado": "Publicado"
+    }
+  ],
+  "promociones": [
+    {
+      "id": 3,
+      "titulo": "La magia de Navidad está por llegar",
+      "descripcion": "Próximamente encontrará regalos, detalles y productos personalizados para compartir una Navidad muy especial.",
+      "condiciones": "Anuncio anticipado sujeto a disponibilidad. Los diseños, plazos y precios se confirmarán al abrir la temporada navideña.",
+      "imagenId": 61,
+      "inicio": "2026-11-15T00:00:00-06:00",
+      "fin": "2027-01-07T00:00:00-06:00",
+      "orden": 1,
+      "estado": "Publicado"
+    }
+  ],
+  "galeria": [
+    {
+      "id": 1,
+      "imagenId": 10,
+      "titulo": "Llavero personalizado con sublimación",
+      "orden": 0,
+      "estado": "Publicado"
+    },
+    {
+      "id": 2,
+      "imagenId": 11,
+      "titulo": "Personalización con vinil",
+      "orden": 1,
+      "estado": "Publicado"
+    },
+    {
+      "id": 3,
+      "imagenId": 12,
+      "titulo": "Regalos personalizados",
+      "orden": 2,
+      "estado": "Publicado"
+    },
+    {
+      "id": 4,
+      "imagenId": 13,
+      "titulo": "Esferas navideñas personalizadas",
+      "orden": 3,
+      "estado": "Publicado"
+    },
+    {
+      "id": 5,
+      "imagenId": 14,
+      "titulo": "Artículos del bazar",
+      "orden": 4,
+      "estado": "Publicado"
+    },
+    {
+      "id": 6,
+      "imagenId": 15,
+      "titulo": "Proceso de sublimación",
+      "orden": 5,
+      "estado": "Publicado"
+    },
+    {
+      "id": 7,
+      "imagenId": 39,
+      "titulo": "Recuerdo para una mascota",
+      "orden": 10,
+      "estado": "Publicado"
+    },
+    {
+      "id": 8,
+      "imagenId": 40,
+      "titulo": "Placa personalizada para mascota",
+      "orden": 11,
+      "estado": "Publicado"
+    },
+    {
+      "id": 9,
+      "imagenId": 41,
+      "titulo": "Totebag floral personalizado",
+      "orden": 12,
+      "estado": "Publicado"
+    },
+    {
+      "id": 10,
+      "imagenId": 42,
+      "titulo": "Regalo personalizado con taza",
+      "orden": 13,
+      "estado": "Publicado"
+    },
+    {
+      "id": 11,
+      "imagenId": 43,
+      "titulo": "Botella personalizada",
+      "orden": 14,
+      "estado": "Publicado"
+    },
+    {
+      "id": 12,
+      "imagenId": 44,
+      "titulo": "Vaso con tapa de bambú",
+      "orden": 15,
+      "estado": "Publicado"
+    },
+    {
+      "id": 13,
+      "imagenId": 45,
+      "titulo": "Recipientes en forma de corazón",
+      "orden": 16,
+      "estado": "Publicado"
+    },
+    {
+      "id": 14,
+      "imagenId": 46,
+      "titulo": "Esferas navideñas personalizadas",
+      "orden": 17,
+      "estado": "Publicado"
+    },
+    {
+      "id": 15,
+      "imagenId": 47,
+      "titulo": "Tazas con interior de colores",
+      "orden": 18,
+      "estado": "Publicado"
+    },
+    {
+      "id": 16,
+      "imagenId": 48,
+      "titulo": "Placa personalizada",
+      "orden": 19,
+      "estado": "Publicado"
+    },
+    {
+      "id": 17,
+      "imagenId": 49,
+      "titulo": "Can cooler personalizado",
+      "orden": 20,
+      "estado": "Publicado"
+    },
+    {
+      "id": 18,
+      "imagenId": 50,
+      "titulo": "Totebag ilustrado",
+      "orden": 21,
+      "estado": "Publicado"
+    },
+    {
+      "id": 19,
+      "imagenId": 51,
+      "titulo": "Arreglo de cumpleaños",
+      "orden": 22,
+      "estado": "Publicado"
+    },
+    {
+      "id": 20,
+      "imagenId": 52,
+      "titulo": "Caja de regalo personalizada",
+      "orden": 23,
+      "estado": "Publicado"
+    },
+    {
+      "id": 21,
+      "imagenId": 53,
+      "titulo": "Taza ilustrada",
+      "orden": 24,
+      "estado": "Publicado"
+    },
+    {
+      "id": 22,
+      "imagenId": 54,
+      "titulo": "Regalo infantil personalizado",
+      "orden": 25,
+      "estado": "Publicado"
+    },
+    {
+      "id": 23,
+      "imagenId": 63,
+      "titulo": "Totebag personalizada",
+      "orden": 26,
+      "estado": "Publicado"
+    },
+    {
+      "id": 24,
+      "imagenId": 64,
+      "titulo": "Totebag personalizada",
+      "orden": 27,
+      "estado": "Publicado"
+    },
+    {
+      "id": 25,
+      "imagenId": 65,
+      "titulo": "Totebag personalizada",
+      "orden": 28,
+      "estado": "Publicado"
+    },
+    {
+      "id": 26,
+      "imagenId": 66,
+      "titulo": "Totebag personalizada",
+      "orden": 29,
+      "estado": "Publicado"
+    },
+    {
+      "id": 27,
+      "imagenId": 67,
+      "titulo": "Detalle personalizado para regalar",
+      "orden": 30,
+      "estado": "Publicado"
+    },
+    {
+      "id": 28,
+      "imagenId": 68,
+      "titulo": "Detalle personalizado para regalar",
+      "orden": 31,
+      "estado": "Publicado"
+    },
+    {
+      "id": 29,
+      "imagenId": 69,
+      "titulo": "Detalle personalizado para regalar",
+      "orden": 32,
+      "estado": "Publicado"
+    },
+    {
+      "id": 30,
+      "imagenId": 70,
+      "titulo": "Detalle personalizado para regalar",
+      "orden": 33,
+      "estado": "Publicado"
+    },
+    {
+      "id": 31,
+      "imagenId": 71,
+      "titulo": "Detalle personalizado para regalar",
+      "orden": 34,
+      "estado": "Publicado"
+    },
+    {
+      "id": 32,
+      "imagenId": 72,
+      "titulo": "Detalle personalizado para regalar",
+      "orden": 35,
+      "estado": "Publicado"
+    },
+    {
+      "id": 33,
+      "imagenId": 73,
+      "titulo": "Botella personalizada",
+      "orden": 36,
+      "estado": "Publicado"
+    },
+    {
+      "id": 34,
+      "imagenId": 74,
+      "titulo": "Vaso personalizado",
+      "orden": 37,
+      "estado": "Publicado"
+    },
+    {
+      "id": 35,
+      "imagenId": 75,
+      "titulo": "Vaso personalizado",
+      "orden": 38,
+      "estado": "Publicado"
+    },
+    {
+      "id": 36,
+      "imagenId": 76,
+      "titulo": "Detalle personalizado para regalar",
+      "orden": 39,
+      "estado": "Publicado"
+    },
+    {
+      "id": 37,
+      "imagenId": 77,
+      "titulo": "Totebag con diseño personalizado",
+      "orden": 40,
+      "estado": "Publicado"
+    },
+    {
+      "id": 38,
+      "imagenId": 78,
+      "titulo": "Totebag con diseño personalizado",
+      "orden": 41,
+      "estado": "Publicado"
+    },
+    {
+      "id": 39,
+      "imagenId": 79,
+      "titulo": "Totebag con diseño personalizado",
+      "orden": 42,
+      "estado": "Publicado"
+    },
+    {
+      "id": 40,
+      "imagenId": 80,
+      "titulo": "Totebag con diseño personalizado",
+      "orden": 43,
+      "estado": "Publicado"
+    },
+    {
+      "id": 41,
+      "imagenId": 81,
+      "titulo": "Taza personalizada",
+      "orden": 44,
+      "estado": "Publicado"
+    },
+    {
+      "id": 42,
+      "imagenId": 82,
+      "titulo": "Taza personalizada",
+      "orden": 45,
+      "estado": "Publicado"
+    },
+    {
+      "id": 43,
+      "imagenId": 83,
+      "titulo": "Taza personalizada",
+      "orden": 46,
+      "estado": "Publicado"
+    },
+    {
+      "id": 44,
+      "imagenId": 84,
+      "titulo": "Taza personalizada",
+      "orden": 47,
+      "estado": "Publicado"
+    },
+    {
+      "id": 45,
+      "imagenId": 85,
+      "titulo": "Adorno navideño personalizado",
+      "orden": 48,
+      "estado": "Publicado"
+    },
+    {
+      "id": 46,
+      "imagenId": 86,
+      "titulo": "Vaso personalizado",
+      "orden": 49,
+      "estado": "Publicado"
+    },
+    {
+      "id": 47,
+      "imagenId": 87,
+      "titulo": "Vaso personalizado",
+      "orden": 50,
+      "estado": "Publicado"
+    },
+    {
+      "id": 48,
+      "imagenId": 88,
+      "titulo": "Prenda personalizada",
+      "orden": 51,
+      "estado": "Publicado"
+    },
+    {
+      "id": 49,
+      "imagenId": 89,
+      "titulo": "Prenda personalizada",
+      "orden": 52,
+      "estado": "Publicado"
+    },
+    {
+      "id": 50,
+      "imagenId": 90,
+      "titulo": "Prenda personalizada",
+      "orden": 53,
+      "estado": "Publicado"
+    },
+    {
+      "id": 51,
+      "imagenId": 91,
+      "titulo": "Prenda personalizada",
+      "orden": 54,
+      "estado": "Publicado"
+    },
+    {
+      "id": 52,
+      "imagenId": 92,
+      "titulo": "Prenda personalizada",
+      "orden": 55,
+      "estado": "Publicado"
+    },
+    {
+      "id": 53,
+      "imagenId": 93,
+      "titulo": "Detalle para una celebración",
+      "orden": 56,
+      "estado": "Publicado"
+    },
+    {
+      "id": 54,
+      "imagenId": 94,
+      "titulo": "Regalo personalizado",
+      "orden": 57,
+      "estado": "Publicado"
+    },
+    {
+      "id": 55,
+      "imagenId": 95,
+      "titulo": "Regalo personalizado",
+      "orden": 58,
+      "estado": "Publicado"
+    },
+    {
+      "id": 56,
+      "imagenId": 96,
+      "titulo": "Regalo personalizado",
+      "orden": 59,
+      "estado": "Publicado"
+    },
+    {
+      "id": 57,
+      "imagenId": 97,
+      "titulo": "Empaque personalizado para dulces",
+      "orden": 60,
+      "estado": "Publicado"
+    },
+    {
+      "id": 58,
+      "imagenId": 98,
+      "titulo": "Empaque personalizado para dulces",
+      "orden": 61,
+      "estado": "Publicado"
+    },
+    {
+      "id": 59,
+      "imagenId": 99,
+      "titulo": "Empaque personalizado para dulces",
+      "orden": 62,
+      "estado": "Publicado"
+    },
+    {
+      "id": 60,
+      "imagenId": 100,
+      "titulo": "Empaque personalizado para dulces",
+      "orden": 63,
+      "estado": "Publicado"
+    },
+    {
+      "id": 61,
+      "imagenId": 101,
+      "titulo": "Empaque personalizado para dulces",
+      "orden": 64,
+      "estado": "Publicado"
+    },
+    {
+      "id": 62,
+      "imagenId": 102,
+      "titulo": "Empaque personalizado para dulces",
+      "orden": 65,
+      "estado": "Publicado"
+    },
+    {
+      "id": 63,
+      "imagenId": 103,
+      "titulo": "Empaque personalizado para dulces",
+      "orden": 66,
+      "estado": "Publicado"
+    },
+    {
+      "id": 64,
+      "imagenId": 104,
+      "titulo": "Empaque personalizado para dulces",
+      "orden": 67,
+      "estado": "Publicado"
+    },
+    {
+      "id": 65,
+      "imagenId": 105,
+      "titulo": "Empaque personalizado para dulces",
+      "orden": 68,
+      "estado": "Publicado"
+    },
+    {
+      "id": 66,
+      "imagenId": 106,
+      "titulo": "Empaque personalizado para dulces",
+      "orden": 69,
+      "estado": "Publicado"
+    },
+    {
+      "id": 67,
+      "imagenId": 107,
+      "titulo": "Empaque personalizado para dulces",
+      "orden": 70,
+      "estado": "Publicado"
+    },
+    {
+      "id": 68,
+      "imagenId": 108,
+      "titulo": "Empaque personalizado para dulces",
+      "orden": 71,
+      "estado": "Publicado"
+    },
+    {
+      "id": 69,
+      "imagenId": 109,
+      "titulo": "Empaque personalizado para dulces",
+      "orden": 72,
+      "estado": "Publicado"
+    },
+    {
+      "id": 70,
+      "imagenId": 110,
+      "titulo": "Bolsa de regalo personalizada",
+      "orden": 73,
+      "estado": "Publicado"
+    },
+    {
+      "id": 71,
+      "imagenId": 111,
+      "titulo": "Bolsa de regalo personalizada",
+      "orden": 74,
+      "estado": "Publicado"
+    },
+    {
+      "id": 72,
+      "imagenId": 112,
+      "titulo": "Detalle para cumpleaños",
+      "orden": 75,
+      "estado": "Publicado"
+    },
+    {
+      "id": 73,
+      "imagenId": 113,
+      "titulo": "Detalle para cumpleaños",
+      "orden": 76,
+      "estado": "Publicado"
+    },
+    {
+      "id": 74,
+      "imagenId": 114,
+      "titulo": "Regalo personalizado para papá",
+      "orden": 77,
+      "estado": "Publicado"
+    },
+    {
+      "id": 75,
+      "imagenId": 115,
+      "titulo": "Regalo personalizado para papá",
+      "orden": 78,
+      "estado": "Publicado"
+    },
+    {
+      "id": 76,
+      "imagenId": 116,
+      "titulo": "Caja de regalo personalizada",
+      "orden": 79,
+      "estado": "Publicado"
+    },
+    {
+      "id": 77,
+      "imagenId": 146,
+      "titulo": "Caja de regalo personalizada",
+      "orden": 80,
+      "estado": "Publicado"
+    },
+    {
+      "id": 78,
+      "imagenId": 118,
+      "titulo": "Caja de regalo personalizada",
+      "orden": 81,
+      "estado": "Publicado"
+    },
+    {
+      "id": 79,
+      "imagenId": 119,
+      "titulo": "Caja de regalo personalizada",
+      "orden": 82,
+      "estado": "Publicado"
+    },
+    {
+      "id": 80,
+      "imagenId": 120,
+      "titulo": "Caja de regalo personalizada",
+      "orden": 83,
+      "estado": "Publicado"
+    },
+    {
+      "id": 81,
+      "imagenId": 121,
+      "titulo": "Caja de regalo personalizada",
+      "orden": 84,
+      "estado": "Publicado"
+    },
+    {
+      "id": 82,
+      "imagenId": 122,
+      "titulo": "Caja de regalo personalizada",
+      "orden": 85,
+      "estado": "Publicado"
+    },
+    {
+      "id": 83,
+      "imagenId": 123,
+      "titulo": "Caja de regalo personalizada",
+      "orden": 86,
+      "estado": "Publicado"
+    },
+    {
+      "id": 84,
+      "imagenId": 124,
+      "titulo": "Caja de regalo personalizada",
+      "orden": 87,
+      "estado": "Publicado"
+    },
+    {
+      "id": 85,
+      "imagenId": 125,
+      "titulo": "Detalle personalizado para regalar",
+      "orden": 88,
+      "estado": "Publicado"
+    },
+    {
+      "id": 86,
+      "imagenId": 126,
+      "titulo": "Detalle personalizado para regalar",
+      "orden": 89,
+      "estado": "Publicado"
+    },
+    {
+      "id": 87,
+      "imagenId": 127,
+      "titulo": "Taza con diseño personalizado",
+      "orden": 90,
+      "estado": "Publicado"
+    },
+    {
+      "id": 88,
+      "imagenId": 128,
+      "titulo": "Taza con diseño personalizado",
+      "orden": 91,
+      "estado": "Publicado"
+    },
+    {
+      "id": 89,
+      "imagenId": 129,
+      "titulo": "Taza con diseño personalizado",
+      "orden": 92,
+      "estado": "Publicado"
+    },
+    {
+      "id": 90,
+      "imagenId": 130,
+      "titulo": "Taza con diseño personalizado",
+      "orden": 93,
+      "estado": "Publicado"
+    },
+    {
+      "id": 91,
+      "imagenId": 131,
+      "titulo": "Taza con diseño personalizado",
+      "orden": 94,
+      "estado": "Publicado"
+    }
+  ],
+  "secciones": [
+    {
+      "id": 1,
+      "clave": "portada",
+      "titulo": "Detalles y artículos para cada ocasión",
+      "cuerpo": "En Bazar Nazareth encontrará artículos de papelería, productos escolares, regalos y opciones personalizadas. Explore nuestros productos y servicios, y contáctenos para encontrar justo lo que necesita.",
+      "imagenId": 16,
+      "orden": 0,
+      "estado": "Publicado"
+    }
+  ],
+  "imagenes": [
+    {
+      "id": 3,
+      "textoAlternativo": "Llavero personalizado de demostración"
+    },
+    {
+      "id": 4,
+      "textoAlternativo": "Detalle personalizado de demostración"
+    },
+    {
+      "id": 7,
+      "textoAlternativo": "Llavero personalizado de ejemplo"
+    },
+    {
+      "id": 10,
+      "textoAlternativo": "Llavero acrílico personalizado con sublimación"
+    },
+    {
+      "id": 11,
+      "textoAlternativo": "Proceso de personalización con vinil y prensa térmica"
+    },
+    {
+      "id": 12,
+      "textoAlternativo": "Regalo personalizado con taza, tarjeta y artículo textil"
+    },
+    {
+      "id": 13,
+      "textoAlternativo": "Esferas navideñas personalizadas con nombres"
+    },
+    {
+      "id": 14,
+      "textoAlternativo": "Interior del bazar con artículos para regalos y personalización"
+    },
+    {
+      "id": 15,
+      "textoAlternativo": "Equipo utilizado para el proceso de sublimación"
+    },
+    {
+      "id": 16,
+      "textoAlternativo": "images (1)"
+    },
+    {
+      "id": 17,
+      "textoAlternativo": "Opciones de llaveros acrílicos personalizables"
+    },
+    {
+      "id": 18,
+      "textoAlternativo": "Can cooler de neopreno para personalizar"
+    },
+    {
+      "id": 19,
+      "textoAlternativo": "Tazas de 11 y 16 onzas disponibles para personalizar"
+    },
+    {
+      "id": 20,
+      "textoAlternativo": "Taza mágica negra que revela el diseño con el calor"
+    },
+    {
+      "id": 21,
+      "textoAlternativo": "Rompecabezas rectangulares y de corazón para personalizar"
+    },
+    {
+      "id": 22,
+      "textoAlternativo": "Placas de aluminio cuadradas y rectangulares para personalizar"
+    },
+    {
+      "id": 23,
+      "textoAlternativo": "Camisetas para sublimación o vinilo termoadhesivo"
+    },
+    {
+      "id": 24,
+      "textoAlternativo": "Camisetas polo Waffit blancas y de colores para personalizar"
+    },
+    {
+      "id": 25,
+      "textoAlternativo": "Block de notas negro con notas adhesivas de colores"
+    },
+    {
+      "id": 26,
+      "textoAlternativo": "Posavasos de neopreno para personalizar"
+    },
+    {
+      "id": 27,
+      "textoAlternativo": "Gorra de colores para personalizar"
+    },
+    {
+      "id": 28,
+      "textoAlternativo": "Visera blanca disponible para sublimación"
+    },
+    {
+      "id": 29,
+      "textoAlternativo": "Destapador con funda de cuero para personalizar"
+    },
+    {
+      "id": 30,
+      "textoAlternativo": "Porta tarjetas adhesivo para celular personalizable"
+    },
+    {
+      "id": 31,
+      "textoAlternativo": "Variedad de formas de imanes para personalizar"
+    },
+    {
+      "id": 32,
+      "textoAlternativo": "Bolsas de manta sublimables por ambos lados"
+    },
+    {
+      "id": 33,
+      "textoAlternativo": "Mamelucos de poliéster para bebés"
+    },
+    {
+      "id": 34,
+      "textoAlternativo": "Vasos transparentes con tapa de bambú decorados con vinilo"
+    },
+    {
+      "id": 35,
+      "textoAlternativo": "Ejemplos de cajas, vasos y botellas decorados con vinil"
+    },
+    {
+      "id": 36,
+      "textoAlternativo": "Ejemplos de stickers personalizados para objetos y negocios"
+    },
+    {
+      "id": 37,
+      "textoAlternativo": "Ejemplos de recuerdos y regalos personalizados para fiestas"
+    },
+    {
+      "id": 38,
+      "textoAlternativo": "Placa personalizada en forma de hueso para el collar de una mascota"
+    },
+    {
+      "id": 39,
+      "textoAlternativo": "Recuerdo personalizado con fotografías y huellas de una mascota"
+    },
+    {
+      "id": 40,
+      "textoAlternativo": "Placa azul personalizada para el collar de una mascota"
+    },
+    {
+      "id": 41,
+      "textoAlternativo": "Bolsa de tela personalizada con un diseño floral"
+    },
+    {
+      "id": 42,
+      "textoAlternativo": "Regalo personalizado con taza, camiseta y dulces"
+    },
+    {
+      "id": 43,
+      "textoAlternativo": "Botella rosada personalizada con nombre y diseño floral"
+    },
+    {
+      "id": 44,
+      "textoAlternativo": "Vaso transparente personalizado con ilustración y tapa de bambú"
+    },
+    {
+      "id": 45,
+      "textoAlternativo": "Recipientes en forma de corazón de colores"
+    },
+    {
+      "id": 46,
+      "textoAlternativo": "Esferas navideñas personalizadas con nombres"
+    },
+    {
+      "id": 47,
+      "textoAlternativo": "Variedad de tazas con interior de colores"
+    },
+    {
+      "id": 48,
+      "textoAlternativo": "Placa pequeña personalizada con una ilustración de anime"
+    },
+    {
+      "id": 49,
+      "textoAlternativo": "Can cooler personalizado con una ilustración de anime"
+    },
+    {
+      "id": 50,
+      "textoAlternativo": "Bolsa de tela personalizada con una ilustración"
+    },
+    {
+      "id": 51,
+      "textoAlternativo": "Arreglo de regalo personalizado para cumpleaños"
+    },
+    {
+      "id": 52,
+      "textoAlternativo": "Caja con taza, libreta y detalles personalizados"
+    },
+    {
+      "id": 53,
+      "textoAlternativo": "Taza blanca personalizada con ilustraciones de colores"
+    },
+    {
+      "id": 54,
+      "textoAlternativo": "Caja de regalo infantil con artículos personalizados"
+    },
+    {
+      "id": 55,
+      "textoAlternativo": "Llavero redondo personalizado sostenido con la mano"
+    },
+    {
+      "id": 56,
+      "textoAlternativo": "Placa redonda personalizada para una boda"
+    },
+    {
+      "id": 57,
+      "textoAlternativo": "Vaso transparente con tapa de bambú y decoración de vinil"
+    },
+    {
+      "id": 58,
+      "textoAlternativo": "Stickers circulares impresos para promocionar un negocio"
+    },
+    {
+      "id": 59,
+      "textoAlternativo": "Ejemplos de bolsas, recuerdos y arreglos personalizados"
+    },
+    {
+      "id": 60,
+      "textoAlternativo": "Taza, llavero, stickers y regalo con decoración de Halloween"
+    },
+    {
+      "id": 61,
+      "textoAlternativo": "Regalos y productos personalizados con decoración navideña"
+    },
+    {
+      "id": 62,
+      "textoAlternativo": "Tres llaveros acrílicos blancos en formas cuadrada, redonda y de corazón"
+    },
+    {
+      "id": 63,
+      "textoAlternativo": "Muestra de trabajo realizado por Bazar Nazareth: totebag personalizada"
+    },
+    {
+      "id": 64,
+      "textoAlternativo": "Muestra de trabajo realizado por Bazar Nazareth: totebag personalizada"
+    },
+    {
+      "id": 65,
+      "textoAlternativo": "Muestra de trabajo realizado por Bazar Nazareth: totebag personalizada"
+    },
+    {
+      "id": 66,
+      "textoAlternativo": "Muestra de trabajo realizado por Bazar Nazareth: totebag personalizada"
+    },
+    {
+      "id": 67,
+      "textoAlternativo": "Muestra de trabajo realizado por Bazar Nazareth: detalle personalizado para regalar"
+    },
+    {
+      "id": 68,
+      "textoAlternativo": "Muestra de trabajo realizado por Bazar Nazareth: detalle personalizado para regalar"
+    },
+    {
+      "id": 69,
+      "textoAlternativo": "Muestra de trabajo realizado por Bazar Nazareth: detalle personalizado para regalar"
+    },
+    {
+      "id": 70,
+      "textoAlternativo": "Muestra de trabajo realizado por Bazar Nazareth: detalle personalizado para regalar"
+    },
+    {
+      "id": 71,
+      "textoAlternativo": "Muestra de trabajo realizado por Bazar Nazareth: detalle personalizado para regalar"
+    },
+    {
+      "id": 72,
+      "textoAlternativo": "Muestra de trabajo realizado por Bazar Nazareth: detalle personalizado para regalar"
+    },
+    {
+      "id": 73,
+      "textoAlternativo": "Muestra de trabajo realizado por Bazar Nazareth: botella personalizada"
+    },
+    {
+      "id": 74,
+      "textoAlternativo": "Muestra de trabajo realizado por Bazar Nazareth: vaso personalizado"
+    },
+    {
+      "id": 75,
+      "textoAlternativo": "Muestra de trabajo realizado por Bazar Nazareth: vaso personalizado"
+    },
+    {
+      "id": 76,
+      "textoAlternativo": "Muestra de trabajo realizado por Bazar Nazareth: detalle personalizado para regalar"
+    },
+    {
+      "id": 77,
+      "textoAlternativo": "Muestra de trabajo realizado por Bazar Nazareth: totebag con diseño personalizado"
+    },
+    {
+      "id": 78,
+      "textoAlternativo": "Muestra de trabajo realizado por Bazar Nazareth: totebag con diseño personalizado"
+    },
+    {
+      "id": 79,
+      "textoAlternativo": "Muestra de trabajo realizado por Bazar Nazareth: totebag con diseño personalizado"
+    },
+    {
+      "id": 80,
+      "textoAlternativo": "Muestra de trabajo realizado por Bazar Nazareth: totebag con diseño personalizado"
+    },
+    {
+      "id": 81,
+      "textoAlternativo": "Muestra de trabajo realizado por Bazar Nazareth: taza personalizada"
+    },
+    {
+      "id": 82,
+      "textoAlternativo": "Muestra de trabajo realizado por Bazar Nazareth: taza personalizada"
+    },
+    {
+      "id": 83,
+      "textoAlternativo": "Muestra de trabajo realizado por Bazar Nazareth: taza personalizada"
+    },
+    {
+      "id": 84,
+      "textoAlternativo": "Muestra de trabajo realizado por Bazar Nazareth: taza personalizada"
+    },
+    {
+      "id": 85,
+      "textoAlternativo": "Muestra de trabajo realizado por Bazar Nazareth: adorno navideño personalizado"
+    },
+    {
+      "id": 86,
+      "textoAlternativo": "Muestra de trabajo realizado por Bazar Nazareth: vaso personalizado"
+    },
+    {
+      "id": 87,
+      "textoAlternativo": "Muestra de trabajo realizado por Bazar Nazareth: vaso personalizado"
+    },
+    {
+      "id": 88,
+      "textoAlternativo": "Muestra de trabajo realizado por Bazar Nazareth: prenda personalizada"
+    },
+    {
+      "id": 89,
+      "textoAlternativo": "Muestra de trabajo realizado por Bazar Nazareth: prenda personalizada"
+    },
+    {
+      "id": 90,
+      "textoAlternativo": "Muestra de trabajo realizado por Bazar Nazareth: prenda personalizada"
+    },
+    {
+      "id": 91,
+      "textoAlternativo": "Muestra de trabajo realizado por Bazar Nazareth: prenda personalizada"
+    },
+    {
+      "id": 92,
+      "textoAlternativo": "Muestra de trabajo realizado por Bazar Nazareth: prenda personalizada"
+    },
+    {
+      "id": 93,
+      "textoAlternativo": "Muestra de trabajo realizado por Bazar Nazareth: detalle para una celebración"
+    },
+    {
+      "id": 94,
+      "textoAlternativo": "Muestra de trabajo realizado por Bazar Nazareth: regalo personalizado"
+    },
+    {
+      "id": 95,
+      "textoAlternativo": "Muestra de trabajo realizado por Bazar Nazareth: regalo personalizado"
+    },
+    {
+      "id": 96,
+      "textoAlternativo": "Muestra de trabajo realizado por Bazar Nazareth: regalo personalizado"
+    },
+    {
+      "id": 97,
+      "textoAlternativo": "Muestra de trabajo realizado por Bazar Nazareth: empaque personalizado para dulces"
+    },
+    {
+      "id": 98,
+      "textoAlternativo": "Muestra de trabajo realizado por Bazar Nazareth: empaque personalizado para dulces"
+    },
+    {
+      "id": 99,
+      "textoAlternativo": "Muestra de trabajo realizado por Bazar Nazareth: empaque personalizado para dulces"
+    },
+    {
+      "id": 100,
+      "textoAlternativo": "Muestra de trabajo realizado por Bazar Nazareth: empaque personalizado para dulces"
+    },
+    {
+      "id": 101,
+      "textoAlternativo": "Muestra de trabajo realizado por Bazar Nazareth: empaque personalizado para dulces"
+    },
+    {
+      "id": 102,
+      "textoAlternativo": "Muestra de trabajo realizado por Bazar Nazareth: empaque personalizado para dulces"
+    },
+    {
+      "id": 103,
+      "textoAlternativo": "Muestra de trabajo realizado por Bazar Nazareth: empaque personalizado para dulces"
+    },
+    {
+      "id": 104,
+      "textoAlternativo": "Muestra de trabajo realizado por Bazar Nazareth: empaque personalizado para dulces"
+    },
+    {
+      "id": 105,
+      "textoAlternativo": "Muestra de trabajo realizado por Bazar Nazareth: empaque personalizado para dulces"
+    },
+    {
+      "id": 106,
+      "textoAlternativo": "Muestra de trabajo realizado por Bazar Nazareth: empaque personalizado para dulces"
+    },
+    {
+      "id": 107,
+      "textoAlternativo": "Muestra de trabajo realizado por Bazar Nazareth: empaque personalizado para dulces"
+    },
+    {
+      "id": 108,
+      "textoAlternativo": "Muestra de trabajo realizado por Bazar Nazareth: empaque personalizado para dulces"
+    },
+    {
+      "id": 109,
+      "textoAlternativo": "Muestra de trabajo realizado por Bazar Nazareth: empaque personalizado para dulces"
+    },
+    {
+      "id": 110,
+      "textoAlternativo": "Muestra de trabajo realizado por Bazar Nazareth: bolsa de regalo personalizada"
+    },
+    {
+      "id": 111,
+      "textoAlternativo": "Muestra de trabajo realizado por Bazar Nazareth: bolsa de regalo personalizada"
+    },
+    {
+      "id": 112,
+      "textoAlternativo": "Muestra de trabajo realizado por Bazar Nazareth: detalle para cumpleaños"
+    },
+    {
+      "id": 113,
+      "textoAlternativo": "Muestra de trabajo realizado por Bazar Nazareth: detalle para cumpleaños"
+    },
+    {
+      "id": 114,
+      "textoAlternativo": "Muestra de trabajo realizado por Bazar Nazareth: regalo personalizado para papá"
+    },
+    {
+      "id": 115,
+      "textoAlternativo": "Muestra de trabajo realizado por Bazar Nazareth: regalo personalizado para papá"
+    },
+    {
+      "id": 116,
+      "textoAlternativo": "Muestra de trabajo realizado por Bazar Nazareth: caja de regalo personalizada"
+    },
+    {
+      "id": 117,
+      "textoAlternativo": "Muestra de trabajo realizado por Bazar Nazareth: caja de regalo personalizada"
+    },
+    {
+      "id": 118,
+      "textoAlternativo": "Muestra de trabajo realizado por Bazar Nazareth: caja de regalo personalizada"
+    },
+    {
+      "id": 119,
+      "textoAlternativo": "Muestra de trabajo realizado por Bazar Nazareth: caja de regalo personalizada"
+    },
+    {
+      "id": 120,
+      "textoAlternativo": "Muestra de trabajo realizado por Bazar Nazareth: caja de regalo personalizada"
+    },
+    {
+      "id": 121,
+      "textoAlternativo": "Muestra de trabajo realizado por Bazar Nazareth: caja de regalo personalizada"
+    },
+    {
+      "id": 122,
+      "textoAlternativo": "Muestra de trabajo realizado por Bazar Nazareth: caja de regalo personalizada"
+    },
+    {
+      "id": 123,
+      "textoAlternativo": "Muestra de trabajo realizado por Bazar Nazareth: caja de regalo personalizada"
+    },
+    {
+      "id": 124,
+      "textoAlternativo": "Muestra de trabajo realizado por Bazar Nazareth: caja de regalo personalizada"
+    },
+    {
+      "id": 125,
+      "textoAlternativo": "Muestra de trabajo realizado por Bazar Nazareth: detalle personalizado para regalar"
+    },
+    {
+      "id": 126,
+      "textoAlternativo": "Muestra de trabajo realizado por Bazar Nazareth: detalle personalizado para regalar"
+    },
+    {
+      "id": 127,
+      "textoAlternativo": "Muestra de trabajo realizado por Bazar Nazareth: taza con diseño personalizado"
+    },
+    {
+      "id": 128,
+      "textoAlternativo": "Muestra de trabajo realizado por Bazar Nazareth: taza con diseño personalizado"
+    },
+    {
+      "id": 129,
+      "textoAlternativo": "Muestra de trabajo realizado por Bazar Nazareth: taza con diseño personalizado"
+    },
+    {
+      "id": 130,
+      "textoAlternativo": "Muestra de trabajo realizado por Bazar Nazareth: taza con diseño personalizado"
+    },
+    {
+      "id": 131,
+      "textoAlternativo": "Muestra de trabajo realizado por Bazar Nazareth: taza con diseño personalizado"
+    },
+    {
+      "id": 132,
+      "textoAlternativo": "Imagen informativa de block de notas personalizado"
+    },
+    {
+      "id": 133,
+      "textoAlternativo": "Imagen informativa de camisetas personalizadas"
+    },
+    {
+      "id": 134,
+      "textoAlternativo": "Imagen informativa de can cooler personalizado"
+    },
+    {
+      "id": 135,
+      "textoAlternativo": "Imagen informativa de destapador personalizado"
+    },
+    {
+      "id": 136,
+      "textoAlternativo": "Imagen informativa de gorras personalizadas"
+    },
+    {
+      "id": 137,
+      "textoAlternativo": "Imagen informativa de imanes personalizados"
+    },
+    {
+      "id": 138,
+      "textoAlternativo": "Imagen informativa de llaveros personalizados"
+    },
+    {
+      "id": 139,
+      "textoAlternativo": "Imagen informativa de placas de aluminio personalizadas"
+    },
+    {
+      "id": 140,
+      "textoAlternativo": "Imagen informativa de porta tarjetas personalizado"
+    },
+    {
+      "id": 141,
+      "textoAlternativo": "Imagen informativa de posavasos personalizados"
+    },
+    {
+      "id": 142,
+      "textoAlternativo": "Imagen informativa de rompecabezas personalizado"
+    },
+    {
+      "id": 143,
+      "textoAlternativo": "Imagen informativa de tazas personalizadas"
+    },
+    {
+      "id": 144,
+      "textoAlternativo": "Imagen informativa de viseras personalizadas"
+    },
+    {
+      "id": 146,
+      "textoAlternativo": "WhatsApp Image 2026 10 30 at 8.31.06 PM"
+    }
+  ],
+  "promocionProductos": [],
+  "promocionServicios": []
+}

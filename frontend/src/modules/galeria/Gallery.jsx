@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import Modal from '../../shared/Modal.jsx';
 import Img from '../../shared/Img.jsx';
 import { BazarDoodle } from '../../shared/Icons.jsx';
-import { galleryItems as selectGalleryItems } from './galleryItems.js';
+import { galleryItems as selectGalleryItems, isGiftComplement } from './galleryItems.js';
 export default function Gallery({ data, images, business }) {
   const { t, language } = useLanguage();
 
@@ -58,7 +58,7 @@ export default function Gallery({ data, images, business }) {
                   <Img id={g.imagenId} alt={images[g.imagenId]} />
                   <span aria-hidden="true">⌕</span>
                 </button>
-                <p className="inspiration-caption">{g.titulo || images[g.imagenId]}</p>
+                <p className="inspiration-caption">{g.titulo || images[g.imagenId]}{isGiftComplement(g, images) && <small className="gallery-complement">{t('Complemento para regalos')}</small>}</p>
               </div>
             ))}
           </div>
@@ -108,10 +108,7 @@ export default function Gallery({ data, images, business }) {
             `/idea/${gallerySelection.id}${language === 'en' ? '?lang=en' : ''}`,
             window.location.origin,
           ).href;
-          const candy =
-            /dulce|cajita|caramelo|confite|sweet|candy|gift box/i.test(
-              `${gallerySelection.titulo || ''} ${description}`,
-            );
+          const candy = isGiftComplement(gallerySelection, images);
           const selectedMessage = [
             t('Hola, quisiera consultar por esta idea de la galería:'),
             t('• Referencia: {reference}', { reference }),
@@ -161,7 +158,7 @@ export default function Gallery({ data, images, business }) {
                     <p>
                       {' '}
                       {t(
-                        'Esta foto muestra algunos de los dulces que se pueden agregar a sus cajitas de regalo.',
+                        'Complementos para su regalo: estos dulces pueden acompañar una cajita personalizada. Opciones y disponibilidad por confirmar.',
                       )}{' '}
                     </p>
                   )}
@@ -184,7 +181,7 @@ export default function Gallery({ data, images, business }) {
                       }}
                     >
                       {' '}
-                      {t('Quiero esta idea')}{' '}
+                      {t(candy ? 'Consultar complementos' : 'Quiero esta idea')}{' '}
                     </a>
                     <a
                       className="button secondary"

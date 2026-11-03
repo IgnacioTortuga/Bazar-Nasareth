@@ -487,3 +487,5 @@
   .public-site .language-toggle { width: 44px; }
   .public-site .brand { overflow-wrap: normal; }
 }
+
+.public-site .gallery-complement { display: block; font-weight: 400; font-size: .75rem; margin-top: 6px; color: inherit; }

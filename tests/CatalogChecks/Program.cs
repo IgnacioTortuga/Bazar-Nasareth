@@ -34,6 +34,8 @@ Check(html.Contains("clic-whatsapp"), "La medición activada debe registrar clic
 Check(html.Contains("origen=detalle"), "La ficha compartible debe identificar el origen del clic.");
 Check(html.Contains("/images/simbolo-bazar.png"), "La ficha debe usar el logotipo original.");
 Check(html.Contains(">Por encargo<"), "La página debe informar la modalidad del negocio.");
+Check(html.Contains("<div class=\"price-row\"><strong class=\"price\">"), "Precio y modalidad comparten una fila adaptable.");
+Check(html.IndexOf("class=\"availability\"") > html.IndexOf("class=\"price\""), "Por encargo aparece junto al precio y después de la descripción.");
 var disabled = ProductSharing.RenderProduct(product, business, images, null, false);
 Check(!disabled.Contains("clic-whatsapp"), "No se debe registrar si la medición está desactivada.");
 Check(!disabled.Contains("og:image"), "No se debe inventar una fotografía.");

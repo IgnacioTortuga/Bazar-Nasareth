@@ -4,8 +4,9 @@ public static class PublicEndpoints
 {
     public static void Map(WebApplication app, IConfiguration configuration)
     {
-        app.MapGet("/api/publico", async (BazarDb db) =>
+        app.MapGet("/api/publico", async (BazarDb db, HttpContext ctx) =>
         {
+            ctx.Response.Headers.CacheControl = "no-store";
             var now = DateTimeOffset.UtcNow;
             var categorias = await db.Categorias.AsNoTracking().Where(x => x.Activa).OrderBy(x => x.Orden).ToListAsync();
             var categoryIds = categorias.Select(x => x.Id).ToArray();

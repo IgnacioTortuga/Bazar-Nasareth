@@ -38,7 +38,7 @@ export default function App() {
   const loadPage = useCallback(async () => {
     setLoading(true);
     setPublicError('');
-    Promise.allSettled([api('/publico'), api('/session')]).then(
+    Promise.allSettled([api('/publico', { cache: 'no-store' }), api('/session')]).then(
       ([pub, user]) => {
         if (pub.status === 'fulfilled') setData(pub.value);
         else
@@ -57,6 +57,34 @@ export default function App() {
     if (!loading && !account && path.startsWith('/contenido'))
       navigate('/login');
   }, [loading, account, path]);
+  // Una pestaña pública puede seguir abierta mientras se edita en otra.
+  const previousPath = useRef(path);
+  useEffect(() => {
+    const returningFromEditor = previousPath.current.startsWith('/contenido') && !path.startsWith('/contenido');
+    previousPath.current = path;
+    if (loading || path.startsWith('/contenido') || path === '/login') return;
+    let request;
+    const refresh = () => {
+      request?.abort();
+      request = new AbortController();
+      const current = request;
+      api('/publico', { cache: 'no-store', signal: current.signal })
+        .then((next) => { if (!current.signal.aborted) { setData(next); setPublicError(''); } })
+        .catch(() => { if (!current.signal.aborted) setPublicError('No pudimos actualizar el bazar. Compruebe su conexión y vuelva a intentarlo.'); });
+    };
+    const onVisible = () => { if (document.visibilityState === 'visible') refresh(); };
+    const onPageShow = (event) => { if (event.persisted) refresh(); };
+    if (returningFromEditor) refresh();
+    window.addEventListener('focus', refresh);
+    window.addEventListener('pageshow', onPageShow);
+    document.addEventListener('visibilitychange', onVisible);
+    return () => {
+      request?.abort();
+      window.removeEventListener('focus', refresh);
+      window.removeEventListener('pageshow', onPageShow);
+      document.removeEventListener('visibilitychange', onVisible);
+    };
+  }, [path, loading]);
   async function submit(e) {
     e.preventDefault();
     if (loginInFlight.current) return;
