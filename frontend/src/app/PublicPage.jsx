@@ -142,6 +142,20 @@ function PublicContent({ originalData }) {
       symbol: 'spark',
     },
   ];
+  function navigateSection(event, id) {
+    event.preventDefault();
+    setMenu(false);
+    setActiveSection(id);
+    requestAnimationFrame(() => {
+      const section = document.getElementById(id);
+      if (!section) return;
+      const header = document.querySelector('.public-header');
+      const url = new URL(window.location.href);
+      url.hash = id;
+      history.pushState(history.state, '', url);
+      window.scrollTo({ top: section.getBoundingClientRect().top + window.scrollY - (header?.getBoundingClientRect().height || 0) - 16, behavior: 'auto' });
+    });
+  }
   function searchCatalog(e) {
     e.preventDefault();
     setMenu(false);
@@ -181,10 +195,12 @@ function PublicContent({ originalData }) {
         <BazarDoodle /> {t('Un detalle pequeño. Una sonrisa enorme.')}{' '}
         <BazarDoodle />
       </div>
-      <header className="public-header">
+      <header className="public-header" onBlur={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget)) setMenu(false);
+      }}>
         <ContrastToggle theme={reading.theme} onToggle={reading.toggleTheme} />
         <div className="header-inner wrap">
-          <a className="brand" href="#inicio">
+          <a className="brand" href="#inicio" aria-label={business.nombre}>
             <img
               className="brand-mark"
               src="/images/simbolo-bazar.png"
@@ -192,7 +208,8 @@ function PublicContent({ originalData }) {
               width="48"
               height="48"
             />
-            {business.nombre}
+            <span className="brand-full">{business.nombre}</span>
+            <span className="brand-compact" aria-hidden="true">{business.nombre.replace(/\s+de Hojancha$/i, '')}</span>
           </a>
           <button
             className="mobile-menu"
@@ -201,16 +218,15 @@ function PublicContent({ originalData }) {
             aria-controls="public-navigation"
             aria-label={menu ? t('Cerrar navegación') : t('Abrir navegación')}
           >
-            ☰
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><path d={menu ? 'M6 6l12 12M6 18 18 6' : 'M4 6h16M4 12h16M4 18h16'} /></svg>
+            <span>{t(menu ? 'Cerrar' : 'Menú')}</span>
           </button>
-          <nav id="public-navigation" className={menu ? 'open' : ''}>
+          <nav id="public-navigation" className={menu ? 'open' : ''}
+            aria-label={t('Navegación principal')}>
             <a
               href="#inicio"
               className={`nav-home ${activeSection === 'inicio' ? 'is-active' : ''}`}
-              onClick={() => {
-                setActiveSection('inicio');
-                setMenu(false);
-              }}
+              onClick={(event) => navigateSection(event, 'inicio')}
             >
               {' '}
               {t('Inicio')}{' '}
@@ -220,10 +236,7 @@ function PublicContent({ originalData }) {
                 key={id}
                 href={'#' + id}
                 className={activeSection === id ? 'is-active' : ''}
-                onClick={() => {
-                  setActiveSection(id);
-                  setMenu(false);
-                }}
+                onClick={(event) => navigateSection(event, id)}
               >
                 {label}
               </a>

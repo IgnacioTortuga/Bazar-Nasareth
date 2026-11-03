@@ -12,6 +12,15 @@ void Check(bool condition, string message)
     checks++;
 }
 
+var sharedIdea = new GaleriaImagen { Id = 9, ImagenId = 41, Titulo = "Taza <script> & regalo" };
+var ideaHtml = GallerySharing.Render(sharedIdea, "Foto con \"comillas\"", "https://bazar.example");
+Check(ideaHtml.Contains("https://bazar.example/api/imagenes/41/archivo"), "La idea compartida incluye imagen absoluta.");
+Check(ideaHtml.Contains("https://bazar.example/idea/9"), "La idea tiene enlace permanente.");
+Check(!ideaHtml.Contains("Taza <script>"), "El título de galería se escapa.");
+Check(ideaHtml.Contains("&quot;comillas&quot;"), "La descripción de la imagen no rompe atributos.");
+Check(!GallerySharing.Render(sharedIdea, "Foto", "https://user:pass@otro.example").Contains("og:image\""), "La idea rechaza dominios con credenciales.");
+Check(GallerySharing.Render(sharedIdea, "Foto", null, true).Contains("Back to gallery"), "La idea conserva navegación en inglés.");
+
 var product = new Producto { Id = 17, Nombre = "Regalo <script>alert(1)</script>", Descripcion = "Una descripción con \"comillas\" & detalles", PrecioInformativo = 1500, Moneda = "CRC" };
 var business = new InformacionNegocio();
 ProductPhoto[] images = [new(3, "Foto \"especial\" <img>")];

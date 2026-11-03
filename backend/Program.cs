@@ -71,6 +71,7 @@ ContentEndpoints.Map(admin);
 RelationsEndpoints.Map(admin);
 EditorEndpoints.Map(admin);
 ProductSharing.Map(app, builder.Configuration);
+GallerySharing.Map(app, builder.Configuration);
 MetricsEndpoints.Map(app, builder.Configuration);
 app.MapFallbackToFile("index.html");
 app.Run();

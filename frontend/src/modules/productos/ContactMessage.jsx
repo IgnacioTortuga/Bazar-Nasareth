@@ -21,6 +21,7 @@ export default function ContactMessage({
   const message = [
     t('Hola, me interesa cotizar este producto:'),
     t('• Producto: {name}', { name: product.nombre }),
+    new URL(`/producto/${product.id}${language === 'en' ? '?lang=en' : ''}`, window.location.origin).href,
     campaign ? t('• Temática: {theme}', { theme: campaign }) : null,
     t('• Cantidad: {quantity} {unit}', {
       quantity: cantidad,

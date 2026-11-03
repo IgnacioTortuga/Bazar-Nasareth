@@ -3,20 +3,23 @@ import React, { useState } from 'react';
 import Modal from '../../shared/Modal.jsx';
 import Img from '../../shared/Img.jsx';
 import { BazarDoodle } from '../../shared/Icons.jsx';
-import { imageUrl } from '../../shared/images.js';
+import { galleryItems as selectGalleryItems } from './galleryItems.js';
 export default function Gallery({ data, images, business }) {
   const { t, language } = useLanguage();
 
   const [galleryPage, setGalleryPage] = useState(1);
   const [gallerySelection, setGallerySelection] = useState(null);
-  const galleryPageSize = 3;
+  const [query, setQuery] = useState('');
+  const galleryItems = selectGalleryItems(data.galeria, images, query);
+  const galleryPageSize = 6;
   const galleryPages = Math.max(
     1,
-    Math.ceil(data.galeria.length / galleryPageSize),
+    Math.ceil(galleryItems.length / galleryPageSize),
   );
-  const visibleGallery = data.galeria.slice(
-    (galleryPage - 1) * galleryPageSize,
-    galleryPage * galleryPageSize,
+  const currentPage = Math.min(galleryPage, galleryPages);
+  const visibleGallery = galleryItems.slice(
+    (currentPage - 1) * galleryPageSize,
+    currentPage * galleryPageSize,
   );
 
   return (
@@ -38,6 +41,9 @@ export default function Gallery({ data, images, business }) {
               )}{' '}
             </p>
           </div>
+          <label className="gallery-search">{t('Buscar una idea')}
+            <input type="search" value={query} placeholder={t('Ej.: taza, regalo, mascota…')} onChange={(event) => { setQuery(event.target.value); setGalleryPage(1); }} />
+          </label>
           <div className="inspiration-grid" aria-live="polite">
             {visibleGallery.map((g) => (
               <div className="inspiration-card" key={g.id}>
@@ -52,6 +58,7 @@ export default function Gallery({ data, images, business }) {
                   <Img id={g.imagenId} alt={images[g.imagenId]} />
                   <span aria-hidden="true">⌕</span>
                 </button>
+                <p className="inspiration-caption">{g.titulo || images[g.imagenId]}</p>
               </div>
             ))}
           </div>
@@ -62,30 +69,30 @@ export default function Gallery({ data, images, business }) {
             >
               <button
                 type="button"
-                disabled={galleryPage === 1}
-                onClick={() => setGalleryPage((page) => page - 1)}
+                disabled={currentPage === 1}
+                onClick={() => setGalleryPage(currentPage - 1)}
               >
                 {' '}
                 {t('← Anterior')}{' '}
               </button>
               <span>
                 {' '}
-                {t('Página')} {galleryPage} {t('de')} {galleryPages}
+                {t('Página')} {currentPage} {t('de')} {galleryPages}
               </span>
               <button
                 type="button"
-                disabled={galleryPage === galleryPages}
-                onClick={() => setGalleryPage((page) => page + 1)}
+                disabled={currentPage === galleryPages}
+                onClick={() => setGalleryPage(currentPage + 1)}
               >
                 {' '}
                 {t('Siguiente →')}{' '}
               </button>
             </nav>
           )}
-          {!data.galeria.length && (
+          {!galleryItems.length && (
             <p className="empty">
               {' '}
-              {t('Próximamente compartiremos ideas para inspirarse.')}{' '}
+              {t(query ? 'No encontramos ideas con esa búsqueda.' : 'Próximamente compartiremos ideas para inspirarse.')}{' '}
             </p>
           )}
         </div>
@@ -98,7 +105,7 @@ export default function Gallery({ data, images, business }) {
             t('Idea personalizada');
           const reference = `Idea #${gallerySelection.id}: ${gallerySelection.titulo || description}`;
           const imageReference = new URL(
-            imageUrl(gallerySelection.imagenId),
+            `/idea/${gallerySelection.id}${language === 'en' ? '?lang=en' : ''}`,
             window.location.origin,
           ).href;
           const candy =
@@ -108,7 +115,7 @@ export default function Gallery({ data, images, business }) {
           const selectedMessage = [
             t('Hola, quisiera consultar por esta idea de la galería:'),
             t('• Referencia: {reference}', { reference }),
-            t('• Imagen: {url}', { url: imageReference }),
+            t('Ver foto y detalle: {url}', { url: imageReference }),
             candy
               ? t(
                   '• Consulta: Quisiera conocer qué dulces se pueden agregar a una cajita de regalo.',
@@ -148,6 +155,8 @@ export default function Gallery({ data, images, business }) {
                     {t('Idea #')}
                     {gallerySelection.id}
                   </h2>
+                  <p>{gallerySelection.titulo || description}</p>
+                  <a className="idea-original-link" href={imageReference} target="_blank" rel="noopener noreferrer">{t('Abrir foto y detalle ↗')}</a>
                   {candy && (
                     <p>
                       {' '}
