@@ -36,6 +36,8 @@ Check(html.Contains("/images/simbolo-bazar.png"), "La ficha debe usar el logotip
 Check(html.Contains(">Por encargo<"), "La página debe informar la modalidad del negocio.");
 Check(html.Contains("<div class=\"price-row\"><strong class=\"price\">"), "Precio y modalidad comparten una fila adaptable.");
 Check(html.IndexOf("class=\"availability\"") > html.IndexOf("class=\"price\""), "Por encargo aparece junto al precio y después de la descripción.");
+Check(html.Contains("rel=\"icon\""), "La ficha usa el logo como icono de pestaña.");
+Check(html.IndexOf("class=\"back-link\"") < html.IndexOf("<main>"), "El regreso al catálogo queda en el encabezado y no ocupa una banda sobre los paneles.");
 var disabled = ProductSharing.RenderProduct(product, business, images, null, false);
 Check(!disabled.Contains("clic-whatsapp"), "No se debe registrar si la medición está desactivada.");
 Check(!disabled.Contains("og:image"), "No se debe inventar una fotografía.");

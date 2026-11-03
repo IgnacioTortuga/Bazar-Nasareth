@@ -494,7 +494,9 @@ export default function Editor({
           ))}
         </nav>
         <div className="aside-bottom">
-          <a href="/" target="_blank" rel="noopener noreferrer">
+          <a href="/" target="_blank" rel="noopener noreferrer" onClick={(event) => {
+            event.currentTarget.href = `/?actualizado=${Date.now()}`;
+          }}>
             Ver página ↗
           </a>
           <button onClick={requestLogout}>Cerrar sesión</button>
