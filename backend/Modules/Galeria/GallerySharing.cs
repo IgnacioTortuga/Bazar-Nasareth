@@ -34,7 +34,7 @@ public static class GallerySharing
         <!doctype html><html lang="{{lang}}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
         <title>{{E(title)}} · Bazar Nazareth</title><meta name="description" content="{{E(alt)}}">
         <meta property="og:type" content="website"><meta property="og:title" content="{{E(title)}} · Bazar Nazareth"><meta property="og:description" content="{{E(alt)}}">{{metadata}}
-        <link rel="stylesheet" href="/idea.css">
+        <link rel="icon" type="image/png" href="/images/simbolo-bazar.png"><link rel="stylesheet" href="/idea.css">
         <script>try{document.documentElement.dataset.theme=JSON.parse(localStorage.getItem('bazar.reading-preferences'))?.theme||'light';}catch{}</script></head>
         <body><main><a class="back" href="/?lang={{lang}}#galeria">← {{(english ? "Back to gallery" : "Volver a la galería")}}</a>
         <article><header><span>Bazar Nazareth · Idea #{{idea.Id}}</span><h1>{{E(title)}}</h1></header>

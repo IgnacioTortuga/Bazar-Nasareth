@@ -38,6 +38,17 @@ var storage = Path.GetFullPath(builder.Configuration["ImageDirectory"] ?? Path.C
 Directory.CreateDirectory(storage);
 CopyMissingSeedImages(Path.Combine(app.Environment.ContentRootPath, "seed-images"), storage);
 await DatabaseInitialization.InitializeAsync(app);
+// El documento debe solicitar la versión actual; Vite ya versiona JS y CSS por contenido.
+app.Use(async (ctx, next) =>
+{
+    ctx.Response.OnStarting(() =>
+    {
+        if (ctx.Response.ContentType?.StartsWith("text/html", StringComparison.OrdinalIgnoreCase) == true)
+            ctx.Response.Headers.CacheControl = "no-store, no-cache, must-revalidate";
+        return Task.CompletedTask;
+    });
+    await next();
+});
 app.UseStaticFiles();
 app.UseAuthentication();
 app.UseAuthorization();

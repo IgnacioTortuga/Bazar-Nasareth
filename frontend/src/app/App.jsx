@@ -73,7 +73,7 @@ export default function App() {
         .catch(() => { if (!current.signal.aborted) setPublicError('No pudimos actualizar el bazar. Compruebe su conexión y vuelva a intentarlo.'); });
     };
     const onVisible = () => { if (document.visibilityState === 'visible') refresh(); };
-    const onPageShow = (event) => { if (event.persisted) refresh(); };
+    const onPageShow = (event) => { if (event.persisted) window.location.reload(); };
     if (returningFromEditor) refresh();
     window.addEventListener('focus', refresh);
     window.addEventListener('pageshow', onPageShow);
