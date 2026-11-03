@@ -56,6 +56,9 @@ public static class ProductSharing
             <meta name="theme-color" content="#fffaf7">
             <meta property="og:type" content="product"><meta property="og:title" content="{{{E(T(p.Nombre))}}}">
             <meta property="og:description" content="{{{E(T(p.Descripcion))}}}">{{{metadata}}}
+            <script>
+            try{const p=JSON.parse(localStorage.getItem('bazar.reading-preferences'));document.documentElement.dataset.bazarTheme=p?.theme==='dark'?'dark':'light';const sizes={normal:'100%',medium:'112.5%',large:'125%'};document.documentElement.style.fontSize=sizes[p?.fontSize]||'100%';}catch{}
+            </script>
             <style>
             :root{font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#493653;background:#fffaf7;line-height:1.6;font-synthesis:none}
             *{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 8% 8%,#f9eaf3 0,transparent 25%),#fffaf7;color:#493653}img{display:block;max-width:100%}a{color:inherit}button{font:inherit}
@@ -75,9 +78,25 @@ public static class ProductSharing
             @media(max-width:850px){.header-note{display:none}.product-layout{grid-template-columns:1fr;gap:24px}.info-card{padding:28px;position:static}.hero-stage{border-radius:24px}.confidence{grid-template-columns:1fr}.footer-inner{align-items:flex-start;flex-direction:column;gap:8px}}
             @media(max-width:520px){.header-inner,main,.footer-inner{width:calc(100% - 28px)}main{padding-top:20px}.product-layout{gap:18px}.hero-stage{padding:10px}.info-card{border-radius:22px;padding:24px 20px}h1{font-size:2.35rem}.thumbnail{height:70px;width:70px}.button{min-height:52px}.confidence{margin-top:24px}}
             @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+            body{min-height:100vh;background:linear-gradient(110deg,#fff9ee 12%,#ffeff6 65%,#edfafa)}
+            .theme-toggle{min-width:44px;min-height:44px;border:1px solid #cdb9d8;border-radius:50%;background:#fff;color:#694577;cursor:pointer;margin-left:12px;display:grid;place-items:center}.theme-toggle svg{width:22px;height:22px}
+            :root[data-bazar-theme='dark']{color-scheme:dark;background:#19141f;color:#f5ecfa}
+            :root[data-bazar-theme='dark'] body{background:linear-gradient(110deg,#261c25,#2c1c30,#162c2d);color:#f5ecfa}
+            :root[data-bazar-theme='dark'] :is(.detail-header,.info-card,.confidence article){background:rgb(33 26 41 / 94%);border-color:#65506f}
+            :root[data-bazar-theme='dark'] .hero-stage{background:linear-gradient(145deg,#302538,#211a29);border-color:#65506f}
+            :root[data-bazar-theme='dark'] :is(.thumbnail,.button-secondary,.theme-toggle){background:#302538;color:#f5ecfa;border-color:#80668d}
+            :root[data-bazar-theme='dark'] :is(h1,.confidence b){color:#f5ecfa}
+            :root[data-bazar-theme='dark'] :is(.brand,.back-link,.eyebrow,.price){color:#ffc0de}
+            :root[data-bazar-theme='dark'] :is(.description,.header-note,.price-label,.price-help,.confidence span){color:#d4c4dc}
+            :root[data-bazar-theme='dark'] .order-note{background:#392841;color:#e4d4ee}
+            :root[data-bazar-theme='dark'] .order-note svg{color:#d5b1f2}
+            :root[data-bazar-theme='dark'] .availability{background:#193f36;border-color:#4d8d79;color:#bef4df}
+            :root[data-bazar-theme='dark'] .price-block{border-color:#65506f}
+            :root[data-bazar-theme='dark'] #share-result{color:#bef4df}
+            :root[data-bazar-theme='dark'] .thumbnail.active{border-color:#ffc0de}
             </style></head>
             <body>
-            <header class="detail-header"><div class="header-inner"><a class="brand" href="/?lang={{{lang}}}"><img class="brand-mark" src="/images/simbolo-bazar.png" alt="" width="48" height="48"><span>{{{E(business.Nombre)}}}</span></a><span class="header-note">{{{E(T("Detalles personalizados en Hojancha"))}}}</span></div></header>
+            <header class="detail-header"><div class="header-inner"><a class="brand" href="/?lang={{{lang}}}"><img class="brand-mark" src="/images/simbolo-bazar.png" alt="" width="48" height="48"><span>{{{E(business.Nombre)}}}</span></a><span class="header-note">{{{E(T("Detalles personalizados en Hojancha"))}}}</span><button type="button" class="theme-toggle" id="theme-toggle" aria-label="{{{(english ? "Dark mode" : "Modo oscuro")}}}" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M21 13A9 9 0 0 1 11 3a9 9 0 1 0 10 10Z"/></svg></button></div></header>
             <main><a class="back-link" href="{{{E(CatalogReturnUrl(returnUrl ?? (english ? "/?lang=en#productos" : "/#productos")))}}}" aria-label="{{{E(T("Volver al catálogo de productos"))}}}">← {{{E(T("Volver al catálogo"))}}}</a>
             <section class="product-layout">
             <div class="media-card"><div class="hero-stage"><a class="hero-link" id="photo-link" href="/api/imagenes/{{{primaryPhoto.Id}}}/archivo" target="_blank" aria-label="{{{E(T("Ver fotografía a tamaño completo"))}}}"><img id="product-photo" src="/api/imagenes/{{{primaryPhoto.Id}}}/archivo" alt="{{{E(T(primaryPhoto.Alt))}}}" loading="eager" fetchpriority="high"></a></div>{{{thumbnails}}}</div>
@@ -88,7 +107,11 @@ public static class ProductSharing
             <p id="share-result" role="status" aria-live="polite"></p></article></section>
             <section class="confidence" aria-label="{{{E(T("Información de compra"))}}}"><article><b>{{{E(T("Atención personalizada"))}}}</b><span>{{{E(T("Le ayudamos a confirmar su diseño."))}}}</span></article><article><b>{{{E(T("Preparado por encargo"))}}}</b><span>{{{E(T("El plazo se acuerda antes de producir."))}}}</span></article><article><b>{{{E(T("Precio transparente"))}}}</b><span>{{{E(T("Recibirá confirmación antes de continuar."))}}}</span></article></section></main>
             <footer><div class="footer-inner"><b>{{{E(business.Nombre)}}}</b><span>{{{E(business.Telefono)}}}</span><a href="/?lang={{{lang}}}#contacto">{{{E(T("Ubicación y horarios"))}}}</a></div></footer>
-            <script>document.getElementById('whatsapp').addEventListener('click',()=>{ {{{tracking}}} });
+            <script>
+            const themeButton=document.getElementById('theme-toggle');
+            const syncTheme=()=>themeButton.setAttribute('aria-pressed',document.documentElement.dataset.bazarTheme==='dark'?'true':'false');syncTheme();
+            themeButton.addEventListener('click',()=>{const theme=document.documentElement.dataset.bazarTheme==='dark'?'light':'dark';document.documentElement.dataset.bazarTheme=theme;syncTheme();try{const p=JSON.parse(localStorage.getItem('bazar.reading-preferences'))||{};localStorage.setItem('bazar.reading-preferences',JSON.stringify({...p,theme}));}catch{}});
+            document.getElementById('whatsapp').addEventListener('click',()=>{ {{{tracking}}} });
             document.querySelectorAll('.thumbnail').forEach(button=>button.addEventListener('click',()=>{const image=document.getElementById('product-photo');const link=document.getElementById('photo-link');image.src=button.dataset.src;image.alt=button.dataset.alt;link.href=button.dataset.src;document.querySelectorAll('.thumbnail').forEach(item=>{item.classList.toggle('active',item===button);item.setAttribute('aria-pressed',item===button?'true':'false');});}));
             document.getElementById('share').addEventListener('click',async()=>{const url=location.origin+location.pathname+{{{System.Text.Json.JsonSerializer.Serialize(english ? "?lang=en" : "")}}};try{if(navigator.share){await navigator.share({title:document.title,url});}else{await navigator.clipboard.writeText(url);document.getElementById('share-result').textContent={{{System.Text.Json.JsonSerializer.Serialize(T("Enlace copiado."))}}};}}catch(error){if(error.name!=='AbortError')document.getElementById('share-result').textContent={{{System.Text.Json.JsonSerializer.Serialize(T("Copie el enlace desde la barra de direcciones."))}}};}});</script></body></html>
             """;

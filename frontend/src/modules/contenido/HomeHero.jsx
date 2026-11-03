@@ -1,6 +1,5 @@
 import { useLanguage } from '../../shared/Language.jsx';
 import React from 'react';
-import Img from '../../shared/Img.jsx';
 import { BazarDoodle } from '../../shared/Icons.jsx';
 export default function HomeHero({ hero, images }) {
   const { t, language } = useLanguage();
@@ -54,27 +53,17 @@ export default function HomeHero({ hero, images }) {
             <BazarDoodle kind="spark" /> {t('Detalles con personalidad')}{' '}
           </span>
           <div className="photo-frame photo-main">
-            {hero?.imagenId ? (
-              <Img id={hero.imagenId} alt={images[hero.imagenId]} />
-            ) : (
-              <img
-                src="/images/detalle-llavero.png"
-                alt={t(
-                  'Inspiración del bazar: llavero personalizado con inicial y cerezas',
-                )}
-                width="1004"
-                height="1004"
-                fetchPriority="high"
-              />
-            )}
+            <img src="/images/vasos-personalizados.jpeg"
+              alt={t('Vasos de vidrio personalizados con iniciales doradas, preparados en una caja de regalo')}
+              width="720" height="1280" fetchPriority="high" />
             <span>{t('Algo pequeño, algo especial.')}</span>
           </div>
           <div className="photo-frame photo-small">
             <img
-              src="/images/detalle-personalizado.png"
-              alt={t('Inspiración del bazar: llavero con una frase creativa')}
-              width="1004"
-              height="1004"
+              src="/images/regalo-padrinos.jpeg"
+              alt={t('Caja de regalo con vasos personalizados para padrinos de boda')}
+              width="720"
+              height="1280"
               loading="lazy"
             />
             <span>{t('Un toque de creatividad ✦')}</span>

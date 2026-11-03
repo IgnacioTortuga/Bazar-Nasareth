@@ -1,3 +1,4 @@
+import { AdminIcon } from '../shared/Icons.jsx';
 import useImageLibrary from '../modules/imagenes/useImageLibrary.js';
 import useAccounts from '../modules/usuarios/useAccounts.js';
 import ProductImages from '../modules/productos/ProductImages.jsx';
@@ -484,9 +485,10 @@ export default function Editor({
             <button
               key={p}
               className={active === p ? 'active' : ''}
+              aria-current={active === p ? 'page' : undefined}
               onClick={() => go(p)}
             >
-              {labels[p]}
+              <AdminIcon kind={p} /> <span>{labels[p]}</span>
             </button>
           ))}
         </nav>
@@ -498,6 +500,7 @@ export default function Editor({
         </div>
       </aside>
       <main className="editor-main">
+        <p className="editor-guide">{({portada: 'Personalice la bienvenida de su sitio. Seleccione la portada para editar su título y descripción.', productos: 'Administre su catálogo: cree un producto, agregue fotos y revise la vista previa antes de publicar.', servicios: 'Muestre lo que ofrece el bazar y cómo solicitar cada servicio.', imagenes: 'Suba sus fotografías y reutilícelas en productos, servicios y galería.', promociones: 'Prepare sus promociones, fechas y productos participantes.', galeria: 'Comparta trabajos reales e ideas para sus clientes.', textos: 'Actualice la información complementaria del sitio.', contacto: 'Mantenga al día teléfonos, horarios y ubicaciones.', usuarios: 'Administre las cuentas del equipo y sus permisos de acceso.'})[active]}</p>
         <div className="editor-top">
           <button
             ref={menuButton}

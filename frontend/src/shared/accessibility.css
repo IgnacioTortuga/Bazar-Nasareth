@@ -396,3 +396,34 @@
 @media (min-width:1281px) {
   .public-site .header-inner.wrap { padding-left: max(0px, calc((100vw - 1180px) / 2 - 80px)); }
 }
+
+/* Un mismo fondo suave acompaña todo el recorrido del catálogo. */
+.public-site, .login-screen {
+  --page-wash: linear-gradient(110deg, #fff9ee 12%, #ffeff6 65%, #edfafa);
+  background: var(--page-wash);
+}
+.public-site :is(.hero-band, .featured, .soft, #galeria, .text-section) { background: transparent; }
+.public-site .hero-band::after { display: none; }
+.public-site .contact { background: rgb(255 255 255 / 58%); }
+:root[data-bazar-theme='dark'] .public-site {
+  --page-wash: linear-gradient(110deg, #261c25, #2c1c30, #162c2d);
+  background: var(--page-wash);
+}
+:root[data-bazar-theme='dark'] .public-site :is(.hero-band, .featured, .soft, #galeria, .text-section) { background: transparent; }
+:root[data-bazar-theme='dark'] .public-site .contact { background: rgb(33 26 41 / 80%); }
+.admin-icon { width: 22px; height: 22px; flex: 0 0 22px; }
+.public-site footer .editor-access {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 46px; height: 46px; border-radius: 50%; border: 1px solid #c6abc9;
+  color: #ffe2ef; background: rgb(255 255 255 / 8%); transition: background .2s;
+}
+.public-site footer .editor-access:hover { background: rgb(255 255 255 / 20%); }
+.login-screen { padding: 32px 20px; }
+.login-card { width: min(100%, 480px); background: rgb(255 255 255 / 94%); border-radius: 24px; }
+.login-emblem { display: grid; place-items: center; width: 56px; height: 56px; border-radius: 18px; background: #f8e8f0; color: #875168; margin: 28px 0 20px; }
+.login-card h1 { font-size: clamp(1.8rem, 5vw, 2.2rem); margin-bottom: 12px; }
+.login-intro { color: #706474; line-height: 1.65; margin: 0 0 24px; }
+.login-card .password-toggle { background: transparent; border: 0; color: #775066; padding: 8px 0; min-height: 44px; margin: 0 0 12px; text-align: left; text-decoration: underline; text-underline-offset: 4px; }
+.login-card [role='alert'] { padding: 12px; background: #fff0f1; border-radius: 10px; color: #913342; }
+.editor-layout aside nav button { display: flex; align-items: center; gap: 12px; min-height: 48px; border-radius: 10px; margin-bottom: 4px; }
+.editor-guide { background: #fff; border: 1px solid #e5e0e5; border-left: 4px solid #9bb9b2; border-radius: 12px; padding: 16px 20px; color: #625668; line-height: 1.6; margin: 0 0 24px; }

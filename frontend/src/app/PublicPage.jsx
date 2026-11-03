@@ -7,7 +7,7 @@ import { useMemo } from 'react';
 import { localizeCatalog } from '../shared/translations.js';
 import ThemeFeedback from '../shared/ThemeFeedback.jsx';
 import React, { useEffect, useState } from 'react';
-import { BazarDoodle } from '../shared/Icons.jsx';
+import { AdminIcon, BazarDoodle } from '../shared/Icons.jsx';
 import ProductCatalog from '../modules/productos/ProductCatalog.jsx';
 import ServicesSection from '../modules/servicios/ServicesSection.jsx';
 import PromotionsSection from '../modules/promociones/PromotionsSection.jsx';
@@ -288,7 +288,7 @@ function PublicContent({ originalData }) {
           <span>
             {t('Dos tiendas en Hojancha ·')} {business.telefono}
           </span>
-          <a href="/login">{t('Acceso al editor')}</a>
+          <a className="editor-access" href="/login" aria-label={t('Acceso al editor')} title={t('Acceso al editor')}><AdminIcon /></a>
         </div>
       </footer>
     </div>

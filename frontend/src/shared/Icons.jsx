@@ -51,3 +51,18 @@ function SocialIcon({ kind }) {
   );
 }
 export { BazarDoodle, SocialIcon };
+
+export function AdminIcon({ kind = 'usuarios' }) {
+  const paths = {
+    portada: 'M3 11 12 3l9 8M5 10v11h14V10M9 21v-7h6v7',
+    productos: 'm3 7 9-4 9 4-9 4-9-4Zm0 0v10l9 4 9-4V7M12 11v10',
+    servicios: 'm14 6 4-3 3 3-3 4-4-4ZM14 8 3 19l2 2L16 10',
+    imagenes: 'M3 3h18v18H3zM3 17l6-6 4 4 3-3 5 5M15 7h2',
+    promociones: 'M3 3h9l9 9-9 9-9-9V3ZM7 7h.01',
+    galeria: 'M7 3h14v14H7zM3 7v14h14',
+    textos: 'M5 3h14v18H5zM8 8h8M8 12h8M8 16h5',
+    contacto: 'M20 10c0 6-8 11-8 11S4 16 4 10a8 8 0 1 1 16 0ZM10 10a2 2 0 1 0 4 0 2 2 0 1 0-4 0',
+    usuarios: 'M16 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0ZM4 21v-2a8 8 0 0 1 16 0v2',
+  };
+  return <svg className="admin-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d={paths[kind] || paths.usuarios} /></svg>;
+}
