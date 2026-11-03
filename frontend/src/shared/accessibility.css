@@ -413,11 +413,27 @@
 :root[data-bazar-theme='dark'] .public-site .contact { background: rgb(33 26 41 / 80%); }
 .admin-icon { width: 22px; height: 22px; flex: 0 0 22px; }
 .public-site footer .editor-access {
-  display: inline-flex; align-items: center; justify-content: center;
-  width: 46px; height: 46px; border-radius: 50%; border: 1px solid #c6abc9;
-  color: #ffe2ef; background: rgb(255 255 255 / 8%); transition: background .2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  justify-self: end;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  border: 1px solid rgb(230 207 224 / 32%);
+  color: #eadce8;
+  background: rgb(255 255 255 / 4%);
+  transition: background .2s, border-color .2s, color .2s;
 }
-.public-site footer .editor-access:hover { background: rgb(255 255 255 / 20%); }
+.public-site footer .editor-access .admin-icon { width: 20px; height: 20px; flex-basis: 20px; }
+.public-site footer .editor-access:hover {
+  background: rgb(255 255 255 / 11%);
+  border-color: #d9b6ca;
+  color: #fff1f8;
+}
+@media (prefers-reduced-motion: reduce) {
+  .public-site footer .editor-access { transition: none; }
+}
 .login-screen { padding: 32px 20px; }
 .login-card { width: min(100%, 480px); background: rgb(255 255 255 / 94%); border-radius: 24px; }
 .login-emblem { display: grid; place-items: center; width: 56px; height: 56px; border-radius: 18px; background: #f8e8f0; color: #875168; margin: 28px 0 20px; }
