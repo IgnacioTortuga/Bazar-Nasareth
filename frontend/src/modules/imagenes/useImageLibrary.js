@@ -100,26 +100,37 @@ export default function useImageLibrary({
     }
   }
   async function removeImage(id) {
-    if (!confirm('¿Eliminar esta imagen sin referencias?')) return;
+    if (imageUsages(id).length) {
+      setMessage('Esta foto está en uso. Cámbiela o quítela de los contenidos indicados antes de eliminarla.');
+      return;
+    }
+    setBusy(true);
     try {
       await api('/admin/imagenes/' + id, { method: 'DELETE' });
       await reload();
       setMessage('Imagen eliminada.');
+      return true;
     } catch (e) {
       setMessage(e.message);
+    } finally {
+      setBusy(false);
     }
   }
-  async function saveAlt(id, oldAlt) {
-    const alt = prompt('Texto alternativo', oldAlt);
-    if (alt === null) return;
+  async function saveAlt(id, alt) {
+    setBusy(true);
     try {
       await api('/admin/imagenes/' + id, {
         method: 'PUT',
-        ...json({ textoAlternativo: alt }),
+        ...json({ textoAlternativo: alt.trim() }),
       });
       await reload();
+      setMessage('Descripción de la foto guardada.');
+      return true;
     } catch (e) {
       setMessage(e.message);
+      return false;
+    } finally {
+      setBusy(false);
     }
   }
 

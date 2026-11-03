@@ -13,13 +13,18 @@ export default function Field({
   required = false,
   form,
 }) {
+  const hint = kind === 'status' ? 'Borrador: solo el equipo lo ve. Publicado: visible en el sitio. Archivado: oculto, se puede recuperar.'
+    : kind === 'image' ? 'Elija una foto de la biblioteca. Subir una foto no la asigna automáticamente.'
+    : name === 'orden' ? 'Los números menores aparecen primero.'
+    : name === 'clave' ? 'Nombre interno único. Sus clientes no lo verán.'
+    : null;
   const common = {
     id: name,
     disabled,
     required,
     form,
     'aria-invalid': error ? true : undefined,
-    'aria-describedby': error ? `${name}-error` : undefined,
+    'aria-describedby': [hint && `${name}-hint`, error && `${name}-error`].filter(Boolean).join(' ') || undefined,
     onChange: (e) =>
       onChange(
         name,
@@ -106,6 +111,7 @@ export default function Field({
           }
         />
       )}
+      {hint && <small className="editor-field-hint" id={`${name}-hint`}>{hint}</small>}
       {error && (
         <span id={`${name}-error`} className="field-error">
           {error}

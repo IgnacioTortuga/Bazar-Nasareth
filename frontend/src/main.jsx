@@ -7,3 +7,5 @@ import './shared/accessibility.css';
 createRoot(document.getElementById('root')).render(<App />);
 
 import './shared/motion.css';
+
+import './shared/editor.css';

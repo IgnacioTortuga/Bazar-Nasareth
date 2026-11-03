@@ -1,4 +1,6 @@
-import React from 'react';
+import Modal from '../../shared/Modal.jsx';
+import React, { useState } from 'react';
+import EditorHelp from '../../shared/EditorHelp.jsx';
 import Img from '../../shared/Img.jsx';
 import { imageUrl } from '../../shared/images.js';
 import PaginatedList from '../../shared/PaginatedList.jsx';
@@ -15,13 +17,42 @@ export default function ImageLibrary({
   saveAlt,
   removeImage,
 }) {
+  const [action, setAction] = useState(null);
+  const [description, setDescription] = useState('');
+  const [actionError, setActionError] = useState('');
+  const [filter, setFilter] = useState('todas');
+  const allImages = data.imagenes || [];
+  const unused = allImages.filter((img) => !imageUsages(img.id).length).length;
+  const visibleImages = allImages.filter((img) => filter === 'todas' || (filter === 'libres' ? !imageUsages(img.id).length : imageUsages(img.id).length));
   return (
     <>
-      <p className="image-library-intro">
-        Para cambiar una sección, use <b>Reemplazar</b> en la fila que muestre
-        su uso. <b>Cargar a la biblioteca</b> solo guarda una foto nueva; no la
-        asigna automáticamente.
-      </p>
+      {action && <Modal className="editor-action-dialog" label={action.kind === 'delete' ? 'Eliminar fotografía' : 'Editar descripción'} onClose={() => { if (!busy) setAction(null); }}>
+        <form onSubmit={async (event) => {
+          event.preventDefault();
+          if (busy) return;
+          setActionError('');
+          const success = action.kind === 'delete' ? await removeImage(action.img.id) : await saveAlt(action.img.id, description);
+          if (success) setAction(null);
+          else setActionError(action.kind === 'delete' ? 'No se pudo eliminar. Revise su conexión; la foto puede seguir vinculada a un contenido.' : 'No se pudo guardar la descripción. Revise su conexión e intente de nuevo.');
+        }} aria-busy={busy}>
+          <span className="eyebrow">BIBLIOTECA DE FOTOS</span>
+          <h2>{action.kind === 'delete' ? '¿Eliminar esta fotografía?' : 'Describa su fotografía'}</h2>
+          <p className="editor-dialog-filename">{action.img.nombre}</p>
+          {action.kind === 'delete' ? <p>Se eliminará de la biblioteca. Esta acción no se puede deshacer.</p> : <label className="field">Descripción breve<input autoFocus required maxLength="250" value={description} disabled={busy} onChange={(event) => setDescription(event.target.value)} /><small>Ayuda a identificar la foto y permite que un lector de pantalla la describa.</small></label>}
+          {actionError && <p role="alert">{actionError}</p>}
+          <div className="row"><button type="button" disabled={busy} onClick={() => setAction(null)}>Cancelar</button><button className="button primary" disabled={busy || (action.kind === 'description' && !description.trim())}>{busy ? 'Procesando…' : action.kind === 'delete' ? 'Sí, eliminar foto' : 'Guardar descripción'}</button></div>
+        </form>
+      </Modal>}
+      <div className="editor-overview">
+        <div><strong>{allImages.length}</strong><span>Fotografías en biblioteca</span></div>
+        <div><strong>{allImages.length - unused}</strong><span>Asignadas a contenido</span></div>
+        <div><strong>{unused}</strong><span>Sin asignar · se pueden eliminar</span></div>
+      </div>
+      <EditorHelp title="¿Cómo cambio o elimino una foto?">
+        <p><b>Cambiar:</b> use Reemplazar junto al contenido que quiere actualizar.</p>
+        <p><b>Eliminar:</b> primero quite o cambie la foto en todos los lugares donde se usa. Archivar el contenido conserva su vínculo.</p>
+        <p><b>Subir:</b> guarda una foto en la biblioteca; después debe elegirla en el contenido.</p>
+      </EditorHelp>
       <div className="image-library-toolbar">
         <form className="image-upload-inline" onSubmit={uploadImage}>
           <h2>Añadir fotografía a la biblioteca</h2>
@@ -38,8 +69,9 @@ export default function ImageLibrary({
             />
           </label>
           <label className="field">
-            Texto alternativo
+            Descripción de la foto
             <input
+              placeholder="Ej.: taza blanca con nombre en dorado"
               required
               value={upload.alt}
               disabled={busy}
@@ -50,21 +82,14 @@ export default function ImageLibrary({
             Cargar a la biblioteca
           </button>
         </form>
-        <button
-          className="button"
-          onClick={() => {
-            const first = data.imagenes?.[0];
-            if (first)
-              window.open(imageUrl(first.id), '_blank', 'noopener,noreferrer');
-          }}
-        >
-          Vista previa
-        </button>
+      </div>
+      <div className="editor-filter-tabs" role="group" aria-label="Filtrar fotografías">
+        {[['todas', 'Todas'], ['usadas', 'En uso'], ['libres', 'Sin asignar']].map(([value, label]) => <button type="button" key={value} aria-pressed={filter === value} onClick={() => setFilter(value)} disabled={busy}>{label}</button>)}
       </div>
       <PaginatedList
-        key="imagenes"
+        key={filter}
         label="imágenes"
-        searchTerms={(data.imagenes || []).map((img) =>
+        searchTerms={visibleImages.map((img) =>
           [
             img.nombre,
             img.textoAlternativo,
@@ -74,15 +99,16 @@ export default function ImageLibrary({
           ].join(' '),
         )}
         className="grid image-library"
-        total={data.imagenes?.length || 0}
+        total={visibleImages.length}
         disabled={busy}
       >
-        {data.imagenes?.map((img) => {
+        {visibleImages.map((img) => {
           const usages = imageUsages(img.id);
           return (
             <article className="card image-library-card" key={img.id}>
               <Img id={img.id} alt={img.textoAlternativo} />
               <div className="card-body">
+                <span className={`image-use-badge ${usages.length ? 'in-use' : 'available'}`}>{usages.length ? `En uso · ${usages.length} ${usages.length === 1 ? 'lugar' : 'lugares'}` : 'Sin asignar'}</span>
                 <b>{img.nombre}</b>
                 <p>{img.textoAlternativo}</p>
                 <small>{(img.tamanoBytes / 1024 / 1024).toFixed(2)} MB</small>
@@ -111,19 +137,24 @@ export default function ImageLibrary({
                     </div>
                   ))
                 ) : (
-                  <p className="image-unused">Sin contenido vinculado</p>
+                  <p className="image-unused">Esta foto no está asignada a ningún contenido.</p>
                 )}
                 <div className="row">
-                  <button onClick={() => saveAlt(img.id, img.textoAlternativo)}>
-                    Editar texto alternativo
+                  <button disabled={busy} onClick={() => { setDescription(img.textoAlternativo || ''); setActionError(''); setAction({ kind: 'description', img }); }}>
+                    Editar descripción
                   </button>
-                  <button onClick={() => removeImage(img.id)}>Eliminar</button>
+                  <a className="button" href={imageUrl(img.id)} target="_blank" rel="noopener noreferrer">Ver foto ↗</a>
+                  <button className="image-delete" disabled={busy || usages.length > 0} onClick={() => { setActionError(''); setAction({ kind: 'delete', img }); }}>Eliminar</button>
                 </div>
+                {usages.length > 0 && <EditorHelp title="¿Por qué no puedo eliminarla?">
+                  <p>Cambie o quite esta foto en {usages.map((usage) => `${usage.section}: ${usage.title}`).join('; ')}. Después podrá eliminarla aquí.</p>
+                </EditorHelp>}
               </div>
             </article>
           );
         })}
       </PaginatedList>
+      {!visibleImages.length && <p className="empty">No hay fotografías en este grupo. Puede subir una nueva o elegir otro filtro.</p>}
       <p className="hint">
         Reemplazar sube la nueva foto y actualiza solo el contenido elegido. Si
         la foto se usa en más de un lugar, cada uso tiene su propio botón.

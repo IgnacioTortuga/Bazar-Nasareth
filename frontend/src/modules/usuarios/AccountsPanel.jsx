@@ -1,3 +1,4 @@
+import EditorHelp from '../../shared/EditorHelp.jsx';
 import React from 'react';
 import { sections, labels } from '../../app/adminConfig.js';
 import PaginatedList from '../../shared/PaginatedList.jsx';
@@ -12,6 +13,11 @@ export default function AccountsPanel({
 }) {
   return (
     <>
+      <EditorHelp title="¿Cómo doy acceso a otra persona?">
+        <p><b>Nueva cuenta:</b> complete nombre, correo y una contraseña de al menos 12 caracteres.</p>
+        <p><b>Permisos:</b> marque solo las secciones que esa persona podrá administrar. Acceso completo habilita todas.</p>
+        <p><b>Al editar:</b> deje la contraseña vacía para conservarla. Desactive la cuenta para retirar el acceso.</p>
+      </EditorHelp>
       <PaginatedList
         key="usuarios"
         label="administradores"

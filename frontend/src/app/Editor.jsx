@@ -1,3 +1,4 @@
+import EditorHelp from '../shared/EditorHelp.jsx';
 import { AdminIcon } from '../shared/Icons.jsx';
 import useImageLibrary from '../modules/imagenes/useImageLibrary.js';
 import useAccounts from '../modules/usuarios/useAccounts.js';
@@ -500,7 +501,7 @@ export default function Editor({
         </div>
       </aside>
       <main className="editor-main">
-        <p className="editor-guide">{({portada: 'Personalice la bienvenida de su sitio. Seleccione la portada para editar su título y descripción.', productos: 'Administre su catálogo: cree un producto, agregue fotos y revise la vista previa antes de publicar.', servicios: 'Muestre lo que ofrece el bazar y cómo solicitar cada servicio.', imagenes: 'Suba sus fotografías y reutilícelas en productos, servicios y galería.', promociones: 'Prepare sus promociones, fechas y productos participantes.', galeria: 'Comparta trabajos reales e ideas para sus clientes.', textos: 'Actualice la información complementaria del sitio.', contacto: 'Mantenga al día teléfonos, horarios y ubicaciones.', usuarios: 'Administre las cuentas del equipo y sus permisos de acceso.'})[active]}</p>
+
         <div className="editor-top">
           <button
             ref={menuButton}
@@ -516,6 +517,13 @@ export default function Editor({
         <div className="editor-content">
           <span className="eyebrow">GESTIÓN DE CONTENIDO</span>
           <h1>{labels[active] || 'Editor'}</h1>
+        <p className="editor-guide">{({portada: 'Personalice la bienvenida de su sitio. Seleccione la portada para editar su título y descripción.', productos: 'Administre su catálogo: cree un producto, agregue fotos y revise la vista previa antes de publicar.', servicios: 'Muestre lo que ofrece el bazar y cómo solicitar cada servicio.', imagenes: 'Suba sus fotografías y reutilícelas en productos, servicios y galería.', promociones: 'Prepare sus promociones, fechas y productos participantes.', galeria: 'Comparta trabajos reales e ideas para sus clientes.', textos: 'Actualice la información complementaria del sitio.', contacto: 'Mantenga al día teléfonos, horarios y ubicaciones.', usuarios: 'Administre las cuentas del equipo y sus permisos de acceso.'})[active]}</p>
+          <EditorHelp key={active} title="¿Cómo hago un cambio?">
+            <p><b>1. Edite</b> un contenido existente o cree uno nuevo.</p>
+            <p><b>2. Revise</b> sus textos y fotografías en Vista previa.</p>
+            <p><b>3. Guarde.</b> Un borrador queda privado; Publicado se muestra cuando cumple los requisitos.</p>
+            <p><b>Archivar</b> oculta el contenido y permite recuperarlo después. No elimina sus fotografías.</p>
+          </EditorHelp>
           {message && (
             <div className="notice" role="alert">
               {message}
@@ -678,6 +686,7 @@ export default function Editor({
                       onSubmit={save}
                       aria-busy={busy}
                     />
+                    <div className="editor-draft-status" role="status"><span className={dirty ? 'draft-dot is-dirty' : 'draft-dot'} />{dirty ? 'Tiene cambios sin guardar' : 'Sin cambios pendientes'}<span>Complete → Revise → Guarde</span></div>
                     <FormErrors errors={errors} focusKey={errorAttempt} />
                     <div className="row spread">
                       <h2>
