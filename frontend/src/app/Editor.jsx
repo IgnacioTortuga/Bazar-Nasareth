@@ -1,3 +1,4 @@
+import Modal from '../shared/Modal.jsx';
 import EditorHelp from '../shared/EditorHelp.jsx';
 import { AdminIcon } from '../shared/Icons.jsx';
 import useImageLibrary from '../modules/imagenes/useImageLibrary.js';
@@ -48,7 +49,18 @@ export default function Editor({
     [message, setMessage] = useState(''),
     [busy, setBusy] = useState(false),
     [menu, setMenu] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [deleteError, setDeleteError] = useState('');
   const menuButton = useRef(null);
+  const formPanel = useRef(null);
+  useEffect(() => {
+    if (!selected) return;
+    const frame = requestAnimationFrame(() => {
+      formPanel.current?.scrollIntoView({ block: 'start', behavior: 'auto' });
+      formPanel.current?.querySelector('h2')?.focus({ preventScroll: true });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [selected]);
   const [errors, setErrors] = useState({});
   const [errorAttempt, setErrorAttempt] = useState(0);
   function showErrors(next) {
@@ -268,6 +280,23 @@ export default function Editor({
         .map((x) => x.servicioId),
     );
   }
+  async function deleteGalleryEntry(event) {
+    event.preventDefault();
+    if (busy || !deleteTarget) return;
+    setBusy(true);
+    setDeleteError('');
+    try {
+      await api(`/admin/galeria/${deleteTarget.id}`, { method: 'DELETE' });
+      if (selected?.id === deleteTarget.id) resetPendingChanges();
+      setDeleteTarget(null);
+      await reload();
+      setMessage('Entrada eliminada de la galería. La foto se conserva en la biblioteca.');
+    } catch (error) {
+      setDeleteError(error.message);
+    } finally {
+      setBusy(false);
+    }
+  }
   async function changePublicationState(item, nextState) {
     if (busy || (selected?.id === item.id && !canDiscardChanges())) return;
     const route = collection[active];
@@ -473,6 +502,15 @@ export default function Editor({
 
   return (
     <div className="editor-layout">
+      {deleteTarget && <Modal className="editor-action-dialog" label="Eliminar entrada de galería" onClose={() => { if (!busy) setDeleteTarget(null); }}>
+        <form onSubmit={deleteGalleryEntry} aria-busy={busy}>
+          <h2>¿Eliminar esta entrada?</h2>
+          <p>{deleteTarget.titulo || `Idea #${deleteTarget.id}`}</p>
+          <p>Se eliminarán esta entrada archivada y sus estadísticas. No se puede deshacer. La fotografía seguirá en la biblioteca.</p>
+          {deleteError && <p role="alert">{deleteError}</p>}
+          <div className="row"><button type="button" disabled={busy} onClick={() => setDeleteTarget(null)}>Cancelar</button><button className="button primary" disabled={busy}>{busy ? 'Eliminando…' : 'Eliminar entrada'}</button></div>
+        </form>
+      </Modal>}
       <aside className={menu ? 'open' : ''}>
         <div className="aside-brand">
           BAZAR <span>NAZARETH</span>
@@ -630,7 +668,7 @@ export default function Editor({
                   total={list.length}
                   disabled={busy}
                 >
-                  {list.map((item) => (
+                  {list.map((item, index) => (
                     <div className="list-item list-item-actions" key={item.id}>
                       <button
                         className="list-item-open"
@@ -640,7 +678,7 @@ export default function Editor({
                         <span>
                           <b>{title(item)}</b>{' '}
                           <small>
-                            #{item.id} ·{' '}
+                            {active === 'galeria' ? `N.º ${index + 1}` : `#${item.id}`} ·{' '}
                             {item.estado ||
                               (item.activa ? 'Activa' : 'Inactiva')}
                             {active === 'promociones'
@@ -672,6 +710,13 @@ export default function Editor({
                             : 'Archivar'}
                         </button>
                       )}
+                      {active === 'galeria' && item.estado === 'Archivado' && (
+                        <button className="gallery-delete-button" type="button" disabled={busy} aria-label={`Eliminar entrada archivada: ${title(item)}`} title="Eliminar entrada archivada" onClick={() => {
+                          if (selected?.id === item.id && !canDiscardChanges()) return;
+                          setDeleteError('');
+                          setDeleteTarget(item);
+                        }}>×</button>
+                      )}
                     </div>
                   ))}
                   {!list.length && (
@@ -681,7 +726,7 @@ export default function Editor({
                   )}
                 </PaginatedList>
                 {draft && (
-                  <div className="form-panel">
+                  <div className="form-panel" ref={formPanel}>
                     <form
                       id="content-editor-form"
                       noValidate
@@ -691,7 +736,7 @@ export default function Editor({
                     <div className="editor-draft-status" role="status"><span className={dirty ? 'draft-dot is-dirty' : 'draft-dot'} />{dirty ? 'Tiene cambios sin guardar' : 'Sin cambios pendientes'}<span>Complete → Revise → Guarde</span></div>
                     <FormErrors errors={errors} focusKey={errorAttempt} />
                     <div className="row spread">
-                      <h2>
+                      <h2 tabIndex="-1">
                         {draft.id ? 'Editar' : 'Crear'}{' '}
                         {labels[active].toLowerCase()}
                       </h2>

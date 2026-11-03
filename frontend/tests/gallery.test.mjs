@@ -19,3 +19,10 @@ test('Solo los dulces se presentan como complemento, no todas las cajas personal
   assert.equal(isGiftComplement({ titulo: 'Caja personalizada', imagenId: 2 }, { 2: 'Confites surtidos' }), true);
   assert.equal(isGiftComplement({ titulo: 'Cajita de regalo', imagenId: 3 }, { 3: 'Taza personalizada' }), false);
 });
+
+test('Los números visibles no dejan huecos y una búsqueda conserva la numeración de la galería', () => {
+  const items = [{id: 8, imagenId: 2, titulo: 'Taza'}, {id: 23, imagenId: 5, titulo: 'Bolsa'}];
+  assert.deepEqual(galleryItems(items, {}).map(x => x.displayNumber), [1, 2]);
+  assert.equal(galleryItems(items, {}, 'Bolsa')[0].displayNumber, 2);
+  assert.equal(items[1].id, 23);
+});

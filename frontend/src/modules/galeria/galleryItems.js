@@ -5,8 +5,9 @@ export function galleryItems(items, images, query = '') {
   return items.filter((item) => {
     if (seen.has(item.imagenId)) return false;
     seen.add(item.imagenId);
-    return matchesEditorSearch(`${item.titulo || ''} ${images[item.imagenId] || ''}`, query);
-  });
+    return true;
+  }).map((item, index) => ({ ...item, displayNumber: index + 1 }))
+    .filter((item) => matchesEditorSearch(`${item.titulo || ''} ${images[item.imagenId] || ''}`, query));
 }
 
 export function isGiftComplement(item, images) {

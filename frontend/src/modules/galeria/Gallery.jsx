@@ -11,7 +11,7 @@ export default function Gallery({ data, images, business }) {
   const [gallerySelection, setGallerySelection] = useState(null);
   const [query, setQuery] = useState('');
   const galleryItems = selectGalleryItems(data.galeria, images, query);
-  const galleryPageSize = 6;
+  const galleryPageSize = 3;
   const galleryPages = Math.max(
     1,
     Math.ceil(galleryItems.length / galleryPageSize),
@@ -58,7 +58,7 @@ export default function Gallery({ data, images, business }) {
                   <Img id={g.imagenId} alt={images[g.imagenId]} />
                   <span aria-hidden="true">⌕</span>
                 </button>
-                <p className="inspiration-caption">{g.titulo || images[g.imagenId]}{isGiftComplement(g, images) && <small className="gallery-complement">{t('Complemento para regalos')}</small>}</p>
+                <p className="inspiration-caption"><small className="gallery-complement">{t('Idea #')}{g.displayNumber}</small>{g.titulo || images[g.imagenId]}{isGiftComplement(g, images) && <small className="gallery-complement">{t('Complemento para regalos')}</small>}</p>
               </div>
             ))}
           </div>
@@ -103,7 +103,7 @@ export default function Gallery({ data, images, business }) {
             images[gallerySelection.imagenId] ||
             gallerySelection.titulo ||
             t('Idea personalizada');
-          const reference = `Idea #${gallerySelection.id}: ${gallerySelection.titulo || description}`;
+          const reference = `Referencia #${gallerySelection.id}: ${gallerySelection.titulo || description}`;
           const imageReference = new URL(
             `/idea/${gallerySelection.id}${language === 'en' ? '?lang=en' : ''}`,
             window.location.origin,
@@ -150,7 +150,7 @@ export default function Gallery({ data, images, business }) {
                   <span>{t('Referencia para WhatsApp')}</span>
                   <h2 id="idea-modal-title">
                     {t('Idea #')}
-                    {gallerySelection.id}
+                    {gallerySelection.displayNumber}
                   </h2>
                   <p>{gallerySelection.titulo || description}</p>
                   <a className="idea-original-link" href={imageReference} target="_blank" rel="noopener noreferrer">{t('Abrir foto y detalle ↗')}</a>

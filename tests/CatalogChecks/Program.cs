@@ -109,7 +109,7 @@ var expectedRoutes = new HashSet<string>
     "POST /api/admin/productos/guardar", "PUT /api/admin/productos/{id:int}/guardar",
     "POST /api/admin/promociones/guardar", "PUT /api/admin/promociones/{id:int}/guardar",
     "POST /api/productos/{id:int}/clic-whatsapp", "POST /api/galeria/{id:int}/clic-whatsapp",
-    "GET /api/admin/metricas/whatsapp", "GET /producto/{id:int}"
+    "GET /api/admin/metricas/whatsapp", "GET /producto/{id:int}", "DELETE /api/admin/galeria/{id:int}"
 };
 foreach (var collection in new[] { "categorias", "productos", "servicios", "promociones", "secciones", "galeria" })
 {
@@ -117,7 +117,7 @@ foreach (var collection in new[] { "categorias", "productos", "servicios", "prom
     expectedRoutes.Add("POST /api/admin/" + collection);
     expectedRoutes.Add("PUT /api/admin/" + collection + "/{id:int}");
 }
-Check(routes.SetEquals(expectedRoutes) && endpoints.Length == expectedRoutes.Count, "Las 43 rutas y verbos HTTP deben conservarse sin duplicados.");
+Check(routes.SetEquals(expectedRoutes) && endpoints.Length == expectedRoutes.Count, "Las rutas existentes y la eliminación de galería deben registrarse sin duplicados.");
 foreach (var endpoint in endpoints)
 {
     var path = endpoint.RoutePattern.RawText!;
@@ -129,6 +129,7 @@ foreach (var endpoint in endpoints)
 var context = new DefaultHttpContext();
 var limited = new Editor { Permisos = "productos,imagenes" };
 Check(EditorAccess.Allowed(context, limited, "productos"), "Un editor conserva sus permisos explícitos.");
+Check(!EditorAccess.Allowed(context, limited, "galeria"), "Eliminar galería requiere su permiso específico.");
 Check(!EditorAccess.Allowed(context, limited, "usuarios"), "Un editor no obtiene permisos adicionales al separar los auxiliares.");
 Check(!EditorAccess.Allowed(context, null, "productos"), "La ausencia de editor no concede permisos.");
 Check(EditorValidation.CheckEditor("Editor", "editor@example.com", "contraseña-de-prueba", true, [], limited) is not null,

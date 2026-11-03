@@ -153,7 +153,8 @@ function PublicContent({ originalData }) {
       const url = new URL(window.location.href);
       url.hash = id;
       history.pushState(history.state, '', url);
-      window.scrollTo({ top: section.getBoundingClientRect().top + window.scrollY - (header?.getBoundingClientRect().height || 0) - 16, behavior: 'auto' });
+      const heading = section.querySelector('.eyebrow, h2, h1') || section;
+      window.scrollTo({ top: heading.getBoundingClientRect().top + window.scrollY - (header?.getBoundingClientRect().height || 0) - 16, behavior: 'auto' });
     });
   }
   function searchCatalog(e) {
@@ -263,7 +264,10 @@ function PublicContent({ originalData }) {
           />
         </div>
       </header>
-      <main>
+      <main onClick={(event) => {
+        const anchor = event.target.closest('a[href^="#"]');
+        if (anchor && document.getElementById(anchor.hash.slice(1))) navigateSection(event, anchor.hash.slice(1));
+      }}>
         <HomeHero hero={hero} images={images} />
         <Highlights highlights={highlights} images={images} />
         <ProductCatalog
