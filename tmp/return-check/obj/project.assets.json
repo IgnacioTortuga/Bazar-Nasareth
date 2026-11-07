@@ -1752,23 +1752,23 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\aapbr\\.nuget\\packages\\": {},
+    "C:\\Users\\Portu\\.nuget\\packages\\": {},
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\aapbr\\OneDrive\\Documentos\\GitHub\\Bazar-Nasareth\\tmp\\return-check\\Preview.csproj",
+      "projectUniqueName": "C:\\Users\\Portu\\Downloads\\bazar-nazareth\\Bazar-Nasareth\\tmp\\return-check\\Preview.csproj",
       "projectName": "Preview",
-      "projectPath": "C:\\Users\\aapbr\\OneDrive\\Documentos\\GitHub\\Bazar-Nasareth\\tmp\\return-check\\Preview.csproj",
-      "packagesPath": "C:\\Users\\aapbr\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\aapbr\\OneDrive\\Documentos\\GitHub\\Bazar-Nasareth\\tmp\\return-check\\obj\\",
+      "projectPath": "C:\\Users\\Portu\\Downloads\\bazar-nazareth\\Bazar-Nasareth\\tmp\\return-check\\Preview.csproj",
+      "packagesPath": "C:\\Users\\Portu\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\Portu\\Downloads\\bazar-nazareth\\Bazar-Nasareth\\tmp\\return-check\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
-        "C:\\Users\\aapbr\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\Portu\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
@@ -1784,8 +1784,8 @@
           "framework": "net10.0",
           "targetAlias": "net10.0",
           "projectReferences": {
-            "C:\\Users\\aapbr\\OneDrive\\Documentos\\GitHub\\Bazar-Nasareth\\backend\\BazarNazareth.csproj": {
-              "projectPath": "C:\\Users\\aapbr\\OneDrive\\Documentos\\GitHub\\Bazar-Nasareth\\backend\\BazarNazareth.csproj"
+            "C:\\Users\\Portu\\Downloads\\bazar-nazareth\\Bazar-Nasareth\\backend\\BazarNazareth.csproj": {
+              "projectPath": "C:\\Users\\Portu\\Downloads\\bazar-nazareth\\Bazar-Nasareth\\backend\\BazarNazareth.csproj"
             }
           }
         }

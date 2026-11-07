@@ -1224,7 +1224,7 @@ footer a {
   border: 0;
   background: transparent;
   color: #7645b9;
-  padding: 6px 12px;
+  padding-right: 15px;
   font-size: 1.4rem;
 }
 .public-site .hero-band {

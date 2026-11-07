@@ -1,15 +1,22 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
+var keysDirectory = builder.Configuration["DataProtectionKeysDirectory"];
+if (!string.IsNullOrWhiteSpace(keysDirectory))
+    builder.Services.AddDataProtection()
+        .PersistKeysToFileSystem(new DirectoryInfo(Path.GetFullPath(keysDirectory)))
+        .SetApplicationName("BazarNazareth");
 builder.Services.AddDbContext<BazarDb>(o => o.UseSqlServer(builder.Configuration.GetConnectionString("Bazar") ?? throw new Exception("Falta ConnectionStrings:Bazar")));
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(o =>
 {
     o.Cookie.Name = "bazar.editor";
     o.Cookie.HttpOnly = true;
     o.Cookie.SameSite = SameSiteMode.Strict;
-    o.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+    // Production TLS may terminate at the host's proxy before reaching Kestrel.
+    o.Cookie.SecurePolicy = builder.Environment.IsDevelopment() ? CookieSecurePolicy.SameAsRequest : CookieSecurePolicy.Always;
     o.Events.OnRedirectToLogin = c =>
     {
         c.Response.StatusCode = 401;
@@ -43,7 +50,10 @@ app.Use(async (ctx, next) =>
 {
     ctx.Response.OnStarting(() =>
     {
-        if (ctx.Response.ContentType?.StartsWith("text/html", StringComparison.OrdinalIgnoreCase) == true)
+        // API data and images can depend on the editor's session/publication state.
+        if (ctx.Request.Path.StartsWithSegments("/api"))
+            ctx.Response.Headers.CacheControl = "no-store";
+        else if (ctx.Response.ContentType?.StartsWith("text/html", StringComparison.OrdinalIgnoreCase) == true)
             ctx.Response.Headers.CacheControl = "no-store, no-cache, must-revalidate";
         return Task.CompletedTask;
     });
