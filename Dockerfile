@@ -25,6 +25,9 @@ ENV ASPNETCORE_ENVIRONMENT=Production \
     DataProtectionKeysDirectory=/data/keys
 COPY --from=backend /out/ ./
 COPY --from=frontend /src/frontend/dist/ ./wwwroot/
+# Keep the snapshot outside wwwroot; existing API publication/session checks apply.
+# Program.cs restores missing files into ImageDirectory on every startup.
+COPY backend/uploaded-images/ ./seed-images/
 RUN mkdir -p /data/images /data/keys && chown -R app:app /data
 USER $APP_UID
 EXPOSE 8080

@@ -26,9 +26,20 @@ provider. A LocalDB/SQL Server instance on your PC is not a hosted database.
 
 Render Free discards filesystem changes on sleep, restart, and redeploy. Uploaded
 images and login encryption keys under `/data` will be lost; existing sessions
-will no longer work when the keys are replaced. The Docker build does not include
-your local uploaded images. This setup is for a temporary preview, not a durable
-catalog with administrative image uploads.
+will no longer work when the keys are replaced. For the school demo, the Docker
+image includes a snapshot of the committed JPG/JPEG/PNG/WebP files in
+`backend/uploaded-images`. The existing startup copies missing snapshot files
+from `/app/seed-images` to `/data/images`, preserving filenames and leaving any
+existing destination files unchanged. This restores the bundled photos after a
+restart; new uploads are still temporary until included in a later snapshot.
+This setup is for a temporary preview, not a durable catalog with administrative
+image uploads.
+
+The snapshot stays outside `wwwroot`, so the existing image API still enforces
+publication/session access. Push the matching local image files with the code
+before redeploying Render. Database records and their image filenames must match
+the snapshot; restoring a SQL backup is a separate operation. The image does not
+contain the local SQL database or its connection string.
 
 Render Free sleeps after 15 minutes without inbound traffic and can take about a
 minute to wake. Netlify's proxy timeout is 26 seconds, so the first catalog/login
@@ -88,10 +99,13 @@ access. Both images and cookie encryption keys must survive redeployments. Keep
 the keys private to the application; the file-based key ring is not encrypted by
 this configuration. Start with one backend instance using this disk.
 
-The Docker build excludes local appsettings, uploaded images, and secrets. It
-does not transfer your local SQL database. To retain an existing catalog, restore
-an authorized SQL backup to the target server and copy its matching image files
-to `/data/images`, preserving filenames. Back up both together.
+The Docker build excludes local appsettings and secrets, and includes only
+JPG/JPEG/PNG/WebP files from `backend/uploaded-images` as the demo snapshot.
+It does not transfer your local SQL database. To retain an existing catalog,
+restore an authorized SQL backup to the target server and provide its matching
+image files, preserving filenames. The bundled snapshot fills missing files in
+`/data/images` at startup; files absent from the snapshot must be transferred
+separately. Back up the database and images together.
 
 The existing startup still calls `EnsureCreatedAsync()` and seeds missing initial
 records. It does not migrate an existing schema. Do not point a first deployment

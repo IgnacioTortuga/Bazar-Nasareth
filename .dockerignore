@@ -11,6 +11,13 @@
 **/.env*
 **/appsettings*.json
 **/uploaded-images
+# Include only image assets from the local library for the school demo snapshot.
+!backend/uploaded-images/
+backend/uploaded-images/*
+!backend/uploaded-images/*.jpg
+!backend/uploaded-images/*.jpeg
+!backend/uploaded-images/*.png
+!backend/uploaded-images/*.webp
 **/*.user
 **/*.suo
 **/*.pfx
