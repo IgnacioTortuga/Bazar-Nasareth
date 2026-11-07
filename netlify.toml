@@ -1,0 +1,10 @@
+[build]
+  base = "frontend"
+  command = "npm run build:netlify"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+# Set NETLIFY_BACKEND_ORIGIN in Netlify after deploying the ASP.NET server.
+# The build generates API proxies before the React fallback in dist/_redirects.

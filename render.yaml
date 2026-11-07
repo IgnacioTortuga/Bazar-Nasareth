@@ -1,0 +1,25 @@
+# Temporary preview on Render Free. Requires an external SQL Server database.
+# Files under /data are EPHEMERAL on this plan, including images and login keys.
+services:
+  - type: web
+    name: bazar-nazareth-api-preview
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: ASPNETCORE_HTTP_PORTS
+        value: "10000"
+      - key: FrontendOrigin
+        value: https://bazarnazareth.netlify.app
+      - key: PublicSiteUrl
+        value: https://bazarnazareth.netlify.app
+      - key: ConnectionStrings__Bazar
+        sync: false
+      - key: INITIAL_ADMIN_EMAIL
+        sync: false
+      - key: INITIAL_ADMIN_PASSWORD
+        sync: false

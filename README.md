@@ -42,6 +42,12 @@ El código está organizado por funcionalidades en `frontend/src/modules/` y `ba
    ```
 5. Abra `http://localhost:5173/`; abra `/login` para editar. Vite envía `/api` al backend (`frontend/vite.config.js`). La sesión utiliza una cookie HTTP only. No exponga la API en Internet sin HTTPS, copias de seguridad y configuración de despliegue.
 
+## Despliegue
+
+Para publicar este monorepo con el frontend en Netlify y el servidor ASP.NET en
+un host compatible con Docker/.NET, consulte la [guía de despliegue](docs/despliegue-netlify.md).
+Arrastrar la carpeta del proyecto a Netlify no compila ni ejecuta el backend.
+
 ## Uso del panel
 
 - Primero cree categorías y cargue imágenes en `Imágenes` (JPG, PNG o WebP, máximo 5 MB, texto alternativo obligatorio).
