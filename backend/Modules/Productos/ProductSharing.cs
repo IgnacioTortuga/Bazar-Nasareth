@@ -61,10 +61,16 @@ public static class ProductSharing
             try{const p=JSON.parse(localStorage.getItem('bazar.reading-preferences'));document.documentElement.dataset.bazarTheme=p?.theme==='dark'?'dark':'light';const sizes={normal:'100%',medium:'112.5%',large:'125%'};document.documentElement.style.fontSize=sizes[p?.fontSize]||'100%';}catch{}
             </script>
             <style>
-            :root{font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#493653;background:#fffaf7;line-height:1.6;font-synthesis:none}
+            :root{--detail-width:1220px;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#493653;background:#fffaf7;line-height:1.6;font-synthesis:none}
             *{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 8% 8%,#f9eaf3 0,transparent 25%),#fffaf7;color:#493653}img{display:block;max-width:100%}a{color:inherit}button{font:inherit}
-            .detail-header{background:rgb(255 255 255 / 88%);border-bottom:1px solid #eee3ed;backdrop-filter:blur(14px);position:sticky;top:0;z-index:10}.header-inner,main,.footer-inner{margin:auto;max-width:1220px;width:calc(100% - 40px)}
-            .header-inner{align-items:center;display:grid;gap:12px;grid-template-columns:minmax(0,1fr) minmax(0,max-content) auto;min-height:76px;padding:10px 0}
+            .detail-header{background:rgb(255 255 255 / 88%);border-bottom:1px solid #eee3ed;backdrop-filter:blur(14px);position:sticky;top:0;z-index:10}main,.footer-inner{margin:auto;max-width:var(--detail-width);width:calc(100% - 40px)}
+            .header-inner{
+              --header-gap:12px;
+              align-items:center;display:grid;gap:var(--header-gap);
+              grid-template-columns:minmax(max-content,calc(100% - var(--detail-width) - var(--header-gap))) minmax(0,1fr) auto;
+              margin-left:20px;margin-right:max(20px,calc((100% - var(--detail-width)) / 2));
+              min-height:76px;padding:10px 0;
+            }
             .brand{align-items:center;color:#bd2767;display:flex;font-size:1.05rem;font-weight:800;gap:10px;justify-self:start;line-height:1.25;min-width:0;overflow-wrap:anywhere;text-decoration:none}
             .brand-mark{flex:none;height:52px;object-fit:contain;width:52px}
             .back-link{align-items:center;background:#faf4f8;border:1px solid #d8c8df;border-radius:12px;color:#694577;display:inline-flex;font-size:.88rem;font-weight:750;gap:8px;justify-self:start;line-height:1.25;min-height:44px;min-width:0;overflow-wrap:anywhere;padding:8px 12px;text-decoration:none}
@@ -82,8 +88,8 @@ public static class ProductSharing
             footer{background:linear-gradient(115deg,#302337,#38283f 55%,#29383c);color:#e6dce9;padding:24px 0;border-top:1px solid #a883a2}.footer-inner{align-items:center;display:flex;flex-wrap:wrap;gap:18px 32px;font-size:.82rem;justify-content:space-between}.footer-brand{display:flex;align-items:center;gap:12px;max-width:32ch}.footer-brand img{width:34px;height:34px;object-fit:contain}.footer-inner b{color:#f6e5ee;font-weight:600;line-height:1.5}.footer-links{display:flex;flex-wrap:wrap;align-items:center;gap:8px 18px}.footer-inner a{color:#f0e4ee;display:inline-flex;align-items:center;gap:8px;min-height:44px;text-decoration:none;border-radius:10px;padding:8px 10px;transition:background .2s,color .2s}.footer-inner a:hover{background:#ffffff12;color:#fff}.footer-inner svg{height:18px;width:18px;flex-shrink:0;stroke:currentColor;stroke-width:1.7;fill:none;stroke-linecap:round;stroke-linejoin:round}.footer-inner a:focus-visible{outline:3px solid #ef9dc0;outline-offset:3px}
             :focus-visible{outline:3px solid #ef9dc0;outline-offset:4px}
             @media(max-width:850px){.product-layout{grid-template-columns:1fr;gap:24px}.info-card{padding:28px;position:static}.hero-stage{border-radius:24px}.confidence{grid-template-columns:1fr}.footer-inner{align-items:flex-start;flex-direction:column;gap:8px}}
-            @media(max-width:520px){.header-inner,main,.footer-inner{width:calc(100% - 28px)}main{padding-top:20px}.product-layout{gap:18px}.hero-stage{padding:10px}.info-card{border-radius:22px;padding:24px 20px}h1{font-size:clamp(1.65rem,6vw,1.95rem)}.price{font-size:1.4rem}.availability{font-size:.62rem;padding:5px 8px}.thumbnail{height:70px;width:70px}.button{min-height:52px}.confidence{margin-top:24px}}
-            @media(max-width:520px){.header-inner{gap:6px 12px;grid-template-columns:minmax(0,1fr) auto}.brand{grid-column:1 / -1}}
+            @media(max-width:520px){main,.footer-inner{width:calc(100% - 28px)}main{padding-top:20px}.product-layout{gap:18px}.hero-stage{padding:10px}.info-card{border-radius:22px;padding:24px 20px}h1{font-size:clamp(1.65rem,6vw,1.95rem)}.price{font-size:1.4rem}.availability{font-size:.62rem;padding:5px 8px}.thumbnail{height:70px;width:70px}.button{min-height:52px}.confidence{margin-top:24px}}
+            @media(max-width:520px){.header-inner{row-gap:6px;grid-template-columns:minmax(0,1fr) auto;margin-inline:14px}.back-link{grid-column:1 / -1}}
             @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
             body{min-height:100vh;background:linear-gradient(110deg,#fff9ee 12%,#ffeff6 65%,#edfafa)}
             .theme-toggle{min-width:44px;min-height:44px;border:1px solid #cdb9d8;border-radius:50%;background:#fff;color:#694577;cursor:pointer;display:grid;place-items:center}.theme-toggle svg{width:22px;height:22px}
@@ -107,13 +113,13 @@ public static class ProductSharing
             <body>
             <header class="detail-header">
               <div class="header-inner">
-                <a class="brand" href="/?lang={{{lang}}}">
-                  <img class="brand-mark" src="/images/simbolo-bazar.png" alt="" width="52" height="52">
-                  <span>{{{E(business.Nombre)}}}</span>
-                </a>
                 <a class="back-link" href="{{{E(CatalogReturnUrl(returnUrl ?? (english ? "/?lang=en#productos" : "/#productos")))}}}" aria-label="{{{E(T("Volver al catálogo de productos"))}}}">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 5-7 7 7 7M5 12h14"/></svg>
                   <span>{{{E(T("Volver al catálogo"))}}}</span>
+                </a>
+                <a class="brand" href="/?lang={{{lang}}}">
+                  <img class="brand-mark" src="/images/simbolo-bazar.png" alt="" width="52" height="52">
+                  <span>{{{E(business.Nombre)}}}</span>
                 </a>
                 <button type="button" class="theme-toggle" id="theme-toggle" aria-label="{{{(english ? "Dark mode" : "Modo oscuro")}}}" aria-pressed="false">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M21 13A9 9 0 0 1 11 3a9 9 0 1 0 10 10Z"/></svg>
