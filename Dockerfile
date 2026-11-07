@@ -4,6 +4,8 @@ WORKDIR /src/frontend
 COPY frontend/package*.json ./
 RUN npm ci
 COPY frontend/ ./
+# React and ASP.NET both use the repository-level translation dictionary.
+COPY localization/ /src/localization/
 RUN npm run build
 
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS backend
