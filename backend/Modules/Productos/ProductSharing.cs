@@ -64,9 +64,13 @@ public static class ProductSharing
             :root{font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#493653;background:#fffaf7;line-height:1.6;font-synthesis:none}
             *{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 8% 8%,#f9eaf3 0,transparent 25%),#fffaf7;color:#493653}img{display:block;max-width:100%}a{color:inherit}button{font:inherit}
             .detail-header{background:rgb(255 255 255 / 88%);border-bottom:1px solid #eee3ed;backdrop-filter:blur(14px);position:sticky;top:0;z-index:10}.header-inner,main,.footer-inner{margin:auto;max-width:1220px;width:calc(100% - 40px)}
-            .header-inner{align-items:center;display:flex;justify-content:space-between;min-height:76px}.brand{align-items:center;color:#bd2767;display:flex;font-weight:800;gap:10px;text-decoration:none}.brand-mark{height:48px;object-fit:contain;width:48px}.detail-header-actions{display:flex;align-items:center;gap:12px}.header-inner{gap:16px;flex-wrap:wrap;padding:12px 0}.back-link{white-space:nowrap}.theme-toggle{flex-shrink:0}
-            .header-brand-group{display:flex;align-items:center;flex-wrap:wrap;gap:12px 20px;min-width:0}.header-home{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:8px 12px;border:1px solid #d8c8df;border-radius:12px;color:#694577;background:#faf4f8;font-size:.82rem;font-weight:650;text-decoration:none;white-space:nowrap}.header-home svg{width:18px;height:18px;stroke:currentColor;stroke-width:1.7;fill:none;stroke-linecap:round;stroke-linejoin:round}.header-home:hover{background:#f1e6f2}:root[data-bazar-theme='dark'] .header-home{background:#302538;border-color:#80668d;color:#f5d9e9}:root[data-bazar-theme='dark'] .header-home:hover{background:#46324e}
-            main{padding:34px 0 64px}.back-link{align-items:center;color:#754682;display:inline-flex;font-size:.88rem;font-weight:750;gap:8px;margin-bottom:0;min-height:44px;text-decoration:none}.back-link:hover{text-decoration:underline;text-underline-offset:5px}
+            .header-inner{align-items:center;display:grid;gap:12px;grid-template-columns:minmax(0,1fr) minmax(0,max-content) auto;min-height:76px;padding:10px 0}
+            .brand{align-items:center;color:#bd2767;display:flex;font-size:1.05rem;font-weight:800;gap:10px;justify-self:start;line-height:1.25;min-width:0;overflow-wrap:anywhere;text-decoration:none}
+            .brand-mark{flex:none;height:52px;object-fit:contain;width:52px}
+            .back-link{align-items:center;background:#faf4f8;border:1px solid #d8c8df;border-radius:12px;color:#694577;display:inline-flex;font-size:.88rem;font-weight:750;gap:8px;justify-self:start;line-height:1.25;min-height:44px;min-width:0;overflow-wrap:anywhere;padding:8px 12px;text-decoration:none}
+            .back-link:hover{background:#f1e6f2;text-decoration:underline;text-underline-offset:4px}
+            .back-link svg{flex:none;height:18px;width:18px}
+            main{padding:34px 0 64px}
             .product-layout{align-items:start;display:grid;gap:40px;grid-template-columns:minmax(0,1.18fr) minmax(340px,.82fr)}
             .media-card{min-width:0}.hero-stage{align-items:center;aspect-ratio:1/1;background:linear-gradient(145deg,#fff,#faf2f8);border:1px solid #eee2ed;border-radius:30px;box-shadow:0 24px 70px rgb(92 48 95 / 10%);display:flex;justify-content:center;overflow:hidden;padding:22px;position:relative}.hero-stage::after{border:1px solid rgb(190 77 132 / 10%);border-radius:22px;content:"";inset:12px;pointer-events:none;position:absolute}.hero-stage img{height:100%;object-fit:contain;width:100%}.hero-link{height:100%;width:100%}
             .thumbnails{display:flex;flex-wrap:wrap;gap:12px;margin-top:16px}.thumbnail{background:#fff;border:2px solid transparent;border-radius:15px;cursor:pointer;height:82px;overflow:hidden;padding:5px;width:82px}.thumbnail img{height:100%;object-fit:contain;width:100%}.thumbnail:hover,.thumbnail.active{border-color:#b62a68;box-shadow:0 7px 20px rgb(87 45 92 / 12%)}
@@ -77,11 +81,12 @@ public static class ProductSharing
             #share-result{color:#346d60;font-size:.82rem;min-height:1.4em;text-align:center}.confidence{display:grid;gap:16px;grid-template-columns:repeat(3,1fr);margin-top:36px}.confidence article{background:#fff;border:1px solid #eee4ef;border-radius:18px;padding:18px}.confidence b{color:#51375f;display:block;font-size:.88rem}.confidence span{color:#89758f;font-size:.78rem}
             footer{background:linear-gradient(115deg,#302337,#38283f 55%,#29383c);color:#e6dce9;padding:24px 0;border-top:1px solid #a883a2}.footer-inner{align-items:center;display:flex;flex-wrap:wrap;gap:18px 32px;font-size:.82rem;justify-content:space-between}.footer-brand{display:flex;align-items:center;gap:12px;max-width:32ch}.footer-brand img{width:34px;height:34px;object-fit:contain}.footer-inner b{color:#f6e5ee;font-weight:600;line-height:1.5}.footer-links{display:flex;flex-wrap:wrap;align-items:center;gap:8px 18px}.footer-inner a{color:#f0e4ee;display:inline-flex;align-items:center;gap:8px;min-height:44px;text-decoration:none;border-radius:10px;padding:8px 10px;transition:background .2s,color .2s}.footer-inner a:hover{background:#ffffff12;color:#fff}.footer-inner svg{height:18px;width:18px;flex-shrink:0;stroke:currentColor;stroke-width:1.7;fill:none;stroke-linecap:round;stroke-linejoin:round}.footer-inner a:focus-visible{outline:3px solid #ef9dc0;outline-offset:3px}
             :focus-visible{outline:3px solid #ef9dc0;outline-offset:4px}
-            @media(max-width:850px){.detail-header-actions{margin-left:auto}.product-layout{grid-template-columns:1fr;gap:24px}.info-card{padding:28px;position:static}.hero-stage{border-radius:24px}.confidence{grid-template-columns:1fr}.footer-inner{align-items:flex-start;flex-direction:column;gap:8px}}
+            @media(max-width:850px){.product-layout{grid-template-columns:1fr;gap:24px}.info-card{padding:28px;position:static}.hero-stage{border-radius:24px}.confidence{grid-template-columns:1fr}.footer-inner{align-items:flex-start;flex-direction:column;gap:8px}}
             @media(max-width:520px){.header-inner,main,.footer-inner{width:calc(100% - 28px)}main{padding-top:20px}.product-layout{gap:18px}.hero-stage{padding:10px}.info-card{border-radius:22px;padding:24px 20px}h1{font-size:clamp(1.65rem,6vw,1.95rem)}.price{font-size:1.4rem}.availability{font-size:.62rem;padding:5px 8px}.thumbnail{height:70px;width:70px}.button{min-height:52px}.confidence{margin-top:24px}}
+            @media(max-width:520px){.header-inner{gap:6px 12px;grid-template-columns:minmax(0,1fr) auto}.brand{grid-column:1 / -1}}
             @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
             body{min-height:100vh;background:linear-gradient(110deg,#fff9ee 12%,#ffeff6 65%,#edfafa)}
-            .theme-toggle{min-width:44px;min-height:44px;border:1px solid #cdb9d8;border-radius:50%;background:#fff;color:#694577;cursor:pointer;margin-left:12px;display:grid;place-items:center}.theme-toggle svg{width:22px;height:22px}
+            .theme-toggle{min-width:44px;min-height:44px;border:1px solid #cdb9d8;border-radius:50%;background:#fff;color:#694577;cursor:pointer;display:grid;place-items:center}.theme-toggle svg{width:22px;height:22px}
             :root[data-bazar-theme='dark']{color-scheme:dark;background:#19141f;color:#f5ecfa}
             :root[data-bazar-theme='dark'] body{background:linear-gradient(110deg,#261c25,#2c1c30,#162c2d);color:#f5ecfa}
             :root[data-bazar-theme='dark'] :is(.detail-header,.info-card,.confidence article){background:rgb(33 26 41 / 94%);border-color:#65506f}
@@ -89,6 +94,8 @@ public static class ProductSharing
             :root[data-bazar-theme='dark'] :is(.thumbnail,.button-secondary,.theme-toggle){background:#302538;color:#f5ecfa;border-color:#80668d}
             :root[data-bazar-theme='dark'] :is(h1,.confidence b){color:#f5ecfa}
             :root[data-bazar-theme='dark'] :is(.brand,.back-link,.eyebrow,.price){color:#ffc0de}
+            :root[data-bazar-theme='dark'] .back-link{background:#302538;border-color:#80668d}
+            :root[data-bazar-theme='dark'] .back-link:hover{background:#46324e}
             :root[data-bazar-theme='dark'] :is(.description,.header-note,.price-label,.price-help,.confidence span){color:#d4c4dc}
             :root[data-bazar-theme='dark'] .order-note{background:#392841;color:#e4d4ee}
             :root[data-bazar-theme='dark'] .order-note svg{color:#d5b1f2}
@@ -98,7 +105,21 @@ public static class ProductSharing
             :root[data-bazar-theme='dark'] .thumbnail.active{border-color:#ffc0de}
             </style></head>
             <body>
-            <header class="detail-header"><div class="header-inner"><div class="header-brand-group"><a class="back-link" href="{{{E(CatalogReturnUrl(returnUrl ?? (english ? "/?lang=en#productos" : "/#productos")))}}}" aria-label="{{{E(T("Volver al catálogo de productos"))}}}">← {{{E(T("Volver al catálogo"))}}}</a><a class="brand" href="/?lang={{{lang}}}"><img class="brand-mark" src="/images/simbolo-bazar.png" alt="" width="48" height="48"><span>{{{E(business.Nombre)}}}</span></a></div><div class="detail-header-actions"><button type="button" class="theme-toggle" id="theme-toggle" aria-label="{{{(english ? "Dark mode" : "Modo oscuro")}}}" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M21 13A9 9 0 0 1 11 3a9 9 0 1 0 10 10Z"/></svg></button></div></div></header>
+            <header class="detail-header">
+              <div class="header-inner">
+                <a class="brand" href="/?lang={{{lang}}}">
+                  <img class="brand-mark" src="/images/simbolo-bazar.png" alt="" width="52" height="52">
+                  <span>{{{E(business.Nombre)}}}</span>
+                </a>
+                <a class="back-link" href="{{{E(CatalogReturnUrl(returnUrl ?? (english ? "/?lang=en#productos" : "/#productos")))}}}" aria-label="{{{E(T("Volver al catálogo de productos"))}}}">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 5-7 7 7 7M5 12h14"/></svg>
+                  <span>{{{E(T("Volver al catálogo"))}}}</span>
+                </a>
+                <button type="button" class="theme-toggle" id="theme-toggle" aria-label="{{{(english ? "Dark mode" : "Modo oscuro")}}}" aria-pressed="false">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M21 13A9 9 0 0 1 11 3a9 9 0 1 0 10 10Z"/></svg>
+                </button>
+              </div>
+            </header>
             <main>
             <section class="product-layout">
             <div class="media-card"><div class="hero-stage"><a class="hero-link" id="photo-link" href="/api/imagenes/{{{primaryPhoto.Id}}}/archivo" target="_blank" aria-label="{{{E(T("Ver fotografía a tamaño completo"))}}}"><img id="product-photo" src="/api/imagenes/{{{primaryPhoto.Id}}}/archivo" alt="{{{E(T(primaryPhoto.Alt))}}}" loading="eager" fetchpriority="high"></a></div>{{{thumbnails}}}</div>
