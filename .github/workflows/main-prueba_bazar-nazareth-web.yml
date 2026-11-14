@@ -6,7 +6,7 @@ name: Build and deploy ASP.Net Core app to Azure Web App - bazar-nazareth-web
 on:
   push:
     branches:
-      - 'main-prueba'
+      - 'main'
   workflow_dispatch:
 
 jobs:
@@ -38,6 +38,7 @@ jobs:
           path: ${{env.DOTNET_ROOT}}/myapp
 
   deploy:
+    if: github.ref == 'refs/heads/main'
     runs-on: windows-latest
     needs: build
     permissions:
