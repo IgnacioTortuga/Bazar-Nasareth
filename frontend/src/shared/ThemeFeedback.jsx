@@ -1,8 +1,8 @@
 import { useLanguage } from './Language.jsx';
 import React, { useEffect, useRef } from 'react';
 
-export default function ThemeFeedback({ title, onClose }) {
-  const { t, language } = useLanguage();
+export default function ThemeFeedback({ title, christmas, onClose }) {
+  const { t } = useLanguage();
 
   const close = useRef(onClose);
   close.current = onClose;
@@ -11,9 +11,9 @@ export default function ThemeFeedback({ title, onClose }) {
     return () => clearTimeout(timeout);
   }, []);
   return (
-    <div className="theme-feedback" role="status" aria-atomic="true">
+    <div className={christmas ? 'theme-feedback theme-feedback-christmas' : 'theme-feedback'} role="status" aria-atomic="true">
       <span className="theme-feedback-icon" aria-hidden="true">
-        <svg
+        {christmas ? '❄︎' : <svg
           viewBox="0 0 48 48"
           width="44"
           height="44"
@@ -37,7 +37,7 @@ export default function ThemeFeedback({ title, onClose }) {
             fill="#38213d"
             stroke="none"
           />
-        </svg>
+        </svg>}
       </span>
       <div>
         <strong>

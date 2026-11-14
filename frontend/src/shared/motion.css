@@ -72,6 +72,12 @@
   color: #ffe7c4;
   box-shadow: 0 16px 48px #0006;
 }
+.public-site .theme-feedback-christmas .theme-feedback-icon {
+  background: #e2f3fc;
+  color: #246084;
+  font-size: 1.85rem;
+  line-height: 1;
+}
 @keyframes theme-arrival {
   from {
     opacity: 0;

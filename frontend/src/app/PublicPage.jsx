@@ -178,12 +178,13 @@ function PublicContent({ originalData }) {
   }
   function openCampaign(promotion) {
     const originalChristmasPromotion = christmasPromotions.find((item) => item.id === promotion.id);
-    if (originalChristmasPromotion && isActiveChristmasPromotion(originalChristmasPromotion)) {
+    const christmas = originalChristmasPromotion && isActiveChristmasPromotion(originalChristmasPromotion);
+    if (christmas) {
       setSnowReplay((current) => current + 1);
     }
     setThemeFeedback(
-      /halloween/i.test(promotion.titulo)
-        ? { title: promotion.titulo, id: performance.now() }
+      christmas || /halloween/i.test(promotion.titulo)
+        ? { title: promotion.titulo, id: performance.now(), christmas }
         : null,
     );
     setFilters({ category: '', search: '', promotionId: String(promotion.id) });
@@ -202,6 +203,7 @@ function PublicContent({ originalData }) {
         <ThemeFeedback
           key={themeFeedback.id}
           title={themeFeedback.title}
+          christmas={themeFeedback.christmas}
           onClose={() => setThemeFeedback(null)}
         />
       )}
@@ -266,10 +268,13 @@ function PublicContent({ originalData }) {
               aria-label={t('Buscar productos en el catálogo')}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder={t('Buscar productos…')}
+              placeholder={t('Buscar producto')}
             />
             <button type="submit" aria-label={t('Buscar')}>
-              ⌕
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <circle cx="10.8" cy="10.8" r="6.3" />
+                <path d="m15.5 15.5 4.2 4.2" />
+              </svg>
             </button>
           </form>
         </div>
