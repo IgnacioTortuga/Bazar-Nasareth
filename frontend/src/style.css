@@ -1208,24 +1208,49 @@ footer a {
   border: 1px solid #e9dfee;
   border-radius: 999px;
   width: 170px;
+  min-height: 48px;
   flex-shrink: 0;
 }
 .public-site .header-search input {
-  width: 100%;
+  width: auto;
+  flex: 1;
   min-width: 0;
   border: 0;
   background: transparent;
-  padding: 10px 14px;
+  padding: 10px 12px 10px 14px;
   color: #514160;
   font-size: 0.76rem;
   border-radius: 999px;
 }
 .public-site .header-search button {
+  display: grid;
+  flex: 0 0 44px;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
   border: 0;
   background: transparent;
   color: #7645b9;
-  padding-right: 15px;
-  font-size: 1.4rem;
+  border-radius: 50%;
+  cursor: pointer;
+}
+.public-site .header-search button:hover {
+  background: rgb(118 69 185 / 9%);
+}
+.public-site .header-search button:focus-visible {
+  outline: 2px solid #7645b9;
+  outline-offset: -3px;
+}
+.public-site .header-search button svg {
+  display: block;
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 .public-site .hero-band {
   background: linear-gradient(110deg, #fff9ee 12%, #ffeff6 65%, #edfafa);
