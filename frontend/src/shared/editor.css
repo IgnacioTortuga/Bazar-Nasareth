@@ -117,10 +117,20 @@
   .editor-draft-status > span:last-child { margin-left: 0; width: 100%; }
 }
 
-.editor-action-dialog { width: min(480px, calc(100vw - 32px)); border: 1px solid #e1d3de; border-radius: 22px; padding: 28px; color: #493b4f; background: #fffdfd; box-shadow: 0 24px 80px #30233730; }
-.editor-action-dialog::backdrop { background: #2c223b70; backdrop-filter: blur(4px); }
-.editor-action-dialog h2 { font-size: 1.4rem; margin: 10px 0; letter-spacing: -.025em; }
-.editor-action-dialog p { line-height: 1.6; }
+.editor-action-dialog > form {
+  box-sizing: border-box;
+  width: min(100%, 480px);
+  margin: auto;
+  padding: clamp(18px, 5vw, 28px);
+  border: 1px solid #e1d3de;
+  border-radius: 22px;
+  color: #493b4f;
+  background: #fffdfd;
+  box-shadow: 0 24px 80px #30233730;
+}
+dialog.dialog-shell.editor-action-dialog::backdrop { background: #2c223b70; backdrop-filter: blur(4px); }
+.editor-action-dialog h2 { font-size: 1.4rem; margin: 0 0 12px; letter-spacing: -.025em; }
+.editor-action-dialog p { line-height: 1.6; overflow-wrap: anywhere; }
 .editor-action-dialog .eyebrow { color: #7b5970; font-size: .72rem; letter-spacing: .1em; }
 .editor-dialog-filename { color: #796b7d; overflow-wrap: anywhere; font-size: .85rem; }
 .editor-action-dialog .field { margin: 20px 0; }
