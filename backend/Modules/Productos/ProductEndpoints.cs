@@ -7,7 +7,7 @@ public static class ProductEndpoints
     public static void Map(RouteGroupBuilder admin)
     {
         MapCrud<Categoria>(admin, "categorias", "productos");
-        MapCrud<Producto>(admin, "productos", "productos");
+        MapPublishableCrud<Producto>(admin, "productos", "productos");
         admin.MapPut("/productos/{id:int}/imagenes", async (int id, List<int> ids, HttpContext ctx, BazarDb db) =>
         {
             if (!Allowed(ctx, await Actor(ctx, db), "productos"))

@@ -1,4 +1,4 @@
-public class GaleriaImagen : IRecord
+public class GaleriaImagen : IPublishableRecord
 {
     public int Id { get; set; }
     public int ImagenId { get; set; }

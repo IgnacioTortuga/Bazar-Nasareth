@@ -87,8 +87,9 @@
 .editor-action-dialog :focus-visible { outline: 3px solid #986b7d; outline-offset: 3px; }
 .editor-action-dialog [role='alert'] { color: #913342; background: #fff0f1; padding: 12px; border-radius: 10px; }
 
-.editor-layout .gallery-delete-button { display: inline-grid; place-items: center; flex-shrink: 0; width: 44px; height: 44px; padding: 0; border: 1px solid #dfbbc4; border-radius: 12px; color: #963f51; background: #fff6f7; font-size: 1.6rem; line-height: 1; }
-.editor-layout .gallery-delete-button:hover { background: #f9e5e9; }
+.editor-layout .archived-delete-button { display: inline-grid; place-items: center; flex-shrink: 0; width: 44px; height: 44px; padding: 0; border: 1px solid #dfbbc4; border-radius: 12px; color: #963f51; background: #fff6f7; font-size: 1.6rem; line-height: 1; }
+.editor-layout .archived-delete-button:hover:not(:disabled) { background: #f9e5e9; }
+.editor-layout .archived-delete-button:disabled { opacity: .55; cursor: wait; }
 
 .editor-layout .form-panel { scroll-margin-top: 24px; }
 .editor-layout .form-panel h2:focus-visible { outline: 2px solid #986b7d; outline-offset: 5px; }

@@ -107,9 +107,9 @@ var expectedRoutes = new HashSet<string>
     "GET /api/admin/relaciones", "PUT /api/admin/productos/{id:int}/imagenes", "PUT /api/admin/promociones/{id:int}/relaciones",
     "GET /api/admin/editores", "POST /api/admin/editores", "PUT /api/admin/editores/{id:int}",
     "POST /api/admin/productos/guardar", "PUT /api/admin/productos/{id:int}/guardar",
-    "POST /api/admin/promociones/guardar", "PUT /api/admin/promociones/{id:int}/guardar",
+    "POST /api/admin/promociones/guardar", "PUT /api/admin/promociones/{id:int}/guardar", "PATCH /api/admin/promociones/{id:int}/estado",
     "POST /api/productos/{id:int}/clic-whatsapp", "POST /api/galeria/{id:int}/clic-whatsapp",
-    "GET /api/admin/metricas/whatsapp", "GET /producto/{id:int}", "DELETE /api/admin/galeria/{id:int}"
+    "GET /api/admin/metricas/whatsapp", "GET /producto/{id:int}"
 };
 foreach (var collection in new[] { "categorias", "productos", "servicios", "promociones", "secciones", "galeria" })
 {
@@ -117,7 +117,9 @@ foreach (var collection in new[] { "categorias", "productos", "servicios", "prom
     expectedRoutes.Add("POST /api/admin/" + collection);
     expectedRoutes.Add("PUT /api/admin/" + collection + "/{id:int}");
 }
-Check(routes.SetEquals(expectedRoutes) && endpoints.Length == expectedRoutes.Count, "Las rutas existentes y la eliminación de galería deben registrarse sin duplicados.");
+foreach (var collection in new[] { "productos", "servicios", "promociones", "secciones", "galeria" })
+    expectedRoutes.Add("DELETE /api/admin/" + collection + "/{id:int}");
+Check(routes.SetEquals(expectedRoutes) && endpoints.Length == expectedRoutes.Count, "Las rutas existentes y las operaciones sobre contenido archivado deben registrarse sin duplicados.");
 foreach (var endpoint in endpoints)
 {
     var path = endpoint.RoutePattern.RawText!;

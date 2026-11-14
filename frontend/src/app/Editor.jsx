@@ -153,6 +153,7 @@ export default function Editor({
     setDraft(null);
     setPreview(false);
     setReviewed(false);
+    setDeleteTarget(null);
     setInlineUpload({ file: null, alt: '' });
     setUpload({ file: null, alt: '' });
     resetAccount();
@@ -202,7 +203,7 @@ export default function Editor({
     window.addEventListener('keydown', closeOnEscape);
     return () => window.removeEventListener('keydown', closeOnEscape);
   }, [menu]);
-  async function reload() {
+  async function reload(successMessage = '') {
     setBusy(true);
     try {
       const keys = [
@@ -218,7 +219,7 @@ export default function Editor({
       ];
       const values = await Promise.all(keys.map((k) => api('/admin/' + k)));
       setData(Object.fromEntries(keys.map((k, i) => [k, values[i]])));
-      setMessage('');
+      setMessage(successMessage);
     } catch (e) {
       setMessage(e.message);
     } finally {
@@ -280,17 +281,21 @@ export default function Editor({
         .map((x) => x.servicioId),
     );
   }
-  async function deleteGalleryEntry(event) {
+  async function deleteArchivedContent(event) {
     event.preventDefault();
     if (busy || !deleteTarget) return;
+    const { route, item } = deleteTarget;
     setBusy(true);
     setDeleteError('');
     try {
-      await api(`/admin/galeria/${deleteTarget.id}`, { method: 'DELETE' });
-      if (selected?.id === deleteTarget.id) resetPendingChanges();
+      await api(`/admin/${route}/${item.id}`, { method: 'DELETE' });
+      if (selected?.id === item.id) resetPendingChanges();
       setDeleteTarget(null);
-      await reload();
-      setMessage('Entrada eliminada de la galería. La foto se conserva en la biblioteca.');
+      setData((current) => ({
+        ...current,
+        [route]: current[route].filter((entry) => entry.id !== item.id),
+      }));
+      await reload('Contenido eliminado. Las fotografías se conservan en la biblioteca.');
     } catch (error) {
       setDeleteError(error.message);
     } finally {
@@ -313,18 +318,31 @@ export default function Editor({
     if (!confirm(promptText)) return;
     setBusy(true);
     try {
-      await api('/admin/' + route + '/' + item.id, {
-        method: 'PUT',
-        ...json({ ...item, estado: nextState }),
-      });
+      const itemPath = `/admin/${route}/${item.id}`;
+      if (route === 'promociones') {
+        await api(`${itemPath}/estado`, {
+          method: 'PATCH',
+          ...json({ estado: nextState }),
+        });
+      } else {
+        await api(itemPath, {
+          method: 'PUT',
+          ...json({ ...item, estado: nextState }),
+        });
+      }
       if (selected?.id === item.id) {
         setSelected(null);
         setDraft(null);
         setPreview(false);
         setReviewed(false);
       }
-      await reload();
-      setMessage(
+      setData((current) => ({
+        ...current,
+        [route]: current[route].map((entry) =>
+          entry.id === item.id ? { ...entry, estado: nextState } : entry,
+        ),
+      }));
+      await reload(
         recovering
           ? 'Contenido recuperado como borrador. Abra el elemento para revisarlo y publicarlo.'
           : 'Contenido archivado. Se conservaron sus datos y relaciones.',
@@ -502,15 +520,32 @@ export default function Editor({
 
   return (
     <div className="editor-layout">
-      {deleteTarget && <Modal className="editor-action-dialog" label="Eliminar entrada de galería" onClose={() => { if (!busy) setDeleteTarget(null); }}>
-        <form onSubmit={deleteGalleryEntry} aria-busy={busy}>
-          <h2>¿Eliminar esta entrada?</h2>
-          <p>{deleteTarget.titulo || `Idea #${deleteTarget.id}`}</p>
-          <p>Se eliminarán esta entrada archivada y sus estadísticas. No se puede deshacer. La fotografía seguirá en la biblioteca.</p>
-          {deleteError && <p role="alert">{deleteError}</p>}
-          <div className="row"><button type="button" disabled={busy} onClick={() => setDeleteTarget(null)}>Cancelar</button><button className="button primary" disabled={busy}>{busy ? 'Eliminando…' : 'Eliminar entrada'}</button></div>
-        </form>
-      </Modal>}
+      {deleteTarget && (
+        <Modal
+          className="editor-action-dialog"
+          label="Eliminar contenido archivado"
+          onClose={() => { if (!busy) setDeleteTarget(null); }}
+        >
+          <form onSubmit={deleteArchivedContent} aria-busy={busy}>
+            <h2>¿Eliminar este contenido?</h2>
+            <p>{title(deleteTarget.item)}</p>
+            <p>
+              Se eliminará de forma permanente. Las fotografías seguirán en la biblioteca.
+              {['galeria', 'productos'].includes(deleteTarget.route) &&
+                ' También se eliminarán sus estadísticas.'}
+            </p>
+            {deleteError && <p role="alert">{deleteError}</p>}
+            <div className="row">
+              <button type="button" autoFocus disabled={busy} onClick={() => setDeleteTarget(null)}>
+                Cancelar
+              </button>
+              <button className="button primary" type="submit" disabled={busy}>
+                {busy ? 'Eliminando…' : 'Eliminar definitivamente'}
+              </button>
+            </div>
+          </form>
+        </Modal>
+      )}
       <aside className={menu ? 'open' : ''}>
         <div className="aside-brand">
           BAZAR <span>NAZARETH</span>
@@ -710,12 +745,21 @@ export default function Editor({
                             : 'Archivar'}
                         </button>
                       )}
-                      {active === 'galeria' && item.estado === 'Archivado' && (
-                        <button className="gallery-delete-button" type="button" disabled={busy} aria-label={`Eliminar entrada archivada: ${title(item)}`} title="Eliminar entrada archivada" onClick={() => {
-                          if (selected?.id === item.id && !canDiscardChanges()) return;
-                          setDeleteError('');
-                          setDeleteTarget(item);
-                        }}>×</button>
+                      {item.estado === 'Archivado' && (
+                        <button
+                          className="archived-delete-button"
+                          type="button"
+                          disabled={busy}
+                          aria-label={`Eliminar contenido archivado: ${title(item)}`}
+                          title="Eliminar contenido archivado"
+                          onClick={() => {
+                            if (selected?.id === item.id && !canDiscardChanges()) return;
+                            setDeleteError('');
+                            setDeleteTarget({ route, item });
+                          }}
+                        >
+                          ×
+                        </button>
                       )}
                     </div>
                   ))}

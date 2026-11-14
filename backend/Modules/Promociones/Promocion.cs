@@ -1,4 +1,4 @@
-public class Promocion : IRecord
+public class Promocion : IPublishableRecord
 {
     public int Id { get; set; }
     public string Titulo { get; set; } = "";

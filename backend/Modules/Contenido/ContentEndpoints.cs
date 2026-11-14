@@ -6,6 +6,6 @@ public static class ContentEndpoints
 {
     public static void Map(RouteGroupBuilder admin)
     {
-        MapCrud<SeccionContenido>(admin, "secciones", "textos");
+        MapPublishableCrud<SeccionContenido>(admin, "secciones", "textos");
     }
 }

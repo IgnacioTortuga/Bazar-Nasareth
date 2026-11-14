@@ -1,4 +1,4 @@
-public class SeccionContenido : IRecord
+public class SeccionContenido : IPublishableRecord
 {
     public int Id { get; set; }
     public string Clave { get; set; } = "";

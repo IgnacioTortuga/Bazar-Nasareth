@@ -1,3 +1,4 @@
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using static EditorAccess;
 using static ContentCrud;
@@ -6,7 +7,35 @@ public static class PromotionEndpoints
 {
     public static void Map(RouteGroupBuilder admin)
     {
-        MapCrud<Promocion>(admin, "promociones", "promociones");
+        MapPublishableCrud<Promocion>(admin, "promociones", "promociones");
+        admin.MapPatch("/promociones/{id:int}/estado", async (int id, PromotionState input, HttpContext ctx, BazarDb db) =>
+        {
+            if (!Allowed(ctx, await Actor(ctx, db), "promociones"))
+                return Results.Forbid();
+            if (input.Estado is not ("Borrador" or "Archivado"))
+                return Results.BadRequest("El estado debe ser Borrador o Archivado.");
+
+            var promociones = db.Promociones.Where(x => x.Id == id);
+            var eligible = input.Estado == "Borrador"
+                ? promociones.Where(x => x.Estado == "Archivado")
+                : promociones.Where(x => x.Estado == "Borrador" || x.Estado == "Publicado");
+            try
+            {
+                if (await eligible.ExecuteUpdateAsync(setters => setters.SetProperty(x => x.Estado, input.Estado)) != 0)
+                    return Results.NoContent();
+
+                var current = await promociones.Select(x => x.Estado).SingleOrDefaultAsync();
+                if (current is null)
+                    return Results.NotFound();
+                if (current == input.Estado)
+                    return Results.NoContent();
+                return Results.Conflict("La promoción cambió de estado. Actualice la lista antes de continuar.");
+            }
+            catch (SqlException ex) when (ex.Number == 1205)
+            {
+                return Results.Conflict("Otra operación está cambiando la promoción. Actualice la lista antes de continuar.");
+            }
+        });
         admin.MapPut("/promociones/{id:int}/relaciones", async (int id, PromotionLinks input, HttpContext ctx, BazarDb db) =>
         {
             if (!Allowed(ctx, await Actor(ctx, db), "promociones"))

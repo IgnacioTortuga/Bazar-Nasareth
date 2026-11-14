@@ -6,6 +6,6 @@ public static class ServiceEndpoints
 {
     public static void Map(RouteGroupBuilder admin)
     {
-        MapCrud<Servicio>(admin, "servicios", "servicios");
+        MapPublishableCrud<Servicio>(admin, "servicios", "servicios");
     }
 }

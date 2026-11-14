@@ -1,4 +1,4 @@
-public class Servicio : IRecord
+public class Servicio : IPublishableRecord
 {
     public int Id { get; set; }
     public string Nombre { get; set; } = "";

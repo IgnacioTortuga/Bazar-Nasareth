@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-public class Producto : IRecord
+public class Producto : IPublishableRecord
 {
     public int Id { get; set; }
     public int CategoriaId { get; set; }
