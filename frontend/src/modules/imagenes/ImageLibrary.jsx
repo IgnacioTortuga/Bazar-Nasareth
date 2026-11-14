@@ -40,7 +40,7 @@ export default function ImageLibrary({
           <p className="editor-dialog-filename">{action.img.nombre}</p>
           {action.kind === 'delete' ? <p>Se eliminará de la biblioteca. Esta acción no se puede deshacer.</p> : <label className="field">Descripción breve<input autoFocus required maxLength="250" value={description} disabled={busy} onChange={(event) => setDescription(event.target.value)} /><small>Ayuda a identificar la foto y permite que un lector de pantalla la describa.</small></label>}
           {actionError && <p role="alert">{actionError}</p>}
-          <div className="row"><button type="button" disabled={busy} onClick={() => setAction(null)}>Cancelar</button><button className="button primary" disabled={busy || (action.kind === 'description' && !description.trim())}>{busy ? 'Procesando…' : action.kind === 'delete' ? 'Sí, eliminar foto' : 'Guardar descripción'}</button></div>
+          <div className="row"><button type="button" autoFocus={action.kind === 'delete'} disabled={busy} onClick={() => setAction(null)}>Cancelar</button><button className="button primary" disabled={busy || (action.kind === 'description' && !description.trim())}>{busy ? 'Procesando…' : action.kind === 'delete' ? 'Sí, eliminar foto' : 'Guardar descripción'}</button></div>
         </form>
       </Modal>}
       <div className="editor-overview">
@@ -112,42 +112,43 @@ export default function ImageLibrary({
                 <b>{img.nombre}</b>
                 <p>{img.textoAlternativo}</p>
                 <small>{(img.tamanoBytes / 1024 / 1024).toFixed(2)} MB</small>
-                {usages.length ? (
-                  usages.map((usage) => (
-                    <div
-                      className="image-usage"
-                      key={`${usage.kind}-${usage.id}`}
-                    >
-                      <span>
-                        <b>{usage.title}</b>
-                        <small>Uso: {usage.section}</small>
-                      </span>
-                      <label className="button image-replace-button">
-                        Reemplazar en {usage.section}
-                        <input
-                          type="file"
-                          accept="image/jpeg,image/png,image/webp"
-                          disabled={busy || !permitted(usage.permission)}
-                          onChange={(e) => {
-                            replaceImage(img, usage, e.target.files?.[0]);
-                            e.target.value = '';
-                          }}
-                        />
-                      </label>
-                    </div>
-                  ))
-                ) : (
-                  <p className="image-unused">Esta foto no está asignada a ningún contenido.</p>
-                )}
-                <div className="row">
-                  <button disabled={busy} onClick={() => { setDescription(img.textoAlternativo || ''); setActionError(''); setAction({ kind: 'description', img }); }}>
+                {usages.map((usage) => (
+                  <div className="image-usage" key={`${usage.kind}-${usage.id}`}>
+                    <small>{usage.section}</small>
+                    <b>{usage.title}</b>
+                    <label className="button image-replace-button">
+                      Reemplazar foto
+                      <input
+                        type="file"
+                        aria-label={`Reemplazar foto de ${usage.title} en ${usage.section}`}
+                        accept="image/jpeg,image/png,image/webp"
+                        disabled={busy || !permitted(usage.permission)}
+                        onChange={(e) => {
+                          replaceImage(img, usage, e.target.files?.[0]);
+                          e.target.value = '';
+                        }}
+                      />
+                    </label>
+                  </div>
+                ))}
+                <div className="row image-card-actions">
+                  <button className="button" type="button" disabled={busy} onClick={() => { setDescription(img.textoAlternativo || ''); setActionError(''); setAction({ kind: 'description', img }); }}>
                     Editar descripción
                   </button>
                   <a className="button" href={imageUrl(img.id)} target="_blank" rel="noopener noreferrer">Ver foto ↗</a>
-                  <button className="image-delete" disabled={busy || usages.length > 0} onClick={() => { setActionError(''); setAction({ kind: 'delete', img }); }}>Eliminar</button>
+                  <button
+                    className="button image-delete"
+                    type="button"
+                    aria-label={`Eliminar fotografía ${img.nombre}`}
+                    title={usages.length ? 'Foto en uso' : 'Eliminar fotografía'}
+                    disabled={busy || usages.length > 0}
+                    onClick={() => { setActionError(''); setAction({ kind: 'delete', img }); }}
+                  >
+                    <span aria-hidden="true">×</span>
+                  </button>
                 </div>
                 {usages.length > 0 && <EditorHelp title="¿Por qué no puedo eliminarla?">
-                  <p>Cambie o quite esta foto en {usages.map((usage) => `${usage.section}: ${usage.title}`).join('; ')}. Después podrá eliminarla aquí.</p>
+                  <p>Cambie o quite la foto de cada contenido indicado arriba para poder eliminarla.</p>
                 </EditorHelp>}
               </div>
             </article>

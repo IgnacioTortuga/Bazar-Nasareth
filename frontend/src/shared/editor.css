@@ -47,16 +47,61 @@
 .editor-filter-tabs button[aria-pressed='true'] { background: #785068; color: #fff; border-color: #785068; }
 .editor-layout .image-library-card { overflow: visible; border: 1px solid var(--editor-line); border-radius: 18px; box-shadow: 0 5px 20px #47334207; }
 .editor-layout .image-library-card > img { border-radius: 17px 17px 0 0; }
-.editor-layout .image-library-card .card-body { gap: 10px; }
+.editor-layout .image-library-card .card-body { display: grid; gap: 8px; }
 .editor-layout .image-library-card .card-body > b { overflow-wrap: anywhere; font-size: .9rem; }
-.editor-layout .image-library-card .image-usage { padding: 12px; background: #f8f5f7; border-radius: 12px; border: 1px solid #eee4eb; }
-.editor-layout .image-library-card .row { flex-wrap: wrap; gap: 8px; }
-.editor-layout .image-library-card .row :is(button, a) { font-size: .8rem; }
+.editor-layout .image-library-card .card-body > p { margin: 0; line-height: 1.45; }
+.image-usage {
+  display: grid;
+  justify-items: start;
+  gap: 4px;
+  padding: 10px 12px;
+  background: #f8f5f7;
+  border: 1px solid #eee4eb;
+  border-radius: 12px;
+}
+.image-usage > small { color: var(--editor-muted); }
+.image-usage > b { overflow-wrap: anywhere; font-size: .9rem; line-height: 1.4; }
+.editor-layout .image-replace-button {
+  position: relative;
+  min-height: 44px;
+  margin-top: 4px;
+  padding: 6px 12px;
+  border-color: #dacbd7;
+  background: #fff;
+  color: #6e455b;
+  font-size: .82rem;
+  text-align: center;
+}
+.image-replace-button input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+.image-replace-button:focus-within { outline: 2px solid var(--editor-accent); outline-offset: 2px; }
+.image-replace-button:has(input:disabled) { opacity: .55; cursor: not-allowed; }
+.image-replace-button input:disabled { cursor: not-allowed; }
+.editor-layout .image-card-actions {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr) 44px;
+  gap: 8px;
+}
+.editor-layout .image-card-actions .button {
+  align-self: stretch;
+  min-width: 0;
+  padding: 4px;
+  border-color: var(--editor-line);
+  overflow-wrap: anywhere;
+  text-align: center;
+  font-size: .82rem;
+  line-height: 1.25;
+}
+.editor-layout .image-card-actions .image-delete {
+  border-color: #dfbbc4;
+  background: #fff6f7;
+  color: #963f51;
+  font-size: 1.5rem;
+  line-height: 1;
+}
 .editor-layout .image-library-card .editor-help { margin: 0; }
 .editor-layout .image-use-badge { display: inline-flex; align-self: start; width: fit-content; border-radius: 20px; padding: 4px 10px; font-size: .75rem; font-weight: 650; }
 .editor-layout .image-use-badge.in-use { background: #efe6f2; color: #6c457a; }
 .editor-layout .image-use-badge.available { background: #e6f2ec; color: #38634e; }
-.editor-layout .image-delete { color: #963f51; }
 .editor-layout button:disabled { cursor: not-allowed; opacity: .55; }
 .editor-field-hint { color: #706575; font-size: .8rem; font-weight: 400; line-height: 1.6; }
 .editor-draft-status { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; font-size: .82rem; color: #72586b; background: #f8f3f6; border-radius: 10px; padding: 12px 14px; margin-bottom: 20px; }
