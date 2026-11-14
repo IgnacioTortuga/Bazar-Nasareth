@@ -11,6 +11,11 @@ import { AdminIcon, BazarDoodle } from '../shared/Icons.jsx';
 import ProductCatalog from '../modules/productos/ProductCatalog.jsx';
 import ServicesSection from '../modules/servicios/ServicesSection.jsx';
 import PromotionsSection from '../modules/promociones/PromotionsSection.jsx';
+import ChristmasSnow from '../modules/promociones/ChristmasSnow.jsx';
+import {
+  isActiveChristmasPromotion,
+  isChristmasPromotion,
+} from '../modules/promociones/christmasPromotion.js';
 import HomeHero from '../modules/contenido/HomeHero.jsx';
 import Highlights from '../modules/contenido/Highlights.jsx';
 import TextBlocks from '../modules/contenido/TextBlocks.jsx';
@@ -44,6 +49,11 @@ function PublicContent({ originalData }) {
 
   const reading = useReadingPreferences();
   const [themeFeedback, setThemeFeedback] = useState(null);
+  const [snowReplay, setSnowReplay] = useState(0);
+  const christmasPromotions = useMemo(
+    () => originalData.promociones.filter(isChristmasPromotion),
+    [originalData.promociones],
+  );
   const [filters, setFilters] = useState(readCatalogFilters),
     [menu, setMenu] = useState(false),
     [activeSection, setActiveSection] = useState('inicio');
@@ -167,6 +177,10 @@ function PublicContent({ originalData }) {
     });
   }
   function openCampaign(promotion) {
+    const originalChristmasPromotion = christmasPromotions.find((item) => item.id === promotion.id);
+    if (originalChristmasPromotion && isActiveChristmasPromotion(originalChristmasPromotion)) {
+      setSnowReplay((current) => current + 1);
+    }
     setThemeFeedback(
       /halloween/i.test(promotion.titulo)
         ? { title: promotion.titulo, id: performance.now() }
@@ -181,6 +195,9 @@ function PublicContent({ originalData }) {
   }
   return (
     <div className="public-site">
+      {christmasPromotions.length > 0 && (
+        <ChristmasSnow promotions={christmasPromotions} replay={snowReplay} />
+      )}
       {themeFeedback && (
         <ThemeFeedback
           key={themeFeedback.id}

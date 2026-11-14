@@ -1,0 +1,33 @@
+.christmas-snow {
+  position: fixed;
+  inset: 0;
+  z-index: 35;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.christmas-snow span {
+  position: absolute;
+  top: -1.5rem;
+  left: var(--snow-left);
+  color: #f5fbff;
+  font-size: var(--snow-size);
+  line-height: 1;
+  text-shadow: 0 0 4px #386786;
+  animation: christmas-snow-fall var(--snow-duration) linear var(--snow-delay) both;
+}
+
+@keyframes christmas-snow-fall {
+  from { transform: translate3d(0, 0, 0); opacity: 0; }
+  12%, 78% { opacity: .85; }
+  to { transform: translate3d(var(--snow-drift), calc(100dvh + 1.5rem), 0); opacity: 0; }
+}
+
+@media (max-width: 620px) {
+  .christmas-snow span:nth-child(even) { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .christmas-snow { display: none; }
+  .christmas-snow span { animation: none; }
+}
